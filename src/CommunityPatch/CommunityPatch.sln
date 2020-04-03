@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityPatch", "CommunityPatch.csproj", "{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackageRelease", "..\..\tools\PackageRelease\PackageRelease.csproj", "{E4C55A69-67F6-4F62-8336-B5665C5B55FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|X64 = Debug|X64
@@ -14,5 +16,9 @@ Global
 		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|X64.Build.0 = Release|X64
 		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|X64.Deploy.0 = Release|X64
 		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|X64.ActiveCfg = Release|X64
+		{E4C55A69-67F6-4F62-8336-B5665C5B55FF}.Debug|X64.ActiveCfg = Debug|Any CPU
+		{E4C55A69-67F6-4F62-8336-B5665C5B55FF}.Debug|X64.Build.0 = Debug|Any CPU
+		{E4C55A69-67F6-4F62-8336-B5665C5B55FF}.Release|X64.ActiveCfg = Release|Any CPU
+		{E4C55A69-67F6-4F62-8336-B5665C5B55FF}.Release|X64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

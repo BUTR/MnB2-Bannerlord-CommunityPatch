@@ -34,4 +34,10 @@
         <Link>SubModule.xml</Link>
       </None>
     </ItemGroup>
+    
+    <Target Name="Package">
+        <Exec WorkingDirectory="..\..\"
+              Command="git archive --prefix=CommunityPatch/ -o &quot;CommunityPatch$(Version).zip&quot; -9 HEAD"
+        />
+    </Target>
 </Project>

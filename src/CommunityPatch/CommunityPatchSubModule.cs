@@ -9,6 +9,9 @@ namespace CommunityPatch {
   [PublicAPI]
   public partial class CommunityPatchSubModule : MBSubModuleBase {
 
+    public static void PackageRelease() {
+    }
+    
     public override void BeginGameStart(Game game) {
       var patchType = typeof(IPatch);
       var patches = new LinkedList<IPatch>();
