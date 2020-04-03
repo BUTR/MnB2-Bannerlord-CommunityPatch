@@ -1,0 +1,5 @@
+obj
+bin
+!/bin/Win64_Shipping_Client/.keep
+*.user
+*.suo

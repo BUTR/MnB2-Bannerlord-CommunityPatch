@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
+        <Configurations>Release;Debug</Configurations>
+        <Platforms>X64</Platforms>
+        <RootNamespace />
+        <Version>0.0.1</Version>
+        <Title>Community Patch</Title>
+        <Authors>Tyler Young</Authors>
+        <Company>The Mount &amp; Blade II: Bannerlord Community</Company>
+        <OutDir>../../bin/Win64_Shipping_Client</OutDir>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Steamworks.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\..\SubModule.xml">
+        <Link>SubModule.xml</Link>
+      </None>
+    </ItemGroup>
+</Project>
