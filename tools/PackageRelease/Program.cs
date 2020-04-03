@@ -28,6 +28,7 @@ namespace PackageRelease {
       var dir = Path.Combine(Environment.CurrentDirectory, "bin", "Win64_Shipping_Client");
       foreach (var filePath in Directory.EnumerateFiles(dir)) {
         var fi = new FileInfo(filePath);
+        if (fi.Name[0] == '.') continue;
         using var file = fi.OpenRead();
         var ze = za.CreateEntry("CommunityPatch/bin/Win64_Shipping_Client/" + fi.Name, CompressionLevel.Optimal);
         using var zs = ze.Open();
