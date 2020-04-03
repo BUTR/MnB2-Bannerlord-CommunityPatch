@@ -33,8 +33,8 @@ namespace CommunityPatch.Patches {
         disciplinarian.Skill,
         (int) disciplinarian.RequiredSkillValue,
         disciplinarian.AlternativePerk,
-        disciplinarian.PrimaryRole, disciplinarian.PrimaryBonus,
         SkillEffect.PerkRole.PartyLeader, 0f,
+        disciplinarian.PrimaryRole, disciplinarian.PrimaryBonus,
         disciplinarian.IncrementType
       );
     }

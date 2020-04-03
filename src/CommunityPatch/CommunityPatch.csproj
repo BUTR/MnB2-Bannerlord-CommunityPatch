@@ -36,8 +36,6 @@
     </ItemGroup>
     
     <Target Name="Package">
-        <Exec WorkingDirectory="..\..\"
-              Command="git archive --prefix=CommunityPatch/ -o &quot;CommunityPatch$(Version).zip&quot; -9 HEAD"
-        />
+        <Exec WorkingDirectory="..\..\" Command="git archive --prefix=CommunityPatch/ -o &quot;CommunityPatch$(Version).zip&quot; -9 HEAD" />
     </Target>
 </Project>
