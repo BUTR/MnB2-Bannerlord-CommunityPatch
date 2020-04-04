@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
@@ -9,10 +10,7 @@ namespace CommunityPatch {
   [PublicAPI]
   public partial class CommunityPatchSubModule : MBSubModuleBase {
 
-    public static void PackageRelease() {
-    }
-    
-    public override void BeginGameStart(Game game) {
+    public override void OnGameInitializationFinished(Game game) {
       var patchType = typeof(IPatch);
       var patches = new LinkedList<IPatch>();
 
@@ -26,6 +24,9 @@ namespace CommunityPatch {
 
         try {
           patches.AddLast((IPatch) Activator.CreateInstance(type, true));
+        }
+        catch (TargetInvocationException tie) {
+          Error(tie.InnerException, $"Failed to create instance of patch: {type.FullName}");
         }
         catch (Exception ex) {
           Error(ex, $"Failed to create instance of patch: {type.FullName}");
@@ -49,7 +50,7 @@ namespace CommunityPatch {
         }
       }
 
-      base.BeginGameStart(game);
+      base.OnGameInitializationFinished(game);
     }
 
   }
