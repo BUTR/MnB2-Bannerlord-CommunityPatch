@@ -27,7 +27,7 @@ namespace CommunityPatch.Patches {
       );
 
       // most of the properties of skills have private setters, yet Initialize is public
-      DefaultPerks.Leadership.LeaderOfMasses.Initialize(
+      _perk.Initialize(
         textObjStrings[0],
         textObjStrings[1],
         _perk.Skill,
