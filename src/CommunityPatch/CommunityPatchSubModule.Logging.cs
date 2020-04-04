@@ -9,8 +9,9 @@ namespace CommunityPatch {
 
     [PublicAPI]
     [Conditional("TRACE")]
-    public static void Error(Exception ex, FormattableString msg = null) {
-      Error(msg);
+    public static void Error(Exception ex, string msg = null) {
+      if (msg != null)
+        Error(msg);
 
       var st = new StackTrace(ex, true);
       var f = st.GetFrame(0);
@@ -24,12 +25,21 @@ namespace CommunityPatch {
 
     [PublicAPI]
     [Conditional("TRACE")]
-    public static void Error(FormattableString msg = null) {
+    public static void Error(Exception ex, FormattableString msg)
+      => Error(ex, FormattableString.Invariant(msg));
+
+    [PublicAPI]
+    [Conditional("TRACE")]
+    public static void Error(FormattableString msg)
+      => Error(FormattableString.Invariant(msg));
+
+    [PublicAPI]
+    [Conditional("TRACE")]
+    public static void Error(string msg = null) {
       if (msg == null)
         return;
 
-      var msgStr = FormattableString.Invariant(msg);
-      Debugger.Log(3, "CommunityPatch", msgStr);
+      Debugger.Log(3, "CommunityPatch", msg);
     }
 
     [PublicAPI]
