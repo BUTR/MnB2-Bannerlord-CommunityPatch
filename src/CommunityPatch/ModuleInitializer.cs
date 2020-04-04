@@ -10,6 +10,7 @@ internal static class ModuleInitializer {
     };
     AppDomain.CurrentDomain.UnhandledException += (sender, args) => {
       RecordedUnhandledExceptions.AddLast((Exception) args.ExceptionObject);
+      CopyDiagnosticsToClipboard();
     };
   }
 
