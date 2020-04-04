@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
@@ -20,6 +21,8 @@ namespace CommunityPatch {
       = new LinkedList<Exception>();
 
     internal static readonly OptionsFile Options = new OptionsFile("CommunityPatch.txt");
+
+    internal static CampaignGameStarter CampaignGameStarter;
 
     internal static bool DisableIntroVideo {
       get => Options.Get<bool>(nameof(DisableIntroVideo));
@@ -92,7 +95,7 @@ namespace CommunityPatch {
             null
           ),
           new InquiryElement(
-            nameof(RecordedFirstChanceExceptions),
+            nameof(RecordFirstChanceExceptions),
             DisableIntroVideo ? "Record First Chance Exceptions" : "Ignore First Chance Exceptions",
             null
           ),
@@ -100,7 +103,14 @@ namespace CommunityPatch {
             nameof(CopyDiagnosticsToClipboard),
             "Copy Diagnostics to Clipboard",
             null
-          )
+          ),
+#if DEBUG
+          new InquiryElement(
+            "IntentionallyUnhandled",
+            "Throw Unhandled Exception",
+            null
+          ),
+#endif
         },
         true,
         true,
@@ -116,7 +126,7 @@ namespace CommunityPatch {
               break;
             case nameof(RecordFirstChanceExceptions):
               RecordFirstChanceExceptions = !RecordFirstChanceExceptions;
-              ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Disabled" : "Enabled")}.");
+              ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
               Options.Save();
               break;
             case nameof(CopyDiagnosticsToClipboard):
@@ -126,6 +136,13 @@ namespace CommunityPatch {
               throw new NotImplementedException(selected);
           }
         }, null));
+
+    public override void OnCampaignStart(Game game, object starterObject) {
+      if (starterObject is CampaignGameStarter cgs)
+        CampaignGameStarter = cgs;
+
+      base.OnCampaignStart(game, starterObject);
+    }
 
     public override void OnGameInitializationFinished(Game game) {
       var patchType = typeof(IPatch);

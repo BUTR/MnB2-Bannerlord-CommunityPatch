@@ -31,7 +31,7 @@ namespace CommunityPatch {
 
     [PublicAPI]
     public void Save() {
-      using var sw = new StreamWriter(_path, false, Encoding.UTF8, 65536);
+      using var sw = new StreamWriter(_path, false, Encoding.UTF8, 65536) {NewLine = "\n"};
       _toml.WriteTo(sw);
     }
 

@@ -2,15 +2,10 @@ using System;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
-using HardwareProviders;
-using Helpers;
-using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
-using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
-using TaleWorlds.MountAndBlade.GauntletUI;
 
 namespace CommunityPatch {
 
@@ -23,8 +18,14 @@ namespace CommunityPatch {
         sb.AppendLine("Recorded Unhandled Exceptions:");
         var i = 0;
         foreach (var exc in RecordedUnhandledExceptions) {
-          var excStr = RecordedUnhandledExceptions.ToString();
+          var excStr = exc.ToString();
           sb.Append("  ").Append(++i).Append(". ").AppendLine(excStr.Replace("\n", "\n    "));
+          var iex = exc;
+          var j = 0;
+          while (iex.InnerException != null) {
+            iex = iex.InnerException;
+            sb.Append("    ").Append(i).Append(".").Append(++j).Append(". ").AppendLine(excStr.Replace("\n", "\n    "));
+          }
         }
 
         if (i == 0)
@@ -40,8 +41,14 @@ namespace CommunityPatch {
         sb.AppendLine("Recorded First Chance Exceptions:");
         var i = 0;
         foreach (var exc in RecordedFirstChanceExceptions) {
-          var excStr = RecordedFirstChanceExceptions.ToString();
+          var excStr = exc.ToString();
           sb.Append("  ").Append(++i).Append(". ").AppendLine(excStr.Replace("\n", "\n    "));
+          var iex = exc;
+          var j = 0;
+          while (iex.InnerException != null) {
+            iex = iex.InnerException;
+            sb.Append("    ").Append(i).Append(".").Append(++j).Append(". ").AppendLine(excStr.Replace("\n", "\n    "));
+          }
         }
 
         if (RecordFirstChanceExceptions) {
