@@ -1,3 +1,5 @@
+![Mount & Blade II: Bannerlord Community Patch](https://staticdelivery.nexusmods.com/mods/3174/images/headers/186_1586119060.png)
+
 # Mount & Blade II: Bannerlord Community Patch module
 This is going to be a mod that just fixes up some things in Mount &amp; Blade 2: Bannerlord before the Devs &amp; QA team can get to them. They have priorities and a process.
 
