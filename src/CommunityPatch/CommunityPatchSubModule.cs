@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using Module = TaleWorlds.MountAndBlade.Module;
@@ -79,6 +82,20 @@ namespace CommunityPatch {
         false
       ));
       base.OnSubModuleLoad();
+    }
+
+    private bool _ticked = false;
+
+    protected override void OnApplicationTick(float dt) {
+      if (!_ticked) {
+        _ticked = true;
+        SynchronizationContext.Current.Post(_ => {
+          LoadDelayedSubModules();
+        }, null);
+        base.OnApplicationTick(dt);
+      }
+
+      // other stuff?
     }
 
     private static void ShowMessage(string msg)

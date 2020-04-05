@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
         <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
         <Configurations>Release;Debug</Configurations>
-        <Platforms>X64</Platforms>
+        <Platforms>x64</Platforms>
         <RootNamespace />
         <Version>0.0.1</Version>
         <Title>Community Patch</Title>
@@ -14,7 +13,6 @@
         <OutDir>../../bin/Win64_Shipping_Client</OutDir>
         <LangVersion>8</LangVersion>
     </PropertyGroup>
-
     <ItemGroup>
         <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
             <HintPath>%(Identity)</HintPath>
@@ -28,36 +26,16 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\Native\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
-        <Reference Include="..\..\..\SandBox\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
-        <Reference Include="..\..\..\SandBoxCore\bin\Win64_Shipping_Client\*.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
-        <Reference Include="..\..\..\StoryMode\bin\Win64_Shipping_Client\*.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
     </ItemGroup>
-
     <ItemGroup>
-      <None Include="..\..\SubModule.xml">
-        <Link>SubModule.xml</Link>
-      </None>
+        <None Include="..\..\SubModule.xml">
+            <Link>SubModule.xml</Link>
+        </None>
     </ItemGroup>
-
     <ItemGroup>
-      <PackageReference Include="Fody" Version="6.1.1" />
-      <PackageReference Include="HardwareProviders.CPU.Standard" Version="2.0.1" />
-      <PackageReference Include="HardwareProviders.Standard" Version="2.0.1" />
-      <PackageReference Include="ModuleInit.Fody" Version="2.1.0" />
-      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
-      <PackageReference Include="Tomlyn" Version="0.1.2" />
+        <PackageReference Include="HardwareProviders.CPU.Standard" Version="2.0.1" />
+        <PackageReference Include="HardwareProviders.Standard" Version="2.0.1" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
+        <PackageReference Include="Tomlyn" Version="0.1.2" />
     </ItemGroup>
 </Project>
