@@ -26,6 +26,10 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="$(PkgLib_Harmony)\lib\net48\0Harmony.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>True</Private>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <None Include="..\..\SubModule.xml">
@@ -35,6 +39,10 @@
     <ItemGroup>
         <PackageReference Include="HardwareProviders.CPU.Standard" Version="2.0.1" />
         <PackageReference Include="HardwareProviders.Standard" Version="2.0.1" />
+        <PackageReference Include="Lib.Harmony" Version="2.0.0.9" PrivateAssets="All">
+            <GeneratePathProperty>True</GeneratePathProperty>
+            <NoWarn>NU1701</NoWarn>
+        </PackageReference>
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
         <PackageReference Include="Tomlyn" Version="0.1.2" />
     </ItemGroup>

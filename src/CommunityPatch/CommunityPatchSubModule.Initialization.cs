@@ -85,6 +85,9 @@ namespace CommunityPatch {
 
     private static void LoadDelayedSubModules() {
       foreach (var mod in ModuleInfo.GetModules()) {
+        if (!mod.IsSelected)
+          continue;
+
         var id = mod.Id;
         var subModsXmlPath = ModuleInfo.GetPath(id);
         var modDir = Path.GetDirectoryName(subModsXmlPath);

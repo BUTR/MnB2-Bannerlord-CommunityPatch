@@ -32,7 +32,9 @@ namespace CommunityPatch {
     [PublicAPI]
     public void Save() {
       using var sw = new StreamWriter(_path, false, Encoding.UTF8, 65536) {NewLine = "\n"};
-      _toml.WriteTo(sw);
+      foreach (var kv in _toml.KeyValues)
+        sw.WriteLine(kv.ToString().Trim('\n'));
+      sw.WriteLine();
     }
 
     [PublicAPI]

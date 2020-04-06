@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -17,6 +18,8 @@ namespace CommunityPatch {
   [PublicAPI]
   public partial class CommunityPatchSubModule : MBSubModuleBase {
 
+    internal static readonly Harmony Harmony = new Harmony("CommunityPatch");
+    
     internal static readonly LinkedList<Exception> RecordedFirstChanceExceptions
       = new LinkedList<Exception>();
 
@@ -113,7 +116,7 @@ namespace CommunityPatch {
           ),
           new InquiryElement(
             nameof(RecordFirstChanceExceptions),
-            DisableIntroVideo ? "Record First Chance Exceptions" : "Ignore First Chance Exceptions",
+            RecordFirstChanceExceptions ? "Ignore First Chance Exceptions" : "Record First Chance Exceptions",
             null
           ),
           new InquiryElement(
