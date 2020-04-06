@@ -5,20 +5,19 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 
 If you'd like to collaborate on the project, please contact me via discord (̑[🅠#4344](https://discordapp.com/users/475636674076868618)) on the [TW Forums - Modding](https://discord.gg/Xpxk88) discord or the [Mount and Blade](https://discordapp.com/invite/mountandblade) discord.
 
-This release adds delayed loading support for other mods.
-Mods can add a <DelayedSubModule> element containing traditional <SubModules> that will be only loaded after the first tick of the game. This also allows delay loaded mods to refer to other modules' assemblies, such as SandBox's SandBox.ViewModelCollection.dll etc.
-
 Current Fixes:
 * The Disciplinarian perk.
 * The Healthy Scout perk.
 * The Peak Form perk.
-
+* Fixes Item Comparison perk-based coloring.
 
 Current Features:
 * Enable and Disable the Intro Video
 * Copy Diagnostic Info to the Clipboard
 * Toggle recording First Chance Exception info (don't use unless troubleshooting bugs)
 * Automatically capture Diagnostic Info to the Clipboard when an Unhandled Exception crash occurs
+
+Mods can add a <DelayedSubModule> element containing traditional <SubModules> that will be only loaded after the first tick of the game. This also allows delay loaded mods to refer to other modules' assemblies, such as SandBox's SandBox.ViewModelCollection.dll etc.
 
 
 ## Links
