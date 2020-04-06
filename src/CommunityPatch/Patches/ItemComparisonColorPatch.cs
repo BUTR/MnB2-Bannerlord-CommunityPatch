@@ -15,9 +15,9 @@ namespace CommunityPatch.Patches {
 
     public bool Applied { get; private set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(ItemMenuVM).GetMethod("GetColorFromComparison", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(ItemMenuVM).GetMethod("GetColorFromComparison", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(ItemComparisonColorPatch).GetMethod(nameof(GetColorFromComparisonPatched), BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(ItemComparisonColorPatch).GetMethod(nameof(GetColorFromComparisonPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -44,7 +44,7 @@ namespace CommunityPatch.Patches {
     }
 
     private static bool GetColorFromComparisonPatched(int result, bool isCompared, ref Color __result) {
-      if (MobileParty.MainParty != null && !(MobileParty.MainParty.HasPerk(DefaultPerks.Trade.WholeSeller) || MobileParty.MainParty.HasPerk(DefaultPerks.Trade.Appraiser))) {
+      if (MobileParty.MainParty != null) {
         __result = Colors.Black;
         return false;
       }
