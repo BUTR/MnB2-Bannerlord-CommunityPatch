@@ -8,6 +8,8 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using static CommunityPatch.HarmonyHelpers;
+using Harmony = HarmonyLib.Harmony;
 
 namespace CommunityPatch.Patches {
 
@@ -20,8 +22,9 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(ItemComparisonColorPatch).GetMethod(nameof(GetColorFromComparisonPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public bool IsApplicable(Game game) {
+      if (Applied != true) return false;
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
-      if (patchInfo != null && patchInfo.Owners.Any())
+      if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
       var bytes = TargetMethodInfo.GetMethodBody()?.GetILAsByteArray();

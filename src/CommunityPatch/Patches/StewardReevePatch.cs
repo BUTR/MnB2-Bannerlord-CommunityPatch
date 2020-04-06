@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
@@ -24,12 +25,8 @@ namespace CommunityPatch.Patches {
 
     public bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
-      if (patchInfo != null) {
-        if (patchInfo.Owners.Count > 1)
-          return false;
-        if (patchInfo.Owners.Count == 1 && patchInfo.Owners[0] != "CommunityPatch")
-          return false;
-      }
+      if (AlreadyPatchedByOthers(patchInfo))
+        return false;
       var bytes = TargetMethodInfo.GetMethodBody()?.GetILAsByteArray();
       if (bytes == null) return false;
   

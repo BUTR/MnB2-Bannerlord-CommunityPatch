@@ -18,7 +18,7 @@ namespace CommunityPatch {
   [PublicAPI]
   public partial class CommunityPatchSubModule : MBSubModuleBase {
 
-    internal static readonly Harmony Harmony = new Harmony("CommunityPatch");
+    internal static readonly Harmony Harmony = new Harmony(nameof(CommunityPatch));
 
     internal static readonly LinkedList<Exception> RecordedFirstChanceExceptions
       = new LinkedList<Exception>();
@@ -26,8 +26,9 @@ namespace CommunityPatch {
     internal static readonly LinkedList<Exception> RecordedUnhandledExceptions
       = new LinkedList<Exception>();
 
-    internal static readonly OptionsFile Options = new OptionsFile("CommunityPatch.txt");
+    internal static readonly OptionsFile Options = new OptionsFile(nameof(CommunityPatch)+".txt");
 
+    [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
 
     internal static bool DisableIntroVideo {
@@ -165,25 +166,7 @@ namespace CommunityPatch {
     }
 
     public override void OnGameInitializationFinished(Game game) {
-      var patchType = typeof(IPatch);
-      var patches = new LinkedList<IPatch>();
-
-      foreach (var type in typeof(CommunityPatchSubModule).Assembly.GetTypes()) {
-        if (!patchType.IsAssignableFrom(type))
-          continue;
-        if (patchType == type)
-          continue;
-
-        try {
-          patches.AddLast((IPatch) Activator.CreateInstance(type, true));
-        }
-        catch (TargetInvocationException tie) {
-          Error(tie.InnerException, $"Failed to create instance of patch: {type.FullName}");
-        }
-        catch (Exception ex) {
-          Error(ex, $"Failed to create instance of patch: {type.FullName}");
-        }
-      }
+      var patches = Patches;
 
       foreach (var patch in patches) {
         try {
@@ -205,6 +188,37 @@ namespace CommunityPatch {
       }
 
       base.OnGameInitializationFinished(game);
+    }
+
+    private static LinkedList<IPatch> _patches;
+
+    private static LinkedList<IPatch> Patches {
+      get {
+        if (_patches != null)
+          return _patches;
+
+        var patchType = typeof(IPatch);
+        _patches = new LinkedList<IPatch>();
+
+        foreach (var type in typeof(CommunityPatchSubModule).Assembly.GetTypes()) {
+          if (!patchType.IsAssignableFrom(type))
+            continue;
+          if (patchType == type)
+            continue;
+
+          try {
+            _patches.AddLast((IPatch) Activator.CreateInstance(type, true));
+          }
+          catch (TargetInvocationException tie) {
+            Error(tie.InnerException, $"Failed to create instance of patch: {type.FullName}");
+          }
+          catch (Exception ex) {
+            Error(ex, $"Failed to create instance of patch: {type.FullName}");
+          }
+        }
+
+        return _patches;
+      }
     }
 
   }

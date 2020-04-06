@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
+using HardwareProviders.CPU;
 using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
@@ -122,7 +124,7 @@ namespace CommunityPatch {
       }
 
       try {
-        var cpus = HardwareProviders.CPU.Cpu.Discover();
+        var cpus = Cpu.Discover();
 
         sb.AppendLine("  CPU Info:");
         for (var i = 0; i < cpus.Length; ++i) {
