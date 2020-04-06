@@ -43,8 +43,9 @@ namespace CommunityPatch.Patches {
       Applied = true;
     }
 
-    private static bool GetColorFromComparisonPatched(int result, bool isCompared, ref Color __result) {
-      if (MobileParty.MainParty != null) {
+    // ReSharper disable once InconsistentNaming
+    private static bool GetColorFromComparisonPatched(int result, bool isCompared, out Color __result) {
+      if (MobileParty.MainParty == null) {
         __result = Colors.Black;
         return false;
       }
