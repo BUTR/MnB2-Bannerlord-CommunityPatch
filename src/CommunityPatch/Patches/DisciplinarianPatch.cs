@@ -7,6 +7,8 @@ namespace CommunityPatch.Patches {
 
   internal class DisciplinarianPatch : IPatch {
 
+    public bool Applied { get; private set; }
+
     private readonly PerkObject _perk
         = PerkObject.FindFirst(x => x.Name.GetID() == "ER3ieXOb");
 
@@ -34,6 +36,7 @@ namespace CommunityPatch.Patches {
         _perk.PrimaryRole, _perk.PrimaryBonus,
         _perk.IncrementType
       );
+      Applied = true;
     }
 
   }

@@ -19,7 +19,7 @@ namespace CommunityPatch {
   public partial class CommunityPatchSubModule : MBSubModuleBase {
 
     internal static readonly Harmony Harmony = new Harmony("CommunityPatch");
-    
+
     internal static readonly LinkedList<Exception> RecordedFirstChanceExceptions
       = new LinkedList<Exception>();
 
@@ -194,12 +194,14 @@ namespace CommunityPatch {
             patch.Apply(game);
           }
           catch (Exception ex) {
-            Error(ex, $"Error while applying patch: {patch.GetType().FullName}");
+            Error(ex, $"Error while applying patch: {patch.GetType().Name}");
           }
         }
         catch (Exception ex) {
-          Error(ex, $"Error while checking if patch is applicable: {patch.GetType().FullName}");
+          Error(ex, $"Error while checking if patch is applicable: {patch.GetType().Name}");
         }
+
+        ShowMessage($"{(patch.Applied ? "Applied" : "Skipped")} Patch: {patch.GetType().Name}");
       }
 
       base.OnGameInitializationFinished(game);

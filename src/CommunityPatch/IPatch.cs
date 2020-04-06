@@ -9,6 +9,8 @@ namespace CommunityPatch {
     bool IsApplicable(Game game);
 
     void Apply(Game game);
+    
+    bool Applied { get; }
 
   }
 

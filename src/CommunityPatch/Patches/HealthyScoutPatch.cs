@@ -7,6 +7,8 @@ namespace CommunityPatch.Patches {
 
   internal class HealthyScoutPatch : IPatch {
 
+    public bool Applied { get; private set; }
+
     private readonly PerkObject _perk
       = PerkObject.FindFirst(x => x.Name.GetID() == "dDKOoD3e");
 
@@ -36,6 +38,7 @@ namespace CommunityPatch.Patches {
         _perk.SecondaryRole, _perk.SecondaryBonus,
         _perk.IncrementType
       );
+      Applied = true;
     }
 
   }
