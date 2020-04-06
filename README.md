@@ -9,6 +9,8 @@ Current Fixes:
 * The Disciplinarian perk.
 * The Healthy Scout perk.
 * The Peak Form perk.
+* The Ruler perk.
+* The Reeve perk.
 * Fixes Item Comparison perk-based coloring.
 
 Current Features:
