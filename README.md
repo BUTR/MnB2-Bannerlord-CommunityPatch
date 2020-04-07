@@ -3,7 +3,7 @@
 # Mount & Blade II: Bannerlord Community Patch module
 This is going to be a mod that just fixes up some things in Mount &amp; Blade 2: Bannerlord before the Devs &amp; QA team can get to them. They have priorities and a process.
 
-If you'd like to collaborate on the project, please contact me via discord (̑[🅠#4344](https://discordapp.com/users/475636674076868618)) on the [TW Forums - Modding](https://discord.gg/Xpxk88) discord or the [Mount and Blade](https://discordapp.com/invite/mountandblade) discord.
+If you'd like to collaborate on the project, please contact me via discord (̑[🅠#4344](https://discordapp.com/users/475636674076868618)) on the [TW Forums - Modding](https://discord.gg/5fBVT8j) discord or the [Mount and Blade](https://discordapp.com/invite/mountandblade) discord.
 
 Current Fixes:
 * The Disciplinarian perk.
