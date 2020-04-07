@@ -11,6 +11,7 @@ Current Fixes:
 * The Peak Form perk.
 * The Ruler perk.
 * The Reeve perk.
+* The Bannerlord perk.
 * Fixes Item Comparison perk-based coloring.
 
 Current Features:
