@@ -27,11 +27,10 @@ namespace CommunityPatch.Patches {
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
-      var bytes = TargetMethodInfo.GetMethodBody()?.GetILAsByteArray();
+      var bytes = TargetMethodInfo.GetCilBytes();
       if (bytes == null) return false;
 
-      using var hasher = SHA256.Create();
-      var hash = hasher.ComputeHash(bytes);
+     var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
         0x4C, 0x29, 0xDC, 0x2D, 0x78, 0x89, 0xA7, 0xA8,
         0xC6, 0xDA, 0x84, 0xDB, 0x07, 0x2E, 0x7D, 0xB4,

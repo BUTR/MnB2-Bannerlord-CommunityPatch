@@ -27,11 +27,10 @@ namespace CommunityPatch.Patches {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
-      var bytes = TargetMethodInfo.GetMethodBody()?.GetILAsByteArray();
+      var bytes = TargetMethodInfo.GetCilBytes();
       if (bytes == null) return false;
 
-      using var hasher = SHA256.Create();
-      var hash = hasher.ComputeHash(bytes);
+     var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
         0xC8, 0xA5, 0xFD, 0x25, 0xE8, 0x42, 0x2F, 0x6E,
         0x5F, 0xC6, 0x02, 0xBB, 0x06, 0x2C, 0x6A, 0x9E,
