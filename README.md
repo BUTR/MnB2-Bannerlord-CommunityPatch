@@ -11,6 +11,10 @@ Current Fixes:
 * The Peak Form perk.
 * The Ruler perk.
 * The Reeve perk.
+* The Mounted Archer perk.
+* The Bow Expert perk.
+* The Crossbow Cavalry perk
+* The Crossbow Expert perk
 * Fixes Item Comparison perk-based coloring.
 
 Current Features:
