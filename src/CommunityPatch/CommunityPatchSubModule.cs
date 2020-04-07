@@ -166,7 +166,18 @@ namespace CommunityPatch {
     }
 
     public override void OnGameInitializationFinished(Game game) {
+      ApplyPatches(game);
+
+      base.OnGameInitializationFinished(game);
+    }
+    
+    public static IDictionary<Type,IPatch> ActivePatches
+     = new Dictionary<Type, IPatch>();
+
+    private static void ApplyPatches(Game game) {
       var patches = Patches;
+
+      ActivePatches.Clear();
 
       foreach (var patch in patches) {
         try {
@@ -184,10 +195,12 @@ namespace CommunityPatch {
           Error(ex, $"Error while checking if patch is applicable: {patch.GetType().Name}");
         }
 
-        ShowMessage($"{(patch.Applied ? "Applied" : "Skipped")} Patch: {patch.GetType().Name}");
-      }
+        var patchApplied = patch.Applied;
+        if (patchApplied)
+          ActivePatches.Add(patch.GetType(), patch);
 
-      base.OnGameInitializationFinished(game);
+        ShowMessage($"{(patchApplied ? "Applied" : "Skipped")} Patch: {patch.GetType().Name}");
+      }
     }
 
     private static LinkedList<IPatch> _patches;
