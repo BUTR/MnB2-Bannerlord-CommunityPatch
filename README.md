@@ -13,6 +13,7 @@ Current Fixes:
 * The Reeve perk.
 * The Bannerlord perk.
 * The Man-At-Arms perk.
+* The Swords As Tribute (Steward) perk.
 * Fixes Item Comparison perk-based coloring.
 
 Current Features:
