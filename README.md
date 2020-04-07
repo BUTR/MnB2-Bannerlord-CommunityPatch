@@ -12,6 +12,7 @@ Current Fixes:
 * The Ruler perk.
 * The Reeve perk.
 * The Bannerlord perk.
+* The Man-At-Arms perk.
 * Fixes Item Comparison perk-based coloring.
 
 Current Features:
