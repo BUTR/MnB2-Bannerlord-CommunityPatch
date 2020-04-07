@@ -16,6 +16,7 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo TargetMethodInfo
       // using assembly qualified name here
+      // ReSharper disable once PossibleNullReferenceException
       = Type.GetType("SandBox.LordConversationsCampaignBehavior, SandBox, Version=1.0.0.0, Culture=neutral")
         .GetMethod("conversation_player_want_to_end_service_as_mercenary_on_condition",
           BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);

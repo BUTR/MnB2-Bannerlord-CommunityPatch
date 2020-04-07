@@ -9,7 +9,7 @@ namespace CommunityPatch {
   public static class MethodHelpers {
 
     public static byte[] GetCilBytes(this MethodBase mb)
-      => mb.GetMethodBody().GetILAsByteArray() ?? Array.Empty<byte>();
+      => mb.GetMethodBody()?.GetILAsByteArray() ?? Array.Empty<byte>();
 
     public static byte[] GetSha256(this byte[] bytes) {
       using var hasher = SHA256.Create();
