@@ -41,8 +41,14 @@ namespace CommunityPatch.Patches {
     }
 
     private static void PartySizeLimitPatched(PartyBase __instance, ref int __result) {
-      if (__instance.LeaderHero != null && __instance.LeaderHero.GetPerkValue(DefaultPerks.Steward.Bannerlord))
-        __result += __instance.LeaderHero.Clan.Settlements.Count() * 2;
+      __result += BannerlordPerkExtra(__instance.LeaderHero);
+    }
+
+    public static int BannerlordPerkExtra(Hero hero) {
+      if (hero == null || !hero.GetPerkValue(DefaultPerks.Steward.Bannerlord))
+        return 0;
+
+      return hero.Clan.Settlements.Count() * 2;
     }
 
   }
