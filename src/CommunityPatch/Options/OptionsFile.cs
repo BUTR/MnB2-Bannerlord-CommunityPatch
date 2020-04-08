@@ -10,35 +10,7 @@ using Path = System.IO.Path;
 
 namespace CommunityPatch {
 
-  public sealed partial class OptionsFile : OptionsStore, IEquatable<OptionsFile>, IComparable<OptionsFile> {
-
-    public bool Equals(OptionsFile other)
-      => _path == other._path;
-
-    public override bool Equals(OptionsStore other)
-      => other is OptionsFile file && Equals(file);
-
-    public override bool Equals(object obj) {
-      if (ReferenceEquals(null, obj))
-        return false;
-      if (ReferenceEquals(this, obj))
-        return true;
-      if (obj is OptionsFile file)
-        return Equals(file);
-      if (obj is OptionsStore store)
-        return Equals(store);
-
-      return false;
-    }
-
-    public override int GetHashCode()
-      => (_path != null ? _path.GetHashCode() : 0);
-
-    public static bool operator ==(OptionsFile left, OptionsFile right)
-      => Equals(left, right);
-
-    public static bool operator !=(OptionsFile left, OptionsFile right)
-      => !Equals(left, right);
+  public class OptionsFile : OptionsStore {
 
     private readonly string _path;
 
@@ -61,17 +33,6 @@ namespace CommunityPatch {
       using var sw = new StreamWriter(_path, false, Encoding.UTF8, 65536) {NewLine = "\n"};
       foreach (var kv in _toml.KeyValues)
         sw.WriteLine(kv.ToString().Trim('\n'));
-
-      foreach (var table in _toml.Tables) {
-        sw.WriteLine();
-        sw.Write(table.OpenBracket.Text);
-        sw.Write(table.Name.Key.ToString());
-        sw.WriteLine(table.CloseBracket.Text);
-
-        foreach (var kv in table.Items)
-          sw.WriteLine(kv.ToString().Trim('\n'));
-      }
-
       sw.WriteLine();
     }
 
@@ -83,13 +44,13 @@ namespace CommunityPatch {
 
     [PublicAPI]
     [CanBeNull]
-    public KeyValueSyntax GetConfig([NotNull] TableSyntaxBase table, [NotNull] string key)
-      => table.Items
+    public KeyValueSyntax GetConfig([NotNull] TableSyntaxBase t, [NotNull] string key)
+      => t.Items
         .FirstOrDefault(kv => kv.Key.Key.ToString().Trim() == key);
 
     [PublicAPI]
     [CanBeNull]
-    public TableSyntaxBase GetTable([NotNull] string key)
+    public TableSyntaxBase GetNamespace([NotNull] string key)
       => _toml.Tables
         .FirstOrDefault(t => t.Name.Key.ToString().Trim() == key);
 
@@ -122,7 +83,7 @@ namespace CommunityPatch {
     [PublicAPI]
     [NotNull]
     public TableSyntaxBase GetOrCreateNamespace([NotNull] string key) {
-      var t = GetTable(key);
+      var t = GetNamespace(key);
       if (t != null)
         return t;
 
@@ -188,7 +149,7 @@ namespace CommunityPatch {
       if (ns == null)
         return Get<T>(key);
 
-      var t = GetTable(ns);
+      var t = GetNamespace(ns);
       if (t == null) return default;
 
       var kv = GetConfig(t, key);
