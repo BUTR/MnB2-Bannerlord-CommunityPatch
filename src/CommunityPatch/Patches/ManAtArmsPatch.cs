@@ -1,58 +1,62 @@
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  class ManAtArmsPatch : IPatch {
+  sealed class ManAtArmsPatch : PatchBase<ManAtArmsPatch> {
 
-    public bool Applied { get; private set; }
+    public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(PartyBase).GetMethod("get_PartySizeLimit", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultPartySizeLimitModel).GetMethod("CalculateMobilePartyMemberSizeLimit", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(ManAtArmsPatch).GetMethod(nameof(PartySizeLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(ManAtArmsPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    public void Apply(Game game) {
+    private PerkObject _perk;
+
+    public override void Reset()
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "WVLzi1fa");
+
+    public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        null,
-        new HarmonyMethod(PatchMethodInfo));
+        postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
-    public bool IsApplicable(Game game) {
+    public override bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
       var bytes = TargetMethodInfo.GetCilBytes();
       if (bytes == null) return false;
-      
+
       var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
-        0xAE, 0xF7, 0x29, 0x0C, 0x6D, 0x5D, 0xFD, 0xE2, 
-        0x4D, 0x32, 0x24, 0x35, 0x1D, 0x18, 0x3D, 0x8E, 
-        0x40, 0x5E, 0xD3, 0xDA, 0x11, 0xC4, 0x31, 0x92, 
-        0x6B, 0x75, 0xAA, 0xB5, 0xEC, 0x3B, 0x9F, 0x2F
+        0x4B, 0x26, 0xD4, 0x1E, 0xF7, 0xCF, 0x5B, 0x15,
+        0xE1, 0x24, 0x74, 0x8D, 0xE9, 0x46, 0x36, 0x80,
+        0x6A, 0x91, 0x65, 0x5D, 0x7A, 0x6C, 0x3F, 0x43,
+        0xD2, 0x7B, 0x80, 0xA7, 0x3E, 0xF0, 0x10, 0xF6
       });
     }
 
-    private static void PartySizeLimitPatched(PartyBase __instance, ref int __result) {
-      __result += ManAtArmsPerkExtra(__instance.LeaderHero);
-    }
+    // ReSharper disable once InconsistentNaming
+    private static void Postfix(ref int __result, MobileParty party, StatExplainer explainer) {
+      var perk = ActivePatch._perk;
+      if (!party.LeaderHero.GetPerkValue(perk))
+        return;
 
-    public static int ManAtArmsPerkExtra(Hero hero) {
-      if (hero == null || !hero.GetPerkValue(DefaultPerks.Steward.ManAtArms))
-        return 0;
+      var explainedNumber = new ExplainedNumber(__result, explainer);
+      explainedNumber.Add(perk.PrimaryBonus, perk.Name);
 
-      return hero.Clan.Settlements.Count() * 5;
+      __result = (int) explainedNumber.ResultNumber;
     }
-    
-    public void Reset() {}
 
   }
 
