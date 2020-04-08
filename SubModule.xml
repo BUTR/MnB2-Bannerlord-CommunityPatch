@@ -6,7 +6,13 @@
     <SingleplayerModule value="true"/>
     <MultiplayerModule value="true"/>
     <Official value="false"/>
-    <DependedModules/>
+    <DependedModules>
+		<DependedModule Id="Native"/>
+		<DependedModule Id="SandBoxCore"/>
+		<DependedModule Id="Sandbox"/>
+		<DependedModule Id="CustomBattle"/>
+		<DependedModule Id="StoryMode"/>
+	</DependedModules>
     <SubModules>
         <SubModule>
             <Name value="CommunityPatch"/>
