@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
@@ -10,22 +11,28 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  class WarRationsPatch : IPatch {
+  sealed class WarRationsPatch : PatchBase<WarRationsPatch> {
 
-    public bool Applied { get; private set; }
+    public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultMobilePartyFoodConsumptionModel).GetMethod("CalculateDailyFoodConsumptionf", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(WarRationsPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(WarRationsPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    public void Apply(Game game) {
+    private PerkObject _perk;
+
+    public override void Reset()
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "sLv7MMJf");
+
+    public override void Apply(Game game) {
+      if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        new HarmonyMethod(PatchMethodInfo),
-        null);
+        postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
-    public bool IsApplicable(Game game) {
+    public override bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
@@ -42,19 +49,39 @@ namespace CommunityPatch.Patches {
       });
     }
 
-    private static bool Prefix(ref float __result, TextObject ____partyConsumption, MobileParty party, StatExplainer explainer = null) {
-      int num1 = party.Party.NumberOfAllMembers + party.Party.NumberOfPrisoners / 2;
-      float num2 = (float) (-(num1 < 1 ? 1.0 : (double) num1) / 20.0);
-      
-      var quartermaster= ClanHelpers.GetEffectiveQuartermaster(party.LeaderHero.Clan);
-      if (quartermaster != null && party.MemberRoster.Any(element => element.Character?.HeroObject == quartermaster))
-        num2 *= 0.8f;
+    // ReSharper disable once InconsistentNaming
+    private static void Postfix(ref float __result, MobileParty party, StatExplainer explainer) {
+      var qm = party.LeaderHero.Clan.GetEffectiveQuartermaster();
 
-      ExplainedNumber explainedNumber = new ExplainedNumber(0.0f, explainer, (TextObject) null);
-      explainedNumber.Add(num2, ____partyConsumption);
+      if (qm == null)
+        return;
+
+      if (
+        // qm is not clan-wide
+        !CommunityPatchSubModule.Options.Get<bool>("WarRationsQmClanWide")
+        // qm is not leading party
+        && party.LeaderHero != qm
+        // qm is not in party
+        && party.MemberRoster.All(element => element.Character?.HeroObject != qm)
+      )
+        return;
+
+      var perk = ActivePatch._perk;
+      if (!qm.GetPerkValue(perk))
+        return;
+
+      var explainedNumber = new ExplainedNumber(__result, explainer);
+      switch (perk.IncrementType) {
+        case SkillEffect.EffectIncrementType.Add:
+          explainedNumber.Add(perk.PrimaryBonus, perk.Name);
+          break;
+
+        case SkillEffect.EffectIncrementType.AddFactor:
+          explainedNumber.AddFactor(perk.PrimaryBonus, perk.Name);
+          break;
+      }
+
       __result = explainedNumber.ResultNumber;
-
-      return false;
     }
 
   }
