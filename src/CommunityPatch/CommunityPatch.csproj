@@ -38,6 +38,9 @@
         <None Include="..\..\SubModule.xml">
             <Link>SubModule.xml</Link>
         </None>
+        <None Include="..\..\README.md">
+            <Link>README.md</Link>
+        </None>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="HardwareProviders.CPU.Standard" Version="2.0.1" />

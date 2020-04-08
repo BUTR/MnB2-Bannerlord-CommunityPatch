@@ -14,6 +14,7 @@ Current Fixes:
 * The Bannerlord perk.
 * The Man-At-Arms perk.
 * The Swords As Tribute (Steward) perk.
+* Fixes Learning Rate explanation.
 * Fixes Item Comparison perk-based coloring.
 
 Current Features:
