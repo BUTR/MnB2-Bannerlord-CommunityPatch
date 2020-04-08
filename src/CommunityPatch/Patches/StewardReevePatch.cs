@@ -17,6 +17,7 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(StewardReevePatch).GetMethod(nameof(CompanionLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         null,
         new HarmonyMethod(PatchMethodInfo));
@@ -44,6 +45,8 @@ namespace CommunityPatch.Patches {
         __result += (int) DefaultPerks.Steward.Reeve.PrimaryBonus;
       
     }
+    
+    public void Reset() {}
 
   }
 

@@ -17,6 +17,7 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(ManAtArmsPatch).GetMethod(nameof(PartySizeLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         null,
         new HarmonyMethod(PatchMethodInfo));
@@ -50,6 +51,8 @@ namespace CommunityPatch.Patches {
 
       return hero.Clan.Settlements.Count() * 5;
     }
+    
+    public void Reset() {}
 
   }
 

@@ -15,6 +15,8 @@ namespace CommunityPatch {
 
     public abstract bool Applied { get; protected set; }
 
+    public abstract void Reset();
+
   }
 
 }

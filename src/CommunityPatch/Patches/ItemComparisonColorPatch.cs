@@ -40,6 +40,7 @@ namespace CommunityPatch.Patches {
     }
 
     public void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         new HarmonyMethod(PatchMethodInfo));
       Applied = true;
@@ -75,6 +76,8 @@ namespace CommunityPatch.Patches {
       __result = UIColors.PositiveIndicator;
       return false;
     }
+    
+    public void Reset() {}
 
   }
 

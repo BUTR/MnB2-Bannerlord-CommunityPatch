@@ -20,8 +20,10 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(PeakFormPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    private readonly PerkObject _perk
-      = PerkObject.FindFirst(x => x.Name.GetID() == "fBgGbxaw");
+    private PerkObject _perk;
+
+    public override void Reset()
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "fBgGbxaw");
 
     public override bool IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -67,6 +69,8 @@ namespace CommunityPatch.Patches {
         _perk.IncrementType
       );
 
+      if (Applied) return;
+      
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
       

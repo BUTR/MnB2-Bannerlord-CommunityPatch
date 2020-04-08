@@ -12,6 +12,8 @@ namespace CommunityPatch {
     
     bool Applied { get; }
 
+    void Reset();
+
   }
 
 }

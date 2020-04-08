@@ -18,6 +18,7 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(StewardSwordsAsTributePatch).GetMethod(nameof(PartySizeLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         null,
         new HarmonyMethod(PatchMethodInfo));
@@ -51,6 +52,8 @@ namespace CommunityPatch.Patches {
 
       return Math.Max(0, (hero.Clan.Kingdom.Clans.Count() - 1) * 10); // Remove one becuase Kingdom.Clans includes the ruling clan which is not a vassal.
     }
+    
+    public void Reset() {}
 
   }
 

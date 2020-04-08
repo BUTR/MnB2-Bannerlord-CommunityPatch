@@ -36,8 +36,11 @@ namespace CommunityPatch.Patches {
         _perk.PrimaryRole, _perk.PrimaryBonus,
         _perk.IncrementType
       );
+      
       Applied = true;
     }
+    
+    public void Reset() {}
 
   }
 

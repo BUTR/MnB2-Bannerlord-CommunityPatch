@@ -44,6 +44,7 @@ namespace CommunityPatch.Patches {
     }
 
     public void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
@@ -55,6 +56,8 @@ namespace CommunityPatch.Patches {
         && Hero.OneToOneConversationHero.Clan != Hero.MainHero.Clan
         && Hero.MainHero.Clan.IsUnderMercenaryService;
     }
+    
+    public void Reset() {}
 
   }
 

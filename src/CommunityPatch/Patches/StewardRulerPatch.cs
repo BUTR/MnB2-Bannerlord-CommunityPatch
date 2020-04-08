@@ -17,6 +17,7 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(StewardRulerPatch).GetMethod(nameof(CompanionLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         null,
         new HarmonyMethod(PatchMethodInfo));
@@ -43,6 +44,8 @@ namespace CommunityPatch.Patches {
       if (__instance.Leader.GetPerkValue(DefaultPerks.Steward.Ruler))
         __result += Town.All.Count(t => t.Owner.Owner == __instance.Leader);
     }
+    
+    public void Reset() {}
 
   }
 

@@ -17,6 +17,7 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(BannerlordExplainerPatch).GetMethod(nameof(PartySizeLimitExplainerPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         null,
         new HarmonyMethod(PatchMethodInfo));
@@ -47,6 +48,8 @@ namespace CommunityPatch.Patches {
         __result.AddLine("Bannerlord", extra);
     }
 
+    public void Reset() {}
+    
   }
 
 }

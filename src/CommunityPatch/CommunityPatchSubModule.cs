@@ -26,7 +26,7 @@ namespace CommunityPatch {
     internal static readonly LinkedList<Exception> RecordedUnhandledExceptions
       = new LinkedList<Exception>();
 
-    internal static readonly OptionsFile Options = new OptionsFile(nameof(CommunityPatch)+".txt");
+    internal static readonly OptionsFile Options = new OptionsFile(nameof(CommunityPatch) + ".txt");
 
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
@@ -170,17 +170,17 @@ namespace CommunityPatch {
 
       base.OnGameInitializationFinished(game);
     }
-    
-    public static IDictionary<Type,IPatch> ActivePatches
-     = new Dictionary<Type, IPatch>();
+
+    public static IDictionary<Type, IPatch> ActivePatches
+      = new Dictionary<Type, IPatch>();
 
     private static void ApplyPatches(Game game) {
-      var patches = Patches;
+      //ActivePatches.Clear();
 
-      ActivePatches.Clear();
-
-      foreach (var patch in patches) {
+      foreach (var patch in Patches) {
         try {
+          patch.Reset();
+
           if (!patch.IsApplicable(game))
             continue;
 
@@ -197,7 +197,7 @@ namespace CommunityPatch {
 
         var patchApplied = patch.Applied;
         if (patchApplied)
-          ActivePatches.Add(patch.GetType(), patch);
+          ActivePatches[patch.GetType()] = patch;
 
         ShowMessage($"{(patchApplied ? "Applied" : "Skipped")} Patch: {patch.GetType().Name}");
       }
