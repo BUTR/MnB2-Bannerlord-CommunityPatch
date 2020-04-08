@@ -36,7 +36,7 @@ namespace CommunityPatch.Patches {
 
       var bytes = TargetMethodInfo.GetCilBytes();
       if (bytes == null) return false;
-      
+
       var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
           // e.1.0.7
@@ -60,10 +60,12 @@ namespace CommunityPatch.Patches {
       if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 
-      var explainedNumber = new ExplainedNumber(__result, explanation);
-      explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
-
-      __result = (int) explainedNumber.ResultNumber;
+      var extra = party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus;
+      if (extra > 0) {
+        var explainedNumber = new ExplainedNumber(__result, explanation);
+        explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
+        __result = (int) explainedNumber.ResultNumber;
+      }
     }
 
   }
