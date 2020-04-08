@@ -21,13 +21,11 @@ namespace CommunityPatch {
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
 
+    internal static readonly Option<bool> DisableIntroVideo
+      = Options.GetOption<bool>(nameof(DisableIntroVideo));
 
-    protected override void OnSubModuleLoad() {
-      var module = Module.CurrentModule;
-
-      try {
-        Harmony.PatchAll(typeof(CommunityPatchSubModule).Assembly);
-    }
+    internal static readonly Option<bool> RecordFirstChanceExceptions
+      = Options.GetOption<bool>(nameof(RecordFirstChanceExceptions));
       catch (Exception ex) {
         Error(ex, "Could not apply all generic attribute-based harmony patches.");
       }
