@@ -33,6 +33,17 @@ namespace CommunityPatch {
       using var sw = new StreamWriter(_path, false, Encoding.UTF8, 65536) {NewLine = "\n"};
       foreach (var kv in _toml.KeyValues)
         sw.WriteLine(kv.ToString().Trim('\n'));
+
+      foreach (var table in _toml.Tables) {
+        sw.WriteLine();
+        sw.Write(table.OpenBracket.Text);
+        sw.Write(table.Name.Key.ToString());
+        sw.WriteLine(table.CloseBracket.Text);
+
+        foreach (var kv in table.Items)
+          sw.WriteLine(kv.ToString().Trim('\n'));
+      }
+
       sw.WriteLine();
     }
 
