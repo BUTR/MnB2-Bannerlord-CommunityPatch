@@ -19,6 +19,11 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(WarRationsPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
+    internal static bool QuartermasterIsClanWide {
+      get => CommunityPatchSubModule.Options.Get<bool>(nameof(QuartermasterIsClanWide));
+      set => CommunityPatchSubModule.Options.Set(nameof(QuartermasterIsClanWide), value);
+    }
+    
     private PerkObject _perk;
 
     public override void Reset()
@@ -58,7 +63,7 @@ namespace CommunityPatch.Patches {
 
       if (
         // qm is not clan-wide
-        !CommunityPatchSubModule.Options.Get<bool>("WarRationsQmClanWide")
+        !QuartermasterIsClanWide
         // qm is not leading party
         && party.LeaderHero != qm
         // qm is not in party
