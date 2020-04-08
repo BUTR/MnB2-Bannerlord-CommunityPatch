@@ -27,7 +27,7 @@ namespace CommunityPatch {
 
       try {
         Harmony.PatchAll(typeof(CommunityPatchSubModule).Assembly);
-      }
+    }
       catch (Exception ex) {
         Error(ex, "Could not apply all generic attribute-based harmony patches.");
       }
@@ -42,7 +42,7 @@ namespace CommunityPatch {
 
       base.OnSubModuleLoad();
     }
-    
+
     protected override void OnBeforeInitialModuleScreenSetAsRoot() {
       var module = Module.CurrentModule;
 
@@ -98,8 +98,8 @@ namespace CommunityPatch {
       {
         var cgs = (CampaignGameStarter)gameStarterObject;
         cgs.AddBehavior(new CommunityPatchCampaignBehavior());
-      }
-    }
-  }
+        }
+        }
+            }
 
 }

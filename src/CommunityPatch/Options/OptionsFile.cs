@@ -10,7 +10,7 @@ using Path = System.IO.Path;
 
 namespace CommunityPatch {
 
-  public class OptionsFile {
+  public class OptionsFile : OptionsStore {
 
     private readonly string _path;
 
@@ -29,7 +29,7 @@ namespace CommunityPatch {
     }
 
     [PublicAPI]
-    public void Save() {
+    public override void Save() {
       using var sw = new StreamWriter(_path, false, Encoding.UTF8, 65536) {NewLine = "\n"};
       foreach (var kv in _toml.KeyValues)
         sw.WriteLine(kv.ToString().Trim('\n'));
@@ -41,6 +41,18 @@ namespace CommunityPatch {
     public KeyValueSyntax GetConfig([NotNull] string key)
       => _toml.KeyValues
         .FirstOrDefault(kv => kv.Key.Key.ToString().Trim() == key);
+
+    [PublicAPI]
+    [CanBeNull]
+    public KeyValueSyntax GetConfig([NotNull] TableSyntaxBase t, [NotNull] string key)
+      => t.Items
+        .FirstOrDefault(kv => kv.Key.Key.ToString().Trim() == key);
+
+    [PublicAPI]
+    [CanBeNull]
+    public TableSyntaxBase GetNamespace([NotNull] string key)
+      => _toml.Tables
+        .FirstOrDefault(t => t.Name.Key.ToString().Trim() == key);
 
     [PublicAPI]
     [NotNull]
@@ -56,18 +68,59 @@ namespace CommunityPatch {
     }
 
     [PublicAPI]
+    [NotNull]
+    public KeyValueSyntax GetOrCreateConfig([NotNull] TableSyntaxBase t, [NotNull] string key) {
+      var kvs = GetConfig(t, key);
+      if (kvs != null)
+        return kvs;
+
+      kvs = new KeyValueSyntax(key, new BareKeySyntax());
+      _toml.KeyValues.Add(kvs);
+
+      return kvs;
+    }
+
+    [PublicAPI]
+    [NotNull]
+    public TableSyntaxBase GetOrCreateNamespace([NotNull] string key) {
+      var t = GetNamespace(key);
+      if (t != null)
+        return t;
+
+      t = new TableSyntax(key);
+      _toml.Tables.Add(t);
+
+      return t;
+    }
+
+    [PublicAPI]
     public void DeleteConfig([NotNull] string key)
       => _toml.KeyValues.RemoveChildren(GetConfig(key));
 
-    public void Set<T>(string key, T value) {
-      var cfg = GetOrCreateConfig(key);
+    public override void Set<T>(string key, T value) {
+      var keyValueSyntax = GetOrCreateConfig(key);
+      Set(keyValueSyntax, value);
+    }
+
+    public override void Set<T>(string ns, string key, T value) {
+      if (ns == null) {
+        Set(key, value);
+        return;
+      }
+
+      var t = GetOrCreateNamespace(ns);
+      var kv = GetOrCreateConfig(t, key);
+      Set(kv, value);
+    }
+
+    private static void Set<T>(KeyValueSyntax entry, T value) {
       long iVal;
       switch (value) {
         // @formatter:off
-        case bool v: cfg.Value = new BooleanValueSyntax(v); break;
-        case string v: cfg.Value = new StringValueSyntax(v); break;
-        case float v: cfg.Value = new FloatValueSyntax(v); break;
-        case double v: cfg.Value = new FloatValueSyntax(v); break;
+        case bool v: entry.Value = new BooleanValueSyntax(v); break;
+        case string v: entry.Value = new StringValueSyntax(v); break;
+        case float v: entry.Value = new FloatValueSyntax(v); break;
+        case double v: entry.Value = new FloatValueSyntax(v); break;
         case sbyte v: iVal = v; goto setIVal;
         case short v: iVal = v; goto setIVal;
         case int v: iVal = v; goto setIVal;
@@ -84,14 +137,26 @@ namespace CommunityPatch {
       return;
 
       setIVal:
-      cfg.Value = new IntegerValueSyntax(iVal);
+      entry.Value = new IntegerValueSyntax(iVal);
     }
 
-    public T Get<T>(string key) {
+    public override T Get<T>(string key) {
       var cfg = GetConfig(key);
-      if (cfg == null)
-        return default;
+      return cfg == null ? default : Get<T>(cfg);
+    }
 
+    public override T Get<T>(string ns, string key) {
+      if (ns == null)
+        return Get<T>(key);
+
+      var t = GetNamespace(ns);
+      if (t == null) return default;
+
+      var kv = GetConfig(t, key);
+      return kv == null ? default : Get<T>(kv);
+    }
+
+    private static T Get<T>(KeyValueSyntax cfg) {
       var t = typeof(T);
 
       if (t == typeof(string)) {
