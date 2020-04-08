@@ -62,7 +62,7 @@ namespace CommunityPatch {
         }
       }
 
-      if (DisableIntroVideo) {
+      if (IsEarlierThanVersionE108 && DisableIntroVideo) {
         try {
           typeof(Module)
             .GetField("_splashScreenPlayed", BindingFlags.NonPublic | BindingFlags.Instance)
@@ -105,34 +105,36 @@ namespace CommunityPatch {
     private static void ShowMessage(string msg)
       => InformationManager.DisplayMessage(new InformationMessage(msg));
 
-    private void ShowModOptions()
-      => InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
+    private void ShowModOptions() {
+      var elements = new List<InquiryElement>();
+
+      if (IsEarlierThanVersionE108) {
+        elements.Add(new InquiryElement(
+          nameof(DisableIntroVideo),
+          DisableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
+          null
+        ));
+      }
+
+      elements.Add(new InquiryElement(
+        nameof(RecordFirstChanceExceptions),
+        RecordFirstChanceExceptions ? "Ignore First Chance Exceptions" : "Record First Chance Exceptions",
+        null
+      ));
+      elements.Add(new InquiryElement(
+        nameof(CopyDiagnosticsToClipboard),
+        "Copy Diagnostics to Clipboard",
+        null
+      ));
+      elements.Add(new InquiryElement(
+        "IntentionallyUnhandled",
+        "Throw Unhandled Exception",
+        null
+      ));
+      InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
         "Mod Options",
         "Community Patch Mod Options:",
-        new List<InquiryElement> {
-          new InquiryElement(
-            nameof(DisableIntroVideo),
-            DisableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
-            null
-          ),
-          new InquiryElement(
-            nameof(RecordFirstChanceExceptions),
-            RecordFirstChanceExceptions ? "Ignore First Chance Exceptions" : "Record First Chance Exceptions",
-            null
-          ),
-          new InquiryElement(
-            nameof(CopyDiagnosticsToClipboard),
-            "Copy Diagnostics to Clipboard",
-            null
-          ),
-#if DEBUG
-          new InquiryElement(
-            "IntentionallyUnhandled",
-            "Throw Unhandled Exception",
-            null
-          ),
-#endif
-        },
+        elements,
         true,
         true,
         "Apply",
@@ -157,6 +159,7 @@ namespace CommunityPatch {
               throw new NotImplementedException(selected);
           }
         }, null));
+    }
 
     public override void OnCampaignStart(Game game, object starterObject) {
       if (starterObject is CampaignGameStarter cgs)
@@ -204,6 +207,13 @@ namespace CommunityPatch {
     }
 
     private static LinkedList<IPatch> _patches;
+
+    private static readonly ApplicationVersion VersionE108 = new ApplicationVersion(ApplicationVersionType.EarlyAccess, 1, 0, 8);
+
+    private static readonly ApplicationVersionComparer VersionComparer = new ApplicationVersionComparer();
+
+    private static bool IsEarlierThanVersionE108
+      => VersionComparer.Compare(VersionE108, ModuleInfo.GetModules().First(x => x.IsNative()).Version) > 0;
 
     private static LinkedList<IPatch> Patches {
       get {
