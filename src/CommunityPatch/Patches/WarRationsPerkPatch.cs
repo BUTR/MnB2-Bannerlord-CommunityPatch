@@ -71,6 +71,7 @@ namespace CommunityPatch.Patches {
         return;
 
       var explainedNumber = new ExplainedNumber(__result, explainer);
+      explainer?.Lines.RemoveAt(explainer.Lines.Count - 1);
       switch (perk.IncrementType) {
         case SkillEffect.EffectIncrementType.Add:
           explainedNumber.Add(perk.PrimaryBonus, perk.Name);
