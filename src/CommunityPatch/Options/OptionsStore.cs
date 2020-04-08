@@ -12,6 +12,9 @@ namespace CommunityPatch {
 
     public abstract T Get<T>(string ns, string key);
 
+    public OptionNamespace GetNamespace(string ns)
+      => new OptionNamespace(this, ns);
+
   }
 
 }
