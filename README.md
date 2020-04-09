@@ -14,8 +14,11 @@ Current Fixes:
 * The Bannerlord perk.
 * The Man-At-Arms perk.
 * The Swords As Tribute (Steward) perk.
+* The Prominence perk.
+* The Supreme Authority perk.
 * Fixes Learning Rate explanation.
 * Fixes Item Comparison perk-based coloring.
+* Fixes Tier 5 Prisoners not being recruit-able. (Note: Tier 6 are not by design)
 
 Current Features:
 * Enable and Disable the Intro Video
