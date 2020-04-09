@@ -6,7 +6,7 @@
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64</Platforms>
         <RootNamespace />
-        <Version>0.0.1</Version>
+        <Version>0.0.3</Version>
         <Title>Community Patch</Title>
         <Authors>Tyler Young</Authors>
         <Company>The Mount &amp; Blade II: Bannerlord Community</Company>
