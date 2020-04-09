@@ -15,7 +15,8 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultSettlementProsperityModel).GetMethod("CalculateProsperityChangeInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(StewardNourishSettlementPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo1 = typeof(StewardNourishSettlementPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo2 = typeof(StewardNourishSettlementPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     private PerkObject _perk;
 
@@ -26,7 +27,8 @@ namespace CommunityPatch.Patches {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        postfix: new HarmonyMethod(PatchMethodInfo));
+        new HarmonyMethod(PatchMethodInfo1),
+        new HarmonyMethod(PatchMethodInfo2));
       Applied = true;
     }
 
@@ -48,29 +50,37 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    private static void Postfix(ref float __result, Town fortification, StatExplainer explanation) {
-      explanation ??= new StatExplainer();
+    // ReSharper disable once UnusedParameter.Local
+    private static void Prefix(Town town, ref StatExplainer explanation)
+      => explanation ??= new StatExplainer();
 
+    // ReSharper disable once InconsistentNaming
+    private static void Postfix(ref float __result, Town fortification, StatExplainer explanation) {
       var perk = ActivePatch._perk;
       var hero = fortification.Settlement?.OwnerClan?.Leader;
 
-      if (hero != null &&
-        hero.GetPerkValue(perk) &&
-        fortification.Settlement.Parties.Count(x => x.LeaderHero == fortification.Settlement.OwnerClan.Leader) > 0) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
-        if (explanation.Lines.Count > 0)
-          explanation.Lines.RemoveAt(explanation.Lines.Count - 1);
-        float extra = 0;
-        for (int i = 0; i < explanation.Lines.Count; ++i) {
-          if (explanation.Lines[i].Number > 0)
-            extra += explanation.Lines[i].Number;
-        }
+      if (hero == null || !hero.GetPerkValue(perk)
+        || fortification.Settlement.Parties.Count(x => x.LeaderHero == fortification.Settlement.OwnerClan.Leader) <= 0)
+        return;
 
-        if (extra > 0) {
-          explainedNumber.Add(extra * perk.PrimaryBonus - extra, perk.Name);
-          __result = explainedNumber.ResultNumber;
-        }
+      var explainedNumber = new ExplainedNumber(__result, explanation);
+      
+      if (explanation.Lines.Count > 0)
+        explanation.Lines.RemoveAt(explanation.Lines.Count - 1);
+      
+      float extra = 0;
+      // ReSharper disable once ForCanBeConvertedToForeach
+      for (var i = 0; i < explanation.Lines.Count; i++) {
+        var line = explanation.Lines[i];
+        if (line.Number > 0)
+          extra += line.Number;
       }
+
+      if (extra < float.Epsilon)
+        return;
+
+      explainedNumber.Add(extra * perk.PrimaryBonus - extra, perk.Name);
+      __result = explainedNumber.ResultNumber;
     }
 
   }
