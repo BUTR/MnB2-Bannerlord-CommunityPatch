@@ -77,11 +77,11 @@ namespace CommunityPatch.Patches {
     }
     
     public static void Postfix(ref int __result, Village village) {
-      if (village.Bound.Town.Governor.GetPerkValue(PerkObject.FindFirst(x => x.Name.GetID() == "XNc2NIGL"))) {
-        var perk = ActivePatch._perk;
-        __result += (int) (__result * perk.PrimaryBonus);
+      if (!(village.Bound?.Town?.Governor?.GetPerkValue(PerkObject.FindFirst(x => x.Name.GetID() == "XNc2NIGL")) ?? false)) {
+        return;
       }
-      
+      var perk = ActivePatch._perk;
+      __result += (int) (__result * perk.PrimaryBonus);
     }
     
 
