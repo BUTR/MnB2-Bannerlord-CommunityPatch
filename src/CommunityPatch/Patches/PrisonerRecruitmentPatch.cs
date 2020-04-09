@@ -48,7 +48,7 @@ namespace CommunityPatch.Patches {
     private static void Postfix(ref float[] __result) {
       var newResult = new float[__result.Length+1];
         newResult[0] = 1f;
-        Array.Copy(newResult, 0, __result, 1, __result.Length);
+        Array.Copy(__result, 0, newResult, 1, __result.Length);
         __result = newResult;
     }
   }
