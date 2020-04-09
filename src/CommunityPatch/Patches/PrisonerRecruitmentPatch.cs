@@ -46,16 +46,10 @@ namespace CommunityPatch.Patches {
 
     // ReSharper disable once InconsistentNaming
     private static void Postfix(ref float[] __result) {
-      __result = new float[6] {
-        1f,
-        1f,
-        0.5f,
-        0.3f,
-        0.2f,
-        0.1f
-      };
+      var newResult = new float[__result.Length+1];
+        newResult[0] = 1f;
+        Array.Copy(newResult, 0, __result, 1, __result.Length);
+        __result = newResult;
     }
-
   }
-
 }
