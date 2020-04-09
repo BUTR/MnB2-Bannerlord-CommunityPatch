@@ -186,15 +186,19 @@ namespace CommunityPatch {
       foreach (var patch in Patches) {
         try {
           patch.Reset();
+        }
+        catch (Exception ex) {
+          Error(ex, $"Error while resetting patch: {patch.GetType().Name}");
+        }
 
-          if (!patch.IsApplicable(game))
-            continue;
-
-          try {
-            patch.Apply(game);
-          }
-          catch (Exception ex) {
-            Error(ex, $"Error while applying patch: {patch.GetType().Name}");
+        try {
+          if (patch.IsApplicable(game)) {
+            try {
+              patch.Apply(game);
+            }
+            catch (Exception ex) {
+              Error(ex, $"Error while applying patch: {patch.GetType().Name}");
+            }
           }
         }
         catch (Exception ex) {
