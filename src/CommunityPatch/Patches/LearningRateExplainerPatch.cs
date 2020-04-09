@@ -25,6 +25,14 @@ namespace CommunityPatch.Patches {
       .GetMethod("CalculateLearningLimit", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
         null, CallingConventions.Any, new[] {typeof(int), typeof(int), typeof(TextObject), typeof(StatExplainer)}, null);
 
+    private static readonly MethodInfo CheckMethodInfo1 = typeof(DefaultCharacterDevelopmentModel)
+      .GetMethod("CalculateLearningRate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+        null, CallingConventions.Any, new[] {typeof(Hero), typeof(SkillObject), typeof(StatExplainer)}, null);
+
+    private static readonly MethodInfo CheckMethodInfo2 = typeof(DefaultCharacterDevelopmentModel)
+      .GetMethod("CalculateLearningRate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+        null, CallingConventions.Any, new[] {typeof(int), typeof(int), typeof(int), typeof(int), typeof(TextObject), typeof(StatExplainer)}, null);
+
     private static readonly MethodInfo PatchMethodInfo1 = typeof(LearningRateExplainerPatch)
       .GetMethod(nameof(CalculateLearning1Limit), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
@@ -48,15 +56,15 @@ namespace CommunityPatch.Patches {
         if (AlreadyPatchedByOthers(patchInfo))
           return false;
 
-        var bytes = TargetMethodInfo1.GetCilBytes();
+        var bytes = CheckMethodInfo1.GetCilBytes();
         if (bytes == null) return false;
 
         var hash = bytes.GetSha256();
         if (!hash.SequenceEqual(new byte[] {
-          0x5B, 0x47, 0x05, 0x79, 0x5A, 0x5D, 0xCB, 0xFC,
-          0xFA, 0x46, 0x21, 0x96, 0x00, 0x94, 0x8D, 0xCC,
-          0xC2, 0xE2, 0x35, 0x7F, 0x70, 0x0D, 0x64, 0xD5,
-          0x08, 0xAA, 0x8F, 0x2B, 0xA5, 0x0B, 0xF3, 0x4B
+          0x74, 0x9e, 0xb0, 0xdf, 0xb1, 0x47, 0x44, 0x6a,
+          0xb9, 0x95, 0x50, 0xef, 0x11, 0x36, 0xdf, 0x2f,
+          0xd9, 0x86, 0x52, 0xf6, 0xa8, 0x18, 0x7b, 0x33,
+          0x8f, 0x5c, 0x51, 0xd8, 0x16, 0xa5, 0xe8, 0xd6
         }))
           return false;
       }
@@ -65,15 +73,15 @@ namespace CommunityPatch.Patches {
         if (AlreadyPatchedByOthers(patchInfo))
           return false;
 
-        var bytes = TargetMethodInfo2.GetCilBytes();
+        var bytes = CheckMethodInfo2.GetCilBytes();
         if (bytes == null) return false;
 
         var hash = bytes.GetSha256();
         if (!hash.SequenceEqual(new byte[] {
-          0x0B, 0xA1, 0x1A, 0x7D, 0x20, 0x6B, 0xC2, 0xD2,
-          0x3C, 0xEA, 0xF2, 0xCB, 0x83, 0x7F, 0x88, 0x14,
-          0x7D, 0xE2, 0x90, 0x71, 0x2F, 0xE0, 0x4D, 0x38,
-          0xE5, 0x47, 0xCC, 0x08, 0x62, 0x1E, 0x92, 0x26
+          0xd5, 0xd4, 0x96, 0xde, 0x83, 0x16, 0x30, 0x82,
+          0x9e, 0xa7, 0x34, 0x67, 0x70, 0x7d, 0x38, 0x58,
+          0x28, 0xc7, 0x32, 0xcc, 0x1f, 0x29, 0xbb, 0xe0,
+          0x51, 0xeb, 0x04, 0xd1, 0x22, 0xcb, 0x2b, 0x81
         }))
           return false;
       }
