@@ -51,7 +51,7 @@ namespace CommunityPatch.Patches {
     // ReSharper disable once InconsistentNaming
     private static void Postfix(ref float __result, Village village) {
       var perk = ActivePatch._perk;
-      if (!village.Bound.OwnerClan.Leader.GetPerkValue(perk))
+      if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))
         return;
 
       __result *= perk.PrimaryBonus;
