@@ -49,17 +49,20 @@ namespace CommunityPatch.Patches {
 
     // ReSharper disable once InconsistentNaming
     private static void Postfix(ref float __result, Town fortification, StatExplainer explanation) {
+      explanation ??= new StatExplainer();
+
       var perk = ActivePatch._perk;
       var hero = fortification.Settlement?.OwnerClan?.Leader;
-      
-      if (hero != null && 
+
+      if (hero != null &&
         hero.GetPerkValue(perk) &&
         fortification.Settlement.Parties.Count(x => x.LeaderHero == fortification.Settlement.OwnerClan.Leader) > 0) {
         var explainedNumber = new ExplainedNumber(__result, explanation);
-        explanation?.Lines.RemoveAt(explanation.Lines.Count - 1);
+        if (explanation.Lines.Count > 0)
+          explanation.Lines.RemoveAt(explanation.Lines.Count - 1);
         float extra = 0;
-        for (int i = 0; i < explanation?.Lines.Count; ++i) {
-          if (explanation.Lines[i].Number > 0) 
+        for (int i = 0; i < explanation.Lines.Count; ++i) {
+          if (explanation.Lines[i].Number > 0)
             extra += explanation.Lines[i].Number;
         }
 
@@ -67,7 +70,6 @@ namespace CommunityPatch.Patches {
           explainedNumber.Add(extra * perk.PrimaryBonus - extra, perk.Name);
           __result = explainedNumber.ResultNumber;
         }
-
       }
     }
 
