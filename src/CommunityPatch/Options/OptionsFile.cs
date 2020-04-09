@@ -10,7 +10,35 @@ using Path = System.IO.Path;
 
 namespace CommunityPatch {
 
-  public class OptionsFile : OptionsStore {
+  public sealed partial class OptionsFile : OptionsStore, IEquatable<OptionsFile>, IComparable<OptionsFile> {
+
+    public bool Equals(OptionsFile other)
+      => _path == other._path;
+
+    public override bool Equals(OptionsStore other)
+      => other is OptionsFile file && Equals(file);
+
+    public override bool Equals(object obj) {
+      if (ReferenceEquals(null, obj))
+        return false;
+      if (ReferenceEquals(this, obj))
+        return true;
+      if (obj is OptionsFile file)
+        return Equals(file);
+      if (obj is OptionsStore store)
+        return Equals(store);
+
+      return false;
+    }
+
+    public override int GetHashCode()
+      => (_path != null ? _path.GetHashCode() : 0);
+
+    public static bool operator ==(OptionsFile left, OptionsFile right)
+      => Equals(left, right);
+
+    public static bool operator !=(OptionsFile left, OptionsFile right)
+      => !Equals(left, right);
 
     private readonly string _path;
 
@@ -55,13 +83,13 @@ namespace CommunityPatch {
 
     [PublicAPI]
     [CanBeNull]
-    public KeyValueSyntax GetConfig([NotNull] TableSyntaxBase t, [NotNull] string key)
-      => t.Items
+    public KeyValueSyntax GetConfig([NotNull] TableSyntaxBase table, [NotNull] string key)
+      => table.Items
         .FirstOrDefault(kv => kv.Key.Key.ToString().Trim() == key);
 
     [PublicAPI]
     [CanBeNull]
-    public TableSyntaxBase GetNamespace([NotNull] string key)
+    public TableSyntaxBase GetTable([NotNull] string key)
       => _toml.Tables
         .FirstOrDefault(t => t.Name.Key.ToString().Trim() == key);
 
@@ -94,7 +122,7 @@ namespace CommunityPatch {
     [PublicAPI]
     [NotNull]
     public TableSyntaxBase GetOrCreateNamespace([NotNull] string key) {
-      var t = GetNamespace(key);
+      var t = GetTable(key);
       if (t != null)
         return t;
 
@@ -160,7 +188,7 @@ namespace CommunityPatch {
       if (ns == null)
         return Get<T>(key);
 
-      var t = GetNamespace(ns);
+      var t = GetTable(ns);
       if (t == null) return default;
 
       var kv = GetConfig(t, key);

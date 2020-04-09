@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace CommunityPatch {
 
   [PublicAPI]
-  public class Option<TOption> where TOption : unmanaged, IEquatable<TOption> {
+  public partial class Option<TOption> : IComparable<Option<TOption>>, IEquatable<Option<TOption>>, IEquatable<TOption> where TOption : unmanaged {
 
     [NotNull]
     private readonly OptionsStore _options;
@@ -16,7 +16,7 @@ namespace CommunityPatch {
     public readonly string Name;
 
     public string QualifiedName
-      => !string.IsNullOrEmpty(Namespace) ? $"{Namespace}.{Name}" : Name;
+      => !string.IsNullOrEmpty(Namespace) ? $"[{Namespace}] {Name}" : Name;
 
     public Option([NotNull] OptionsStore options, [CanBeNull] string ns, [NotNull] string name) {
       _options = options;
@@ -40,6 +40,36 @@ namespace CommunityPatch {
 
     public void Set(TOption value)
       => Value = value;
+
+    public bool Equals(Option<TOption> other)
+      => other != null
+        && _options.Equals(other._options)
+        && Namespace == other.Namespace
+        && Name == other.Name;
+
+    public bool Equals(TOption other)
+      => Value.Equals(other);
+
+    public override bool Equals(object obj)
+      => !ReferenceEquals(null, obj)
+        && (ReferenceEquals(this, obj)
+          || obj switch {
+            Option<TOption> opt => Equals(opt),
+            TOption val => Equals(val),
+            _ => false
+          });
+
+    public override int GetHashCode() {
+      unchecked {
+        var hashCode = _options.GetHashCode();
+        hashCode = (hashCode * 397) ^ (Namespace != null ? Namespace.GetHashCode() : 0);
+        hashCode = (hashCode * 397) ^ Name.GetHashCode();
+        return hashCode;
+      }
+    }
+
+    public override string ToString()
+      => $"{QualifiedName} = {Value}";
 
   }
 
