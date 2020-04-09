@@ -41,6 +41,8 @@ namespace CommunityPatch.Patches {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
+      if (Applied)
+        return false;
 
       var bytes = TargetMethodInfo.GetCilBytes();
       if (bytes == null) return false;
@@ -56,7 +58,7 @@ namespace CommunityPatch.Patches {
 
     // ReSharper disable once InconsistentNaming
     private static void Postfix(ref float __result, MobileParty party, StatExplainer explainer) {
-      var qm = party.LeaderHero.Clan.GetEffectiveQuartermaster();
+      var qm = party?.LeaderHero?.Clan?.GetEffectiveQuartermaster();
 
       if (qm == null)
         return;

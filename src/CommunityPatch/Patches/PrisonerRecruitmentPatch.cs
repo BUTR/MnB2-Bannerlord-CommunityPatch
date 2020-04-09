@@ -50,6 +50,7 @@ namespace CommunityPatch.Patches {
     }
 
     public override void Apply(Game game) {
+      if (Applied) return;
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
 

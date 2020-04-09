@@ -13,7 +13,7 @@ namespace CommunityPatch.Patches {
         = PerkObject.FindFirst(x => x.Name.GetID() == "ER3ieXOb");
 
     public bool IsApplicable(Game game)
-      => _perk.PrimaryRole == SkillEffect.PerkRole.Personal;
+      => _perk?.PrimaryRole == SkillEffect.PerkRole.Personal;
 
     public void Apply(Game game) {
       // Dear TaleWorlds; Value should probably be publicly exposed, maybe by a method

@@ -31,6 +31,8 @@ namespace CommunityPatch.Patches {
     public override bool IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
+      if (_perk == null)
+        return false;
       if (_perk.PrimaryBonus != 0f)
         return false;
 
