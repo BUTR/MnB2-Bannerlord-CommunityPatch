@@ -58,15 +58,25 @@ namespace CommunityPatch.Patches {
     // ReSharper disable once InconsistentNaming
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch._perk;
-      if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))
+      var hero = party.LeaderHero;
+      if (hero == null)
+        return;
+      if (!(hero?.GetPerkValue(perk) ?? false))
         return;
 
-      var extra = (int) Math.Max(0, (party.LeaderHero.Clan.Kingdom.Clans.Count() - 1) * perk.PrimaryBonus);
-      if (extra > 0) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
-        explainedNumber.Add(extra, perk.Name);
-        __result = (int) explainedNumber.ResultNumber;
-      }
+      var kingdomClans = hero.Clan?.Kingdom?.Clans;
+
+      if (kingdomClans == null)
+        return;
+
+      var extra = (int) Math.Max(0, (kingdomClans.Count() - 1) * perk.PrimaryBonus);
+
+      if (extra <= 0)
+        return;
+
+      var explainedNumber = new ExplainedNumber(__result, explanation);
+      explainedNumber.Add(extra, perk.Name);
+      __result = (int) explainedNumber.ResultNumber;
     }
 
   }
