@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Threading;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -220,17 +221,19 @@ namespace CommunityPatch {
         if (_patches != null)
           return _patches;
 
-        var patchType = typeof(IPatch);
+        var patchInterfaceType = typeof(IPatch);
         _patches = new LinkedList<IPatch>();
 
         foreach (var type in typeof(CommunityPatchSubModule).Assembly.GetTypes()) {
-          if (!patchType.IsAssignableFrom(type))
+          if (type.IsInterface || type.IsAbstract)
             continue;
-          if (patchType == type)
+          if (!patchInterfaceType.IsAssignableFrom(type))
             continue;
 
           try {
-            _patches.AddLast((IPatch) Activator.CreateInstance(type, true));
+            var patch = (IPatch) Activator.CreateInstance(type, true);
+            //var patch = (IPatch) FormatterServices.GetUninitializedObject(type);
+            _patches.AddLast(patch);
           }
           catch (TargetInvocationException tie) {
             Error(tie.InnerException, $"Failed to create instance of patch: {type.FullName}");
