@@ -14,7 +14,7 @@ Current Fixes:
 * The Bannerlord perk.
 * The Man-At-Arms perk.
 * The Swords As Tribute (Steward) perk.
-* The Agrarian (Steward) perk
+* The Agrarian (Steward) perk.
 * The Prominence perk.
 * The Supreme Authority perk.
 * Fixes Learning Rate explanation.
