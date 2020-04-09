@@ -17,16 +17,19 @@ namespace CommunityPatch.Patches {
   internal class StewardAgrarianPatch : PatchBase<StewardAgrarianPatch> {
 
     public override bool Applied { get; protected set; }
-    
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultVillageProductionCalculatorModel).GetMethod(nameof(DefaultVillageProductionCalculatorModel.CalculateDailyFoodProductionAmount), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+    private static readonly MethodInfo TargetMethodInfo =
+      typeof(DefaultVillageProductionCalculatorModel).GetMethod(nameof(DefaultVillageProductionCalculatorModel.CalculateDailyFoodProductionAmount), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(StewardAgrarianPatch).GetMethod("Postfix", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     private PerkObject _perk;
 
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "XNc2NIGL");
+
     public override bool IsApplicable(Game game)
-    // ReSharper disable once CompareOfFloatsByEqualityOperator
+      // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
       if (_perk.PrimaryBonus != 0f)
         return false;
@@ -40,14 +43,13 @@ namespace CommunityPatch.Patches {
 
       var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
-        0x08,0x72,0x20,0x9c,0x9a,0x23,0x12,0xdf,
-        0xd7,0xa2,0x83,0x20,0xa5,0x89,0xd7,0x6a,
-        0x67,0xb3,0x35,0x22,0x66,0xb1,0xea,0x2c,
-        0x21,0x00,0x4f,0x45,0x3c,0x74, 0x04,0x5e
+        0xBE, 0xB9, 0x2E, 0x39, 0x09, 0xCF, 0x91, 0x9B,
+        0x23, 0x00, 0x33, 0xA2, 0xB2, 0x9D, 0xDF, 0xF6,
+        0x8F, 0xD0, 0xC5, 0x59, 0x3E, 0xB1, 0xE6, 0xB7,
+        0xCE, 0x54, 0xAB, 0x4C, 0xFD, 0x16, 0xB0, 0x57
       });
     }
 
-   
     public override void Apply(Game game) {
       var textObjStrings = TextObject.ConvertToStringList(
         new List<TextObject> {
@@ -67,14 +69,14 @@ namespace CommunityPatch.Patches {
         SkillEffect.EffectIncrementType.AddFactor
       );
       if (Applied) return;
-            
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
-        
     }
-    
-    public static void Postfix(ref int __result, Village village) {
+
+    // ReSharper disable once InconsistentNaming
+    public static void Postfix(ref float __result, Village village) {
       var perk = ActivePatch._perk;
       if (!(village.Bound?.Town?.Governor?.GetPerkValue(perk) ?? false)) {
         return;
@@ -82,7 +84,6 @@ namespace CommunityPatch.Patches {
 
       __result += (int) (__result * perk.PrimaryBonus);
     }
-    
 
   }
 

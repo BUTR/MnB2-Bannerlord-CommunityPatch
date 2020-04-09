@@ -2,7 +2,7 @@
 <Module>
     <Name value="Community Patch"/>
     <Id value="CommunityPatch"/>
-    <Version value="v0.0.1"/>
+    <Version value="v0.0.2"/>
     <SingleplayerModule value="true"/>
     <MultiplayerModule value="true"/>
     <Official value="false"/>

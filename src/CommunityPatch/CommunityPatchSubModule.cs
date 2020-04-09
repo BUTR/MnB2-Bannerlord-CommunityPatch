@@ -63,7 +63,7 @@ namespace CommunityPatch {
         }
       }
 
-      if (IsEarlierThanVersionE108 && DisableIntroVideo) {
+      if (DisableIntroVideo) {
         try {
           typeof(Module)
             .GetField("_splashScreenPlayed", BindingFlags.NonPublic | BindingFlags.Instance)
@@ -111,13 +111,11 @@ namespace CommunityPatch {
     private void ShowModOptions() {
       var elements = new List<InquiryElement>();
 
-      if (IsEarlierThanVersionE108) {
-        elements.Add(new InquiryElement(
-          nameof(DisableIntroVideo),
-          DisableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
-          null
-        ));
-      }
+      elements.Add(new InquiryElement(
+        nameof(DisableIntroVideo),
+        DisableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
+        null
+      ));
 
       elements.Add(new InquiryElement(
         nameof(RecordFirstChanceExceptions),
@@ -215,12 +213,16 @@ namespace CommunityPatch {
 
     private static LinkedList<IPatch> _patches;
 
-    private static readonly ApplicationVersion VersionE108 = new ApplicationVersion(ApplicationVersionType.EarlyAccess, 1, 0, 8);
+    [PublicAPI]
+    public static readonly ApplicationVersionComparer VersionComparer
+      = new ApplicationVersionComparer();
 
-    private static readonly ApplicationVersionComparer VersionComparer = new ApplicationVersionComparer();
-
-    private static bool IsEarlierThanVersionE108
-      => VersionComparer.Compare(VersionE108, ModuleInfo.GetModules().First(x => x.IsNative()).Version) > 0;
+    [PublicAPI]
+    public static ApplicationVersion GameVersion
+      = ModuleInfo.GetModules()
+        .Where(x => x.IsOfficial)
+        .OrderByDescending(x => x.Version, VersionComparer)
+        .FirstOrDefault()?.Version ?? default;
 
     private static LinkedList<IPatch> Patches {
       get {
