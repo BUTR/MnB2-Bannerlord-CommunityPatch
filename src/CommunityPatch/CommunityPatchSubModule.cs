@@ -103,8 +103,10 @@ namespace CommunityPatch {
       // other stuff?
     }
 
-    private static void ShowMessage(string msg)
-      => InformationManager.DisplayMessage(new InformationMessage(msg));
+    private static void ShowMessage(string msg) {
+      InformationManager.DisplayMessage(new InformationMessage(msg));
+      Print(msg);
+    }
 
     private void ShowModOptions() {
       var elements = new List<InquiryElement>();
