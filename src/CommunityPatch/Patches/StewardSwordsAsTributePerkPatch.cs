@@ -1,31 +1,36 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  class StewardSwordsAsTributePatch : IPatch {
+  sealed class StewardSwordsAsTributePatch : PatchBase<StewardSwordsAsTributePatch> {
 
-    public bool Applied { get; private set; }
+    public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(PartyBase).GetMethod("get_PartySizeLimit", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultPartySizeLimitModel).GetMethod("CalculateMobilePartyMemberSizeLimit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(StewardSwordsAsTributePatch).GetMethod(nameof(PartySizeLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(StewardSwordsAsTributePatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    public void Apply(Game game) {
+    private PerkObject _perk;
+
+    public override void Reset()
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "7fHHThQr");
+
+    public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        null,
-        new HarmonyMethod(PatchMethodInfo));
+        postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
-    public bool IsApplicable(Game game) {
+    public override bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
@@ -35,25 +40,34 @@ namespace CommunityPatch.Patches {
 
       var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
-        0xAE, 0xF7, 0x29, 0x0C, 0x6D, 0x5D, 0xFD, 0xE2,
-        0x4D, 0x32, 0x24, 0x35, 0x1D, 0x18, 0x3D, 0x8E,
-        0x40, 0x5E, 0xD3, 0xDA, 0x11, 0xC4, 0x31, 0x92,
-        0x6B, 0x75, 0xAA, 0xB5, 0xEC, 0x3B, 0x9F, 0x2F
-      });
+          // e.1.0.7
+          0x4B, 0x26, 0xD4, 0x1E, 0xF7, 0xCF, 0x5B, 0x15,
+          0xE1, 0x24, 0x74, 0x8D, 0xE9, 0x46, 0x36, 0x80,
+          0x6A, 0x91, 0x65, 0x5D, 0x7A, 0x6C, 0x3F, 0x43,
+          0xD2, 0x7B, 0x80, 0xA7, 0x3E, 0xF0, 0x10, 0xF6
+        })
+        || hash.SequenceEqual(new byte[] {
+          // e.1.0.8
+          0xB5, 0xEE, 0x39, 0xE3, 0xF3, 0xDF, 0x4C, 0xE2,
+          0xC0, 0xAF, 0xD3, 0x1B, 0x5F, 0x6D, 0x36, 0x11,
+          0x76, 0x0B, 0xA3, 0xA4, 0x45, 0xB1, 0xF8, 0x57,
+          0x72, 0xA3, 0x60, 0x08, 0xC4, 0x44, 0x22, 0x89
+        });
     }
 
-    private static void PartySizeLimitPatched(PartyBase __instance, ref int __result) {
-      __result += StewardSwordsAsTributePerkExtra(__instance.LeaderHero);
-    }
+    // ReSharper disable once InconsistentNaming
+    private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
+      var perk = ActivePatch._perk;
+      if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))
+        return;
 
-    public static int StewardSwordsAsTributePerkExtra(Hero hero) {
-      if (hero == null || hero.Clan.Kingdom == null || hero.Clan.Kingdom.RulingClan != hero.Clan || !hero.GetPerkValue(DefaultPerks.Steward.SwordsAsTribute))
-        return 0;
-
-      return Math.Max(0, (hero.Clan.Kingdom.Clans.Count() - 1) * 10); // Remove one becuase Kingdom.Clans includes the ruling clan which is not a vassal.
+      var extra = (int) Math.Max(0, (party.LeaderHero.Clan.Kingdom.Clans.Count() - 1) * perk.PrimaryBonus);
+      if (extra > 0) {
+        var explainedNumber = new ExplainedNumber(__result, explanation);
+        explainedNumber.Add(extra, perk.Name);
+        __result = (int) explainedNumber.ResultNumber;
+      }
     }
-    
-    public void Reset() {}
 
   }
 
