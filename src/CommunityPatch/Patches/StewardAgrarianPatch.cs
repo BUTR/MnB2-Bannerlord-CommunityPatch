@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -5,21 +6,29 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using HarmonyLib;
+using Helpers;
+using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
+using TaleWorlds.Library;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  internal class StewardAgrarianPatch : IPatch {
+  internal class StewardAgrarianPatch : PatchBase<StewardAgrarianPatch> {
 
-    public bool Applied { get; private set; }
+    public override bool Applied { get; protected set; }
+    
+    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultVillageProductionCalculatorModel).GetMethod(nameof(DefaultVillageProductionCalculatorModel.CalculateDailyFoodProductionAmount), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(StewardAgrarianPatch).GetMethod("Postfix", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    private readonly PerkObject _perk
-        = PerkObject.FindFirst(x => x.Name.GetID() == "XNc2NIGL");
+    private PerkObject _perk;
 
-    public bool IsApplicable(Game game)
+    public override void Reset()
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "XNc2NIGL");
+    public override bool IsApplicable(Game game)
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk.PrimaryBonus == 0.3f)
+      if (_perk.PrimaryBonus != 0f)
         return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -31,25 +40,23 @@ namespace CommunityPatch.Patches {
 
       var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
-        0xb4, 0x8e, 0x91, 0x0e, 0x9f, 0x71, 0xc0, 0xf8,
-        0x15, 0xa7, 0x63, 0xb0, 0x0b, 0x56, 0x76, 0xd2,
-        0x02, 0xb5, 0xa7, 0x61, 0x3a, 0x52, 0x58, 0x23,
-        0x5e, 0xbf, 0x3f, 0xb6, 0xe4, 0x93, 0xee, 0xa1
+        0x08,0x72,0x20,0x9c,0x9a,0x23,
+        0x12,0xdf,0xd7,0xa2,0x83,0x20,
+        0xa5,0x89,0xd7,0x6a,0x67,0xb3,
+        0x35,0x22,0x66,0xb1,0xea,0x2c,
+        0x21,0x00,0x4f,0x45,0x3c,0x74,
+        0x04,0x5e
       });
     }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(Town).GetMethod("get_FoodChange");
-    private static readonly MethodInfo PatchMethodInfo = typeof(StewardAgrarianPatch).GetMethod("GetTownFoodStocksChangePatch");
-    public void Apply(Game game) {
-      // Dear TaleWorlds; Value should probably be publicly exposed, maybe by a method
-      // and maybe marked [Obsolete] if you want to avoid your developers doing dirty deeds
+   
+    public override void Apply(Game game) {
       var textObjStrings = TextObject.ConvertToStringList(
         new List<TextObject> {
           _perk.Name,
           _perk.Description
         }
       );
-
       // most of the properties of skills have private setters, yet Initialize is public
       _perk.Initialize(
         textObjStrings[0],
@@ -57,15 +64,26 @@ namespace CommunityPatch.Patches {
         _perk.Skill,
         (int) _perk.RequiredSkillValue,
         _perk.AlternativePerk,
-        SkillEffect.PerkRole.Governor, 0.3f,
-        _perk.PrimaryRole, _perk.PrimaryBonus,
+        _perk.PrimaryRole, 0.3f,
+        _perk.SecondaryRole, _perk.SecondaryBonus,
         SkillEffect.EffectIncrementType.AddFactor
       );
-      private static void GetTownFoodStocksChangePatch(Town __town, StatExplainer __result) {
-        if(__town.Governor.GetPerkValue(DefaultPerks.Steward.Agrarian))
-      }
+      if (Applied) return;
+            
+      CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
+        postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
+        
     }
+    
+    public static void Postfix(ref int __result, Village village) {
+      if (village.Bound.Town.Governor.GetPerkValue(PerkObject.FindFirst(x => x.Name.GetID() == "XNc2NIGL"))) {
+        var perk = ActivePatch._perk;
+        __result += (int) (__result * perk.PrimaryBonus);
+      }
+      
+    }
+    
 
   }
 
