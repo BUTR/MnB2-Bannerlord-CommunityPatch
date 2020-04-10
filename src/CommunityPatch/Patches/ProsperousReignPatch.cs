@@ -62,7 +62,7 @@ namespace CommunityPatch.Patches {
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
       
-      if (explanation.Lines.Count > 0)
+      if (!(__result > -0.0001f) || !(__result < 0.0001f) && explanation.Lines.Count > 0)
         explanation.Lines.RemoveAt(explanation.Lines.Count - 1);
       
       float extra = explanation.Lines.Where(line => line.Number > 0).Sum(line => line.Number);
