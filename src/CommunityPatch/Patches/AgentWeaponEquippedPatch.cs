@@ -62,6 +62,7 @@ namespace CommunityPatch.Patches {
       if (weaponStatsData != null) {
         updatedWeaponStatsData = weaponStatsData        
           .Select(weapon => CrossbowCavalryCrossbowExpertPerksPatch.Apply(__instance, weapon))
+          .Select(weapon => MountedArcherBowExpertPerksPatch.Apply(__instance, weapon))
           .ToArray();
       }
       
