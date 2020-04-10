@@ -51,7 +51,7 @@ namespace CommunityPatch.Patches {
 
     // ReSharper disable once InconsistentNaming
     // ReSharper disable once UnusedParameter.Local
-    private static void Prefix(Town town, ref StatExplainer explanation)
+    private static void Prefix(Town fortification, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
@@ -68,13 +68,7 @@ namespace CommunityPatch.Patches {
       if (explanation.Lines.Count > 0)
         explanation.Lines.RemoveAt(explanation.Lines.Count - 1);
       
-      float extra = 0;
-      // ReSharper disable once ForCanBeConvertedToForeach
-      for (var i = 0; i < explanation.Lines.Count; i++) {
-        var line = explanation.Lines[i];
-        if (line.Number > 0)
-          extra += line.Number;
-      }
+      float extra = explanation.Lines.Where(line => line.Number > 0).Sum(line => line.Number);
 
       if (extra < float.Epsilon)
         return;
