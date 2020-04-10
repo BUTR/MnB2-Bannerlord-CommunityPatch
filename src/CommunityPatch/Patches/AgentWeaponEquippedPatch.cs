@@ -54,7 +54,7 @@ namespace CommunityPatch.Patches {
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
-      // TODO: game version check, skip il hash check?
+      _IsApplicable(game);
 
       var bytes = TargetMethodInfo.GetCilBytes();
       if (bytes == null) return false;
@@ -68,6 +68,8 @@ namespace CommunityPatch.Patches {
         0xE7, 0xA9, 0x48, 0xED, 0x72, 0x4F, 0x77, 0xAC
       });
     }
+
+    protected abstract bool _IsApplicable(Game game);
 
     protected static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk) {
       var heroObject = character.IsHero ? ((CharacterObject) character) : null;
