@@ -24,6 +24,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Supreme Authority
     * Swords As Tribute
     * Tax Collector
+    * Warmonger
 * Learning Rate explanation
 * Item Comparison perk-based coloring
 * Tier 5 Prisoners not being able to be recruited <sub><sup>Tier 6 are not able to be recruited by intended design</sup></sub>
