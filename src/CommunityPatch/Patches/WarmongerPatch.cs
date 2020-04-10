@@ -49,8 +49,7 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    // ReSharper disable once UnusedParameter.Local
-    private static void Postfix(ref int __result, MobileParty armyLeaderParty, MobileParty party) {
+    private static void Postfix(ref int __result, MobileParty armyLeaderParty) {
       var perk = ActivePatch._perk;
       if (!(armyLeaderParty.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
