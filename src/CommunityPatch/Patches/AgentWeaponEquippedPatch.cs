@@ -1,10 +1,8 @@
-using System;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.DotNet;
 using TaleWorlds.Engine;
 using TaleWorlds.MountAndBlade;
 using static CommunityPatch.HarmonyHelpers;
@@ -16,32 +14,19 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo TargetMethodInfo = typeof(Agent)
       .GetMethod("WeaponEquipped", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    // ReSharper disable once InconsistentNaming
-    private static readonly FieldInfo IMBAgentField = typeof(MBAPI)
-      .GetField("IMBAgent", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-
-    private static readonly MethodInfo SetWeaponEquipped = IMBAgentField.FieldType.GetMethod("WeaponEquipped");
-
-    private static readonly MethodInfo GetAgentPointer = typeof(Agent)
-      .GetMethod("get_Pointer", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-
-    private static readonly MethodInfo GetNativeObjectPointer = typeof(NativeObject)
-      .GetMethod("get_Pointer", BindingFlags.NonPublic | BindingFlags.Instance);
-
     private static readonly MethodInfo PatchMethodInfo = typeof(AgentWeaponEquippedPatch)
-      .GetMethod(nameof(PostFix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      .GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override void Apply(Game game) {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        null,
         new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
     // ReSharper disable once InconsistentNaming
-    private static void PostFix(Agent __instance,
+    private static void Prefix(Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
       ref WeaponStatsData[] weaponStatsData,
@@ -50,32 +35,14 @@ namespace CommunityPatch.Patches {
       GameEntity weaponEntity,
       bool removeOldWeaponFromScene,
       bool isWieldedOnSpawn) {
-      if (weaponStatsData != null) {
-        var patch = ActivePatch;
-        for (var i = 0; i < weaponStatsData.Length; i++) {
-          ref var weapon = ref weaponStatsData[i];
-          patch.Apply(__instance, ref weapon);
-        }
+      if (weaponStatsData == null)
+        return;
+
+      var patch = ActivePatch;
+      for (var i = 0; i < weaponStatsData.Length; i++) {
+        ref var weapon = ref weaponStatsData[i];
+        patch.Apply(__instance, ref weapon);
       }
-
-      var agentPointer = (UIntPtr) GetAgentPointer.Invoke(__instance, new object[0]);
-      var weaponEntityPointer = weaponEntity != null
-        ? (UIntPtr) GetNativeObjectPointer.Invoke(weaponEntity, new object[0])
-        : UIntPtr.Zero;
-
-      SetWeaponEquipped.Invoke(IMBAgentField.GetValue(null), new object[] {
-        agentPointer,
-        (int) equipmentSlot,
-        weaponData,
-        weaponStatsData,
-        weaponStatsData?.Length ?? 0,
-        ammoWeaponData,
-        ammoWeaponStatsData,
-        ammoWeaponStatsData?.Length ?? 0,
-        weaponEntityPointer,
-        removeOldWeaponFromScene,
-        isWieldedOnSpawn
-      });
     }
 
     public override bool Applied { get; protected set; }
@@ -102,12 +69,12 @@ namespace CommunityPatch.Patches {
       });
     }
 
-    public static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk) {
+    protected static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk) {
       var heroObject = character.IsHero ? ((CharacterObject) character) : null;
       return heroObject?.GetPerkValue(perk) ?? false;
     }
 
-    public abstract void Apply(Agent agent, ref WeaponStatsData weapon);
+    protected abstract void Apply(Agent agent, ref WeaponStatsData weapon);
 
     public override void Reset() {
     }
