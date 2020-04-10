@@ -16,6 +16,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Agrarian
     * Assessor
     * Bannerlord
+    * Logistics Expert
     * Man-At-Arms
     * Nourish Settlement
     * Prominence
