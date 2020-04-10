@@ -1,13 +1,9 @@
-using System;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.DotNet;
 using TaleWorlds.Engine;
 using TaleWorlds.MountAndBlade;
-
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
@@ -43,9 +39,8 @@ namespace CommunityPatch.Patches {
       ref WeaponStatsData[] ammoWeaponStatsData,
       ref GameEntity weaponEntity,
       bool removeOldWeaponFromScene,
-      bool isWieldedOnSpawn) {
-      ActivePatch.Apply(__instance, equipmentSlot, ref weaponData, ref weaponStatsData, ref ammoWeaponData, ref ammoWeaponStatsData, weaponEntity);
-    }
+      bool isWieldedOnSpawn)
+      => ActivePatch.Apply(__instance, equipmentSlot, ref weaponData, ref weaponStatsData, ref ammoWeaponData, ref ammoWeaponStatsData, weaponEntity);
 
     protected abstract bool _IsApplicable(Game game);
 
@@ -58,11 +53,13 @@ namespace CommunityPatch.Patches {
       GameEntity weaponEntity);
 
     public static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk) {
-      CharacterObject heroObject = character.IsHero ? ((CharacterObject) character) : null;
+      var heroObject = character.IsHero ? (CharacterObject) character : null;
       return heroObject?.GetPerkValue(perk) ?? false;
     }
 
     public override void Reset() {
     }
+
   }
+
 }
