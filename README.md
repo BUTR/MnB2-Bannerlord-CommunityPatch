@@ -17,6 +17,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Assessor
     * Bannerlord
     * Man-At-Arms
+    * Nourish Settlement
     * Prominence
     * Reeve
     * Ruler
