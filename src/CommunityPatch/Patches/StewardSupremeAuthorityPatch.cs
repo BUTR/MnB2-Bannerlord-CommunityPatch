@@ -15,12 +15,12 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultClanPoliticsModel).GetMethod("CalculateInfluenceChangeInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(StewardSupremeAuthorityPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+
     private PerkObject _perk;
 
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "SFjspNSf");
-    
+
     public override bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
@@ -43,11 +43,19 @@ namespace CommunityPatch.Patches {
           0x3A, 0xAE, 0xD5, 0xCF, 0xCE, 0xD4, 0x28, 0x14,
           0xA5, 0x1B, 0xB0, 0x68, 0x47, 0xD7, 0xF0, 0xA5,
           0x4E, 0xFD, 0x48, 0x33, 0x32, 0xDF, 0x2F, 0x5E
+        })
+        || hash.SequenceEqual(new byte[] {
+          // e.1.0.9
+          0xD2, 0x55, 0x27, 0xE0, 0x42, 0x38, 0xA6, 0x32,
+          0x75, 0x41, 0x34, 0xC7, 0x60, 0x3C, 0x24, 0xB6,
+          0x28, 0x42, 0xC1, 0x03, 0x09, 0xA5, 0x42, 0x71,
+          0x72, 0x60, 0xAD, 0x16, 0xD2, 0x19, 0xF6, 0xB7
         });
     }
 
     public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
 
@@ -57,13 +65,14 @@ namespace CommunityPatch.Patches {
     // ReSharper disable once InconsistentNaming
     private static void Postfix(Clan clan, ref ExplainedNumber influenceChange) {
       var perk = ActivePatch._perk;
-      
+
       var ruler = clan?.Kingdom?.Ruler;
       var leader = clan?.Leader;
       if (ruler != null && ruler == leader && ruler.GetPerkValue(perk)) {
         influenceChange.Add(perk.PrimaryBonus, perk.Name);
       }
     }
+
   }
 
 }
