@@ -88,21 +88,6 @@ namespace CommunityPatch {
       ));
       base.OnSubModuleLoad();
     }
-
-    private bool _ticked = false;
-
-    protected override void OnApplicationTick(float dt) {
-      if (!_ticked) {
-        _ticked = true;
-        SynchronizationContext.Current.Post(_ => {
-          LoadDelayedSubModules();
-        }, null);
-        base.OnApplicationTick(dt);
-      }
-
-      // other stuff?
-    }
-
     private static void ShowMessage(string msg) {
       InformationManager.DisplayMessage(new InformationMessage(msg));
       Print(msg);

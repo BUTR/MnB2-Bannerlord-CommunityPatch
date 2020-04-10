@@ -37,7 +37,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 
 
 ### Modders
-Mods can add a <DelayedSubModule> element containing traditional <SubModules> that will be only loaded after the first tick of the game. This also allows delay loaded mods to refer to other modules' assemblies, such as SandBox's SandBox.ViewModelCollection.dll etc.
+`<DelayedSubModule>` support is being separated out to a dedicated module, the [DelayedSubModules](https://github.com/Tyler-IN/MnB2-Bannerlord-DelayedSubModules) project.
 
 ## How To Contribute
 
