@@ -1,13 +1,6 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.DotNet;
-using TaleWorlds.Engine;
 using TaleWorlds.MountAndBlade;
-using static CommunityPatch.Patches.AgentWeaponEquippedPatch;
 
 namespace CommunityPatch.Patches {
 
@@ -18,7 +11,7 @@ namespace CommunityPatch.Patches {
     private static PerkObject CrossbowExpert => PerkObject.FindFirst(perk => perk.Name.GetID() == "T4fREm7U");
 
     // TODO: this apply should probably be split into one for each of these perks 
-    public void Apply(Agent agent, ref WeaponStatsData weapon) {
+    public override void Apply(Agent agent, ref WeaponStatsData weapon) {
       if (weapon.WeaponClass != (int) WeaponClass.Crossbow
         || !HeroHasPerk(agent.Character, CrossbowCavalry)
         && !HeroHasPerk(agent.Character, CrossbowExpert))

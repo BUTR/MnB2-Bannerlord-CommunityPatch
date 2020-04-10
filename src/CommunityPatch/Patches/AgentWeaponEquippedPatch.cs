@@ -20,7 +20,7 @@ namespace CommunityPatch.Patches {
     private static readonly FieldInfo IMBAgentField = typeof(MBAPI)
       .GetField("IMBAgent", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo GetWeaponEquipped = IMBAgentField.FieldType.GetMethod("WeaponEquipped");
+    private static readonly MethodInfo SetWeaponEquipped = IMBAgentField.FieldType.GetMethod("WeaponEquipped");
 
     private static readonly MethodInfo GetAgentPointer = typeof(Agent)
       .GetMethod("get_Pointer", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
@@ -63,7 +63,7 @@ namespace CommunityPatch.Patches {
         ? (UIntPtr) GetNativeObjectPointer.Invoke(weaponEntity, new object[0])
         : UIntPtr.Zero;
 
-      GetWeaponEquipped.Invoke(IMBAgentField.GetValue(null), new object[] {
+      SetWeaponEquipped.Invoke(IMBAgentField.GetValue(null), new object[] {
         agentPointer,
         (int) equipmentSlot,
         weaponData,
