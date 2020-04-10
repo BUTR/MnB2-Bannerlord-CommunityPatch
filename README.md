@@ -16,6 +16,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Agrarian
     * Assessor
     * Bannerlord
+    * Logistics Expert
     * Man-At-Arms
     * Nourish Settlement
     * Prominence
@@ -24,6 +25,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Supreme Authority
     * Swords As Tribute
     * Tax Collector
+    * Warmonger
 * Learning Rate explanation
 * Item Comparison perk-based coloring
 * Tier 5 Prisoners not being able to be recruited <sub><sup>Tier 6 are not able to be recruited by intended design</sup></sub>
@@ -51,10 +53,10 @@ Bannerlord Mod.IO: https://bannerlord.mod.io/community-patch
 
 ## Credits
 ##### Contributors
-* [🅠](https://www.nexusmods.com/users/958353)
-* [Skauzor](https://www.nexusmods.com/users/3289432)
-* [Zarganoth](https://www.nexusmods.com/users/6940484)
-* [Tynakuh](https://www.nexusmods.com/users/51824126)
+* [🅠](https://www.nexusmods.com/users/958353) ([Discord](https://discordapp.com/users/475636674076868618))
+* [Skauzor](https://www.nexusmods.com/users/3289432) ([Discord](https://discordapp.com/users/123778041934643203))
+* [Zarganoth](https://www.nexusmods.com/users/6940484) ([Discord](https://discordapp.com/users/298985985843396618))
+* [Tynakuh](https://www.nexusmods.com/users/51824126) ([Discord](https://discordapp.com/users/178209384852094976))
 
 ##### Others
 * Xaphedo for providing the banner art
