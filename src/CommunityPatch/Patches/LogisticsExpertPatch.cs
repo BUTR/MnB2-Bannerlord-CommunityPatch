@@ -46,9 +46,8 @@ namespace CommunityPatch.Patches {
       });
     }
 
-    // ReSharper disable once UnusedParameter.Local
     // ReSharper disable once InconsistentNaming
-    private static void Postfix(ref float __result, MobileParty mobileParty, float baseSpeed, StatExplainer explanation) {
+    private static void Postfix(ref float __result, MobileParty mobileParty, StatExplainer explanation) {
       var perk = ActivePatch._perk;
       if (!(mobileParty.Army?.LeaderParty?.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
