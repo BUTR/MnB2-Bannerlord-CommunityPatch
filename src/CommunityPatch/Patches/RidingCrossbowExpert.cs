@@ -7,7 +7,7 @@ using TaleWorlds.MountAndBlade;
 namespace CommunityPatch.Patches {
 
   public class RidingCrossbowExpert : AgentWeaponEquippedPatch {
-    
+
     private static PerkObject CrossbowExpert => PerkObject.FindFirst(perk => perk.Name.GetID() == "T4fREm7U");
 
     protected override bool _IsApplicable(Game game)
@@ -20,14 +20,16 @@ namespace CommunityPatch.Patches {
       ref WeaponData ammoWeaponData,
       ref WeaponStatsData[] ammoWeaponStatsData,
       GameEntity weaponEntity) {
-      for (int i = 0; i < weaponStatsData.Length; i++) {
+      for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
         if (weapon.WeaponClass == (int) WeaponClass.Crossbow && HeroHasPerk(__instance.Character, CrossbowExpert)) {
           var updatedWeapon = weapon;
-          updatedWeapon.WeaponFlags = weapon.WeaponFlags & ~((ulong) WeaponFlags.CantReloadOnHorseback);
+          updatedWeapon.WeaponFlags = weapon.WeaponFlags & ~(ulong) WeaponFlags.CantReloadOnHorseback;
           weaponStatsData[i] = updatedWeapon;
         }
       }
     }
+
   }
+
 }
