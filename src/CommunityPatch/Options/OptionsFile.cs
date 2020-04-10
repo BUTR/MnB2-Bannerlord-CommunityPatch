@@ -10,7 +10,7 @@ using Path = System.IO.Path;
 
 namespace CommunityPatch {
 
-  public sealed partial class OptionsFile : OptionsStore, IEquatable<OptionsFile>, IComparable<OptionsFile> {
+  public abstract partial class OptionsFile : OptionsStore, IEquatable<OptionsFile>, IComparable<OptionsFile> {
 
     public bool Equals(OptionsFile other)
       => _path == other._path;
@@ -114,7 +114,7 @@ namespace CommunityPatch {
         return kvs;
 
       kvs = new KeyValueSyntax(key, new BareKeySyntax());
-      _toml.KeyValues.Add(kvs);
+      t.Items.Add(kvs);
 
       return kvs;
     }

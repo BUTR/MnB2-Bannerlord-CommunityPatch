@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace CommunityPatch {
 
-  public partial class Option<TOption> {
+  public sealed partial class StringOption {
 
     public override int CompareTo(object obj) {
       if (!(obj is Option opt))
         return GetHashCode() - obj.GetHashCode();
 
-      if (opt is Option<TOption> genOpt)
+      if (opt is StringOption genOpt)
         return CompareTo(genOpt);
 
       return opt.CompareTo(opt);
     }
 
-    public int CompareTo(Option<TOption> other) {
+    public int CompareTo(StringOption other) {
       if (ReferenceEquals(this, other))
         return 0;
       if (ReferenceEquals(null, other))
@@ -50,27 +50,20 @@ namespace CommunityPatch {
       if (nameComparison != 0)
         return nameComparison;
 
-      return Comparer<Type>.Default.Compare(typeof(Option<TOption>), other.GetType());
+      return Comparer<Type>.Default.Compare(typeof(StringOption), other.GetType());
     }
 
-    public static bool operator <(Option<TOption> left, Option<TOption> right)
+    public static bool operator <(StringOption left, StringOption right)
       => left.CompareTo(right) < 0;
 
-    public static bool operator >(Option<TOption> left, Option<TOption> right)
+    public static bool operator >(StringOption left, StringOption right)
       => left.CompareTo(right) > 0;
 
-    public static bool operator <=(Option<TOption> left, Option<TOption> right)
+    public static bool operator <=(StringOption left, StringOption right)
       => left.CompareTo(right) <= 0;
 
-    public static bool operator >=(Option<TOption> left, Option<TOption> right)
+    public static bool operator >=(StringOption left, StringOption right)
       => left.CompareTo(right) >= 0;
-
-  }
-
-  public partial class Option<TOption, TEnum> {
-
-    public int CompareTo(Option<TOption, TEnum> other)
-      => ((Option<TOption>) this).CompareTo(other);
 
   }
 

@@ -1,10 +1,20 @@
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace CommunityPatch {
 
   [PublicAPI]
   public abstract class OptionsStore : IEquatable<OptionsStore>, IComparable<OptionsStore> {
+
+    public abstract string Name { get; }
+
+    public object GetMetadata(Option option, string metadataType)
+      => GetOptionMetadata(option.Namespace, option.Name, metadataType);
+
+    public abstract object GetOptionMetadata(string ns, string key, string metadataType);
+
+    public abstract IEnumerable<Option> GetKnownOptions();
 
     public abstract void Save();
 
@@ -28,7 +38,7 @@ namespace CommunityPatch {
     public abstract bool Equals(OptionsStore other);
 
     public abstract int CompareTo(OptionsStore other);
-    
+
     public static bool operator <(OptionsStore left, OptionsStore right)
       => left.CompareTo(right) < 0;
 
@@ -39,7 +49,8 @@ namespace CommunityPatch {
       => left.CompareTo(right) <= 0;
 
     public static bool operator >=(OptionsStore left, OptionsStore right)
-      =>left.CompareTo(right) >= 0;
+      => left.CompareTo(right) >= 0;
+
   }
 
 }

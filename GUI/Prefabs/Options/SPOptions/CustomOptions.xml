@@ -1,0 +1,90 @@
+<Prefab>
+  <Window>
+    <OptionsScreenWidget Id="Options" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" CurrentOptionDescriptionWidget="MainSectionListPanel\DescriptionsRightPanel\DescriptionsListPanel\CurrentOptionDescriptionWidget" CurrentOptionImageWidget="MainSectionListPanel\DescriptionsRightPanel\DescriptionsListPanel\CurrentOptionImageWidget" CurrentOptionNameWidget="MainSectionListPanel\DescriptionsRightPanel\DescriptionsListPanel\CurrentOptionNameWidget">
+      <Children>
+
+        <Standard.Background />
+
+        <ListPanel Id="MainSectionListPanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="164">
+          <Children>
+
+            <Widget Id="CenterPanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+              <Children>
+
+                <ScrollablePanel Id="ScrollablePanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" AutoHideScrollBarHandle="true" AutoHideScrollBars="false" ClipRect="MyClipRect" InnerPanel="MyClipRect\TabControl" VerticalScrollbar="..\..\VerticalScrollbar">
+                  <Children>
+                    <Widget Id="MyClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush.GlobalAlphaFactor="0.75" ClipContents="true">
+                      <Children>
+                        <TabControl Id="TabControl" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren">
+                          <Children>
+                            <OptionsGenericPage Id="AudioOptionsPage" DataSource="{AudioOptions}" />
+                            <OptionsGenericPage Id="VideoOptionsPage" DataSource="{VideoOptions}" />
+                            <OptionsGraphicsPage Id="GraphicsOptionsPage" DataSource="{GraphicsOptions}" />
+                            <OptionsGenericPage Id="GameplayOptionsPage" DataSource="{GameplayOptions}" />
+                            <OptionsGenericPage Id="ModOptionsPage" DataSource="{ModOptions}" />
+                            <OptionsGameKeyPage Id="GameKeyOptionGroupsPage" DataSource="{GameKeyOptionGroups}" />
+                            <OptionsGamepadPage Id="GamepadOptionsPage" DataSource="{GamepadOptions}" />
+                          </Children>
+                        </TabControl>
+                      </Children>
+                    </Widget>
+
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="150" VerticalAlignment="Bottom" Sprite="StdAssets\Popup\scrollable_field_gradient" IsEnabled="false" />
+
+                  </Children>
+                </ScrollablePanel>
+
+              </Children>
+            </Widget>
+
+            <ScrollbarWidget Id="VerticalScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="8" HorizontalAlignment="Right" VerticalAlignment="Center" MarginTop="26" MarginBottom="85" AlignmentAxis="Vertical" Handle="VerticalScrollbarHandle" MaxValue="100" MinValue="0">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4" HorizontalAlignment="Center" Sprite="MPLobby\CustomServer\lobby_slider_bed" Brush.AlphaFactor="0.4" />
+                <ImageWidget Id="VerticalScrollbarHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="8" SuggestedHeight="10" HorizontalAlignment="Center" Brush="FaceGen.Scrollbar.Handle" />
+              </Children>
+            </ScrollbarWidget>
+
+            <!--Descriptions Right Panel-->
+            <Widget Id="DescriptionsRightPanel" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="650">
+              <Children>
+
+                <ListPanel Id="DescriptionsListPanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="40" MarginTop="65" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                  <Children>
+                    <RichTextWidget Id="CurrentOptionNameWidget" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="SPOptions.Description.Title.Text" Text=" " />
+                    <RichTextWidget Id="CurrentOptionDescriptionWidget" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="25" Brush="SPOptions.Description.Text" Text=" " />
+                    <Widget Id="CurrentOptionImageWidget" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="576" SuggestedHeight="324" MarginTop="35" />
+                  </Children>
+                </ListPanel>
+
+              </Children>
+            </Widget>
+
+          </Children>
+        </ListPanel>
+
+        <!--Top Panel-->
+        <Standard.TopPanel Parameter.Title="@OptionsLbl">
+          <Children>
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="128" HorizontalAlignment="Center" VerticalAlignment="Bottom" LayoutImp.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                <OptionsTabToggle DataSource="{VideoOptions}" Parameter.ButtonBrush="Header.Tab.Left" Parameter.TabName="VideoOptionsPage" />
+                <OptionsTabToggle DataSource="{GraphicsOptions}" PositionYOffset="2" Parameter.ButtonBrush="Header.Tab.Center" Parameter.TabName="GraphicsOptionsPage" />
+                <OptionsTabToggle DataSource="{AudioOptions}" PositionYOffset="2" Parameter.ButtonBrush="Header.Tab.Center" Parameter.TabName="AudioOptionsPage" />
+                <OptionsTabToggle DataSource="{GameplayOptions}" PositionYOffset="2" Parameter.ButtonBrush="Header.Tab.Center" Parameter.TabName="GameplayOptionsPage" />
+                <OptionsTabToggle DataSource="{ModOptions}" PositionYOffset="2" Parameter.ButtonBrush="Header.Tab.Center" Parameter.TabName="ModOptionsPage" />
+                <OptionsTabToggle DataSource="{GameKeyOptionGroups}" Parameter.ButtonBrush="Header.Tab.Right" Parameter.TabName="GameKeyOptionGroupsPage" />
+                <OptionsTabToggle DataSource="{GamepadOptions}" Parameter.ButtonBrush="Header.Tab.Right" Parameter.TabName="GamepadOptionsPage" IsVisible="@IsEnabled"/>
+              </Children>
+            </ListPanel>
+
+          </Children>
+        </Standard.TopPanel>
+
+        <Standard.DialogCloseButtons Parameter.CancelButtonAction="ExecuteCancel" Parameter.CancelButtonText="@CancelLbl" Parameter.DoneButtonAction="ExecuteDone" Parameter.DoneButtonText="@DoneLbl" />
+
+        <BrightnessOption DataSource="{BrightnessPopUp}" IsVisible="@Visible" />
+
+      </Children>
+    </OptionsScreenWidget>
+  </Window>
+</Prefab>

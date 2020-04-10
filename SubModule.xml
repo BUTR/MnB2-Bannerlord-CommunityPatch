@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <Module>
-    <Name value="Community Patch" />
-    <Id value="CommunityPatch" />
+    <Name value="Community Patch"/>
+    <Id value="CommunityPatch"/>
     <Version value="v0.1.0" />
-    <SingleplayerModule value="true" />
-    <MultiplayerModule value="true" />
-    <Official value="false" />
-    <DependedModules />
+    <SingleplayerModule value="true"/>
+    <MultiplayerModule value="true"/>
+    <Official value="false"/>
+    <DependedModules>
+        <DependedModule Id="Native"/>
+    </DependedModules>
     <SubModules>
         <SubModule>
-            <Name value="CommunityPatch" />
-            <DLLName value="CommunityPatch.dll" />
-            <SubModuleClassType value="CommunityPatch.CommunityPatchSubModule" />
+            <Name value="CommunityPatch"/>
+            <DLLName value="CommunityPatch.dll"/>
+            <SubModuleClassType value="CommunityPatch.CommunityPatchSubModule"/>
             <Tags>
-                <Tag key="DedicatedServerType" value="none" />
-                <Tag key="IsNoRenderModeElement" value="false" />
+                <Tag key="DedicatedServerType" value="none"/>
+                <Tag key="IsNoRenderModeElement" value="false"/>
             </Tags>
         </SubModule>
     </SubModules>
-    <Xmls />
+    <Xmls/>
 </Module>

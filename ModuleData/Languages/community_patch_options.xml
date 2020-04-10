@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
+  <tags>
+    <tag language="English" />
+  </tags>
+  <strings>
+    <string id="ModOptions" text="Mod Options" />
+    <string id="CommunityPatchDisableIntroVideo" text="Disable Intro Video" />
+    <string id="CommunityPatchDisableIntroVideoDescription" text="Disables any sort of default introduction video that occurs when starting the game." />
+  </strings>
+</base>

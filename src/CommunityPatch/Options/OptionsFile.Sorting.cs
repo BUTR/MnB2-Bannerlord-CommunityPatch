@@ -2,7 +2,7 @@ using System;
 
 namespace CommunityPatch {
 
-  public sealed partial class OptionsFile {
+  public partial class OptionsFile {
 
     public override int CompareTo(OptionsStore other)
       => throw new NotImplementedException();
