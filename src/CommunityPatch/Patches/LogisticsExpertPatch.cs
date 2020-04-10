@@ -36,12 +36,12 @@ namespace CommunityPatch.Patches {
 
       var bytes = TargetMethodInfo.GetCilBytes();
       if (bytes == null) return false;
-      
+
       var hash = bytes.GetSha256();
       return hash.SequenceEqual(new byte[] {
-        0x06, 0xE6, 0xB4, 0xA5, 0xA5, 0x0C, 0xAD, 0x4E, 
+        0x06, 0xE6, 0xB4, 0xA5, 0xA5, 0x0C, 0xAD, 0x4E,
         0x5C, 0xCB, 0xB8, 0xBD, 0x80, 0x43, 0x52, 0x81,
-        0x70, 0x70, 0x34, 0x4E, 0x14, 0xA0, 0x58, 0x93, 
+        0x70, 0x70, 0x34, 0x4E, 0x14, 0xA0, 0x58, 0x93,
         0xAB, 0x0C, 0x84, 0xAC, 0x43, 0x3F, 0xDD, 0x63
       });
     }
@@ -50,7 +50,7 @@ namespace CommunityPatch.Patches {
     // ReSharper disable once InconsistentNaming
     private static void Postfix(ref float __result, MobileParty mobileParty, float baseSpeed, StatExplainer explanation) {
       var perk = ActivePatch._perk;
-      if (!(mobileParty.LeaderHero?.GetPerkValue(perk) ?? false))
+      if (!(mobileParty.Army?.LeaderParty?.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
