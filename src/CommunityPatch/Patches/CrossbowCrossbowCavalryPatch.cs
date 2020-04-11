@@ -1,4 +1,8 @@
+using System.Reflection;
+using HarmonyLib;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.ViewModelCollection;
+using TaleWorlds.CampaignSystem.ViewModelCollection.Inventory;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
@@ -39,10 +43,12 @@ namespace CommunityPatch.Patches {
         var weapon = weaponStatsData[i];
         if (weapon.WeaponClass == (int) WeaponClass.Crossbow && HeroHasPerk(__instance.Character, CrossbowCavalry)) {
           var updatedWeapon = weapon;
-          updatedWeapon.WeaponFlags = weapon.WeaponFlags & ~((ulong) WeaponFlags.CantReloadOnHorseback);
+          updatedWeapon.WeaponFlags = weapon.WeaponFlags & ~(ulong) WeaponFlags.CantReloadOnHorseback;
           weaponStatsData[i] = updatedWeapon;
         }
       }
     }
+
   }
+
 }
