@@ -12,6 +12,13 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub>
   * Scouting
     * Healthy Scout
+  * Riding
+    * Crossbow Expert
+    * Bow Expert
+  * Bow
+    * Mounted Archer
+  * Crossbow
+    * Crossbow Cavalry
   * Steward
     * Agrarian
     * Assessor
