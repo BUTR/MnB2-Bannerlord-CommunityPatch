@@ -8,11 +8,11 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  public abstract class AgentWeaponEquippedPatch : PatchBase<AgentWeaponEquippedPatch> {
+  public abstract class AgentWeaponEquippedPatch<TPatch> : PatchBase<TPatch> where TPatch : AgentWeaponEquippedPatch<TPatch> {
 
     private static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod("WeaponEquipped", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(AgentWeaponEquippedPatch).GetMethod(nameof(PostFix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(AgentWeaponEquippedPatch<TPatch>).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override bool Applied { get; protected set; }
 
@@ -31,7 +31,7 @@ namespace CommunityPatch.Patches {
       return _IsApplicable(game);
     }
 
-    private static void PostFix(ref Agent __instance,
+    private static void Prefix(ref Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
       ref WeaponStatsData[] weaponStatsData,
