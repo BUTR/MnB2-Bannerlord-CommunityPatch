@@ -34,6 +34,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Swords As Tribute
     * Tax Collector
     * Warmonger
+    * Enhanced Mines
 * Learning Rate explanation
 * Item Comparison perk-based coloring
 * Party Morale bonus being too low for >10 food variety
