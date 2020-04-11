@@ -64,24 +64,47 @@ namespace CommunityPatch.Patches {
        
     }
 
-    static MissionWeapon ApplyBowPerks(Hero hero, MissionWeapon missionWeapon) {
-      var maxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-      var ammoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+    static short ApplyArrowPerks(Hero hero, bool hasMount) {
+      short extraAmmo = 0;
 
       if (hero.GetPerkValue(DefaultPerks.Bow.LargeQuiver)) {
-        //TODO
+        extraAmmo += 3;
       }
 
-      var currentAmmo = (short) ammoField.GetValue(missionWeapon);
-      var increasedAmmo = (short) (currentAmmo + 3);
-      object boxed = missionWeapon;
-
-      ammoField.SetValue(boxed, (short) 44);
-      maxAmmoField.SetValue(boxed, (short) 44);
-      return (MissionWeapon) boxed;
+      if (hero.GetPerkValue(DefaultPerks.Bow.BattleEquipped)) {
+        extraAmmo += 6;
+      }
+  
+      /*
+      TODO: Mount agent is not ready during InitializeMissionEquipment.
+      TODO: Patching later functions is trouble because MissionWeapon is a struct, so everything is a value, not a reference.
+      TODO: So task is at Mission::SpawnAgent (where mount agent is set), track down references to WeaponMission and update ammo.        
+      if (hasMount) {
+        if (hero.GetPerkValue(DefaultPerks.Riding.SpareArrows)) {
+          extraAmmo += 3;
+        }
+      }
+      else {
+        if (hero.GetPerkValue(DefaultPerks.Athletics.ExtraArrows)) {
+          extraAmmo += 2;
+        }
+      }
+      */
+      return extraAmmo;
     }
+    
+    static short ApplyThrowingAmmoPerks(Hero hero, bool hasMount) {
+      short extraAmmo = 0;
 
-    // ReSharper disable once InconsistentNaming
+      if (hero.GetPerkValue(DefaultPerks.Throwing.FullyArmed)) {
+        extraAmmo += 1;
+      }
+
+      if (hero.GetPerkValue(DefaultPerks.Throwing.BattleReady)) {
+        extraAmmo += 2;
+      }
+      return extraAmmo;
+    }
     private static void Postfix(Agent __instance) {
       if (!__instance.IsHero) {
         return;
@@ -89,20 +112,80 @@ namespace CommunityPatch.Patches {
 
       if (__instance.Character is CharacterObject charObj) {
         var property = typeof(MissionEquipment)
-            .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+          .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
         var missionWeapons = (MissionWeapon[]) property.GetValue(__instance.Equipment);
         for (int i = 0; i < missionWeapons.Length; i++) { 
           if (!missionWeapons[i].Weapons.IsEmpty()) {
             var weaponComponentData = missionWeapons[i].Weapons[0];
             if (weaponComponentData != null) {
               var hero = charObj.HeroObject;
+              short extraAmmo = 0;
+              
               if (weaponComponentData.WeaponClass == WeaponClass.Arrow) {
-                missionWeapons[i] = ApplyBowPerks(hero, missionWeapons[i]);
+                extraAmmo = ApplyArrowPerks(hero, false);
+              }
+              else if (weaponComponentData.WeaponClass == WeaponClass.ThrowingAxe ||
+                weaponComponentData.WeaponClass == WeaponClass.ThrowingKnife ||
+                weaponComponentData.WeaponClass == WeaponClass.Javelin) {
+                extraAmmo = ApplyThrowingAmmoPerks(hero,false);
+              }
+
+              if (extraAmmo > 0) {
+                var maxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                var ammoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                var newMaxAmmo = (short) ((short)maxAmmoField.GetValue(missionWeapons[i]) + extraAmmo);
+                object boxed = missionWeapons[i];
+                ammoField.SetValue(boxed, newMaxAmmo);
+                maxAmmoField.SetValue(boxed, newMaxAmmo);
+                missionWeapons[i] = (MissionWeapon) boxed;
               }
             }
           }
         }
       }
     }
+    /*
+
+    // ReSharper disable once InconsistentNaming
+    private static void Postfix(Agent __result) {
+      if (!__result.IsHero) {
+        return;
+      }
+
+      if (__result.Character is CharacterObject charObj) {
+        var property = typeof(MissionEquipment)
+            .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+        var missionWeapons = (MissionWeapon[]) property.GetValue(__result.Equipment);
+        for (int i = 0; i < missionWeapons.Length; i++) { 
+          if (!missionWeapons[i].Weapons.IsEmpty()) {
+            var weaponComponentData = missionWeapons[i].Weapons[0];
+            if (weaponComponentData != null) {
+              var hero = charObj.HeroObject;
+              short extraAmmo = 0;
+              
+              if (weaponComponentData.WeaponClass == WeaponClass.Arrow) {
+                extraAmmo = ApplyArrowPerks(hero, __result.HasMount);
+              }
+              else if (weaponComponentData.WeaponClass == WeaponClass.ThrowingAxe ||
+                weaponComponentData.WeaponClass == WeaponClass.ThrowingKnife ||
+                weaponComponentData.WeaponClass == WeaponClass.Javelin) {
+                extraAmmo = ApplyThrowingAmmoPerks(hero, __result.HasMount);
+              }
+
+              if (extraAmmo > 0) {
+                var maxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                var ammoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                var newMaxAmmo = (short) ((short)maxAmmoField.GetValue(missionWeapons[i]) + extraAmmo);
+                object boxed = missionWeapons[i];
+                ammoField.SetValue(boxed, newMaxAmmo);
+                maxAmmoField.SetValue(boxed, newMaxAmmo);
+                missionWeapons[i] = (MissionWeapon) boxed;
+              }
+            }
+          }
+        }
+      }
+    }
+    */
   }
 }
