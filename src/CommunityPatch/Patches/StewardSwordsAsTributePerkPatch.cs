@@ -66,9 +66,11 @@ namespace CommunityPatch.Patches {
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch._perk;
       var hero = party.LeaderHero;
-      if (hero == null)
+
+      if (hero == null || hero.Clan?.Kingdom?.RulingClan?.Leader != hero)
         return;
-      if (!(hero?.GetPerkValue(perk) ?? false))
+
+      if (!hero.GetPerkValue(perk))
         return;
 
       var kingdomClans = hero.Clan?.Kingdom?.Clans;
