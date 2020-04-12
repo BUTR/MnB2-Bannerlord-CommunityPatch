@@ -1,14 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using HarmonyLib;
-using JetBrains.Annotations;
-using Mono.Cecil.Cil;
-using Mono.Cecil.Metadata;
 using TaleWorlds.Library;
 
 namespace CommunityPatch {
