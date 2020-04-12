@@ -27,6 +27,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Man-At-Arms
     * Nourish Settlement
     * Prominence
+    * Prosperous Reign
     * Reeve
     * Ruler
     * Supreme Authority
@@ -35,8 +36,8 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Warmonger
 * Learning Rate explanation
 * Item Comparison perk-based coloring
-* Tier 5 Prisoners not being able to be recruited <sub><sup>Tier 6 are not able to be recruited by intended design</sup></sub>
 * Party Morale bonus being too low for >10 food variety
+* Fixed crash that occurs when the Neutral clan gains a clan tier 
 
 ### Current Features
 * Enable and Disable the Intro Video
