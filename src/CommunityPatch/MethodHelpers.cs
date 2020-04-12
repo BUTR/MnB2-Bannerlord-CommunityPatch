@@ -127,25 +127,6 @@ namespace CommunityPatch {
       return hasher.Hash;
     }
 
-    public static byte[] GetSha256(this byte[] bytes) {
-      using var hasher = SHA256.Create();
-      return hasher.ComputeHash(bytes);
-    }
-
-#if DEBUG
-    [PublicAPI]
-    public static string GetFormattedHexOfCilSignatureSha256(string typeName, string methodName) {
-      var type = Type.GetType(typeName);
-      var method = type?.GetMethod(methodName,
-        BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-      return method?.GetFormattedHexOfCilSignatureSha256();
-    }
-
-    [PublicAPI]
-    public static string GetFormattedHexOfCilSignatureSha256(this MethodBase mb)
-      => mb?.MakeCilSignatureSha256().GetSha256().GetFormattedCsHexArray();
-#endif
-
   }
 
 }
