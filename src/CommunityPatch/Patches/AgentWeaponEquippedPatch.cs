@@ -108,15 +108,6 @@ namespace CommunityPatch.Patches {
 
     protected abstract bool AppliesToVersion(Game game);
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    protected abstract void OnWeaponEquipped(Agent __instance,
-      EquipmentIndex equipmentSlot,
-      ref WeaponData weaponData,
-      ref WeaponStatsData[] weaponStatsData,
-      ref WeaponData ammoWeaponData,
-      ref WeaponStatsData[] ammoWeaponStatsData,
-      GameEntity weaponEntity);
-
     protected static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk) {
       var heroObject = character.IsHero ? (CharacterObject) character : null;
       return heroObject?.GetPerkValue(perk) ?? false;

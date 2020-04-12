@@ -51,13 +51,19 @@ namespace CommunityPatch.Patches {
       => VersionComparer.GreaterThan(GameVersion, ApplicationVersion.FromString("e1.0.0"));
 
     // ReSharper disable once InconsistentNaming
-    protected override void OnWeaponEquipped(Agent __instance,
+
+    [UsedImplicitly]
+    // workaround for https://github.com/pardeike/Harmony/issues/286
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CallWeaponEquippedPrefix(ref Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
       ref WeaponStatsData[] weaponStatsData,
       ref WeaponData ammoWeaponData,
       ref WeaponStatsData[] ammoWeaponStatsData,
-      GameEntity weaponEntity) {
+      ref GameEntity weaponEntity,
+      bool removeOldWeaponFromScene,
+      bool isWieldedOnSpawn) {
       if (weaponStatsData == null)
         return;
 
@@ -72,20 +78,6 @@ namespace CommunityPatch.Patches {
         weaponStatsData[i] = updatedWeapon;
       }
     }
-
-    [UsedImplicitly]
-    // workaround for https://github.com/pardeike/Harmony/issues/286
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void CallWeaponEquippedPrefix(ref Agent __instance,
-      EquipmentIndex equipmentSlot,
-      ref WeaponData weaponData,
-      ref WeaponStatsData[] weaponStatsData,
-      ref WeaponData ammoWeaponData,
-      ref WeaponStatsData[] ammoWeaponStatsData,
-      ref GameEntity weaponEntity,
-      bool removeOldWeaponFromScene,
-      bool isWieldedOnSpawn)
-      => ActivePatch.OnWeaponEquipped(__instance, equipmentSlot, ref weaponData, ref weaponStatsData, ref ammoWeaponData, ref ammoWeaponStatsData, weaponEntity);
 
   }
 
