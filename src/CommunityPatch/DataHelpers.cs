@@ -20,7 +20,7 @@ namespace CommunityPatch {
           sb.AppendLine(", ");
         else
           sb.Append(", ");
-        sb.AppendFormat($"{i:X2}");
+        sb.AppendFormat($"{bytes[i]:X2}");
       }
 
       sb.AppendLine();
