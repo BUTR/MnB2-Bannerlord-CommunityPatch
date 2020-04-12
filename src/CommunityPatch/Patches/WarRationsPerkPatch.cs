@@ -21,7 +21,7 @@ namespace CommunityPatch.Patches {
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
-    
+
     internal static bool QuartermasterIsClanWide {
       get => CommunityPatchSubModule.Options.Get<bool>(nameof(QuartermasterIsClanWide));
       set => CommunityPatchSubModule.Options.Set(nameof(QuartermasterIsClanWide), value);
@@ -31,10 +31,11 @@ namespace CommunityPatch.Patches {
 
     private static readonly byte[][] Hashes = {
       new byte[] {
-        0x8B, 0x51, 0x81, 0x08, 0x94, 0x99, 0xA9, 0x74,
-        0xF4, 0xAA, 0x1D, 0x76, 0x6A, 0x98, 0xE1, 0xA4,
-        0x53, 0x65, 0x83, 0xF1, 0x7E, 0xC7, 0x5D, 0xD1,
-        0xF2, 0x18, 0x81, 0xD0, 0x7E, 0xB2, 0x07, 0x5D
+        // e1.1.0.224785
+        0xE7, 0x22, 0xBA, 0x1B, 0x94, 0x5F, 0xD1, 0xAC,
+        0xF8, 0xD9, 0x6C, 0xCD, 0x00, 0xA1, 0x9B, 0x88,
+        0xC6, 0x39, 0x57, 0xF5, 0xE4, 0xA1, 0x52, 0xB1,
+        0x69, 0x81, 0x32, 0xCA, 0xDB, 0x10, 0x4E, 0xAB
       }
     };
 
@@ -53,7 +54,7 @@ namespace CommunityPatch.Patches {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
-      
+
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
     }

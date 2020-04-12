@@ -30,14 +30,11 @@ namespace CommunityPatch.Patches {
       CommunityPatchSubModule.Harmony.Patch(ItemMenuVmAddWeaponItemFlags, new HarmonyMethod(PatchMethodInfo));
       base.Apply(game);
     }
-    
-    public override IEnumerable<MethodBase> GetMethodsChecked() {
-      yield return ItemMenuVmAddWeaponItemFlags;
 
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
       foreach (var mb in base.GetMethodsChecked())
         yield return mb;
     }
-
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
@@ -48,7 +45,7 @@ namespace CommunityPatch.Patches {
           .Invoke(weapon, new object[] {HeroHasPerk(character, _mountedArcher) ? "bow" : weapon.ItemUsage});
     }
 
-    protected override void Apply(Agent __instance,
+    protected override void OnWeaponEquipped(Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
       ref WeaponStatsData[] weaponStatsData,
@@ -85,15 +82,7 @@ namespace CommunityPatch.Patches {
       ref GameEntity weaponEntity,
       bool removeOldWeaponFromScene,
       bool isWieldedOnSpawn)
-      => WeaponEquippedPrefix(ref __instance,
-        equipmentSlot,
-        ref weaponData,
-        ref weaponStatsData,
-        ref ammoWeaponData,
-        ref ammoWeaponStatsData,
-        ref weaponEntity,
-        removeOldWeaponFromScene,
-        isWieldedOnSpawn);
+      => ActivePatch.OnWeaponEquipped(__instance, equipmentSlot, ref weaponData, ref weaponStatsData, ref ammoWeaponData, ref ammoWeaponStatsData, weaponEntity);
 
   }
 

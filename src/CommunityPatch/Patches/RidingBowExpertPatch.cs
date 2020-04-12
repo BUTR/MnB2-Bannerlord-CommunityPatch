@@ -32,8 +32,6 @@ namespace CommunityPatch.Patches {
     }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
-      yield return ItemMenuVmAddWeaponItemFlags;
-
       foreach (var mb in base.GetMethodsChecked())
         yield return mb;
     }
@@ -46,7 +44,7 @@ namespace CommunityPatch.Patches {
           .Invoke(weapon, new[] {HeroHasPerk(character, _bowExpert) ? "bow" : weapon.ItemUsage});
     }
 
-    protected override void Apply(Agent __instance,
+    protected override void OnWeaponEquipped(Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
       ref WeaponStatsData[] weaponStatsData,
@@ -83,15 +81,7 @@ namespace CommunityPatch.Patches {
       ref GameEntity weaponEntity,
       bool removeOldWeaponFromScene,
       bool isWieldedOnSpawn)
-      => WeaponEquippedPrefix(ref __instance,
-        equipmentSlot,
-        ref weaponData,
-        ref weaponStatsData,
-        ref ammoWeaponData,
-        ref ammoWeaponStatsData,
-        ref weaponEntity,
-        removeOldWeaponFromScene,
-        isWieldedOnSpawn);
+      => ActivePatch.OnWeaponEquipped(__instance, equipmentSlot, ref weaponData, ref weaponStatsData, ref ammoWeaponData, ref ammoWeaponStatsData, weaponEntity);
 
   }
 

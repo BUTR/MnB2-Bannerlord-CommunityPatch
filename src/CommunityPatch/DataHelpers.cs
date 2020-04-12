@@ -12,14 +12,14 @@ namespace CommunityPatch {
       var sb = new StringBuilder();
 
       sb.AppendLine("new byte[] {");
-      sb.AppendFormat("// ").AppendLine(CommunityPatchSubModule.GameVersion.ToString());
-      sb.AppendFormat($"{bytes[0]:X2}");
+      sb.AppendFormat("  // ").AppendLine(CommunityPatchSubModule.GameVersion.ToString());
+      sb.AppendFormat($"  0x{bytes[0]:X2}");
       for (var i = 1; i < bytes.Length; ++i) {
         if (i % 8 == 0)
-          sb.AppendLine(", ");
+          sb.AppendLine(",").Append("  ");
         else
           sb.Append(", ");
-        sb.AppendFormat($"{bytes[i]:X2}");
+        sb.AppendFormat($"0x{bytes[i]:X2}");
       }
 
       sb.AppendLine();
