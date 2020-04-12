@@ -20,7 +20,7 @@ internal static class Program {
     Environment.CurrentDirectory = gameBinDir;
 
     Assembly AssemblyResolver(object sender, ResolveEventArgs eventArgs) {
-      Console.WriteLine("Loading: " + eventArgs.Name);
+      //Console.WriteLine("Loading: " + eventArgs.Name);
 
       if (eventArgs.Name == null)
         return null;
