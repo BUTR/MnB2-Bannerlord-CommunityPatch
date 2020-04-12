@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Threading;
 using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
@@ -209,7 +207,7 @@ namespace CommunityPatch {
         .OrderByDescending(x => x.Version, VersionComparer)
         .FirstOrDefault()?.Version ?? default;
 
-    private static LinkedList<IPatch> Patches {
+    public static LinkedList<IPatch> Patches {
       get {
         if (_patches != null)
           return _patches;
@@ -237,6 +235,15 @@ namespace CommunityPatch {
         }
 
         return _patches;
+      }
+    }
+
+    public static string GetBinSubDir() {
+      try {
+        return Utilities.GetConfigsPath();
+      }
+      catch (NullReferenceException) {
+        return "Win64_Shipping_Client";
       }
     }
 

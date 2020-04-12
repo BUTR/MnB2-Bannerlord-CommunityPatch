@@ -1,7 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -26,38 +27,46 @@ namespace CommunityPatch.Patches {
         .GetMethod(nameof(Postfix),
           BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
+    public IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
+    }
+    
+    private static readonly byte[][] Hashes = {
+      new byte[] {
+        0x31, 0x81, 0x47, 0x2b, 0x6a, 0xde, 0xc8, 0x26,
+        0x37, 0x68, 0xb3, 0x81, 0x0a, 0x47, 0x57, 0x51,
+        0x37, 0x30, 0xa4, 0xa4, 0xb3, 0xde, 0xa7, 0x59,
+        0x1a, 0x75, 0x90, 0x8a, 0x18, 0xdf, 0xa7, 0x2b
+      }
+    };
+
     public bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatched(patchInfo))
         return false;
 
-      var bytes = TargetMethodInfo.GetCilBytes();
-      if (bytes == null) return false;
-
-     var hash = bytes.GetSha256();
-      return hash.SequenceEqual(new byte[] {
-        0x31, 0x81, 0x47, 0x2b, 0x6a, 0xde, 0xc8, 0x26,
-        0x37, 0x68, 0xb3, 0x81, 0x0a, 0x47, 0x57, 0x51,
-        0x37, 0x30, 0xa4, 0xa4, 0xb3, 0xde, 0xa7, 0x59,
-        0x1a, 0x75, 0x90, 0x8a, 0x18, 0xdf, 0xa7, 0x2b
-      });
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
+      return hash.MatchesAnySha256(Hashes);
     }
 
     public void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
     // ReSharper disable once InconsistentNaming
+    [MethodImpl(MethodImplOptions.NoInlining)]
     static void Postfix(out bool __result) {
       __result = Hero.MainHero.MapFaction == Hero.OneToOneConversationHero.MapFaction
         && Hero.OneToOneConversationHero.Clan != Hero.MainHero.Clan
         && Hero.MainHero.Clan.IsUnderMercenaryService;
     }
-    
-    public void Reset() {}
+
+    public void Reset() {
+    }
 
   }
 

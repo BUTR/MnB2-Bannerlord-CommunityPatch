@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Helpers;
 using TaleWorlds.CampaignSystem;
@@ -16,11 +17,32 @@ namespace CommunityPatch.Patches {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultCharacterStatsModel).GetMethod(nameof(DefaultCharacterStatsModel.MaxHitpoints), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultCharacterStatsModel)
+      .GetMethod(nameof(DefaultCharacterStatsModel.MaxHitpoints), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(HealthyScoutPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
+    }
+
     private PerkObject _perk;
+
+    private static readonly byte[][] Hashes = {
+      new byte[] {
+        0xb4, 0x8e, 0x91, 0x0e, 0x9f, 0x71, 0xc0, 0xf8,
+        0x15, 0xa7, 0x63, 0xb0, 0x0b, 0x56, 0x76, 0xd2,
+        0x02, 0xb5, 0xa7, 0x61, 0x3a, 0x52, 0x58, 0x23,
+        0x5e, 0xbf, 0x3f, 0xb6, 0xe4, 0x93, 0xee, 0xa1
+      },
+      new byte[] {
+        // e1.1.0
+        0xD5, 0x4F, 0x75, 0x22, 0xAC, 0xD2, 0x2E, 0xA7,
+        0xA8, 0x4D, 0x56, 0x4D, 0x3F, 0x92, 0x44, 0xFF,
+        0x33, 0x01, 0xA6, 0x65, 0xFB, 0x0F, 0x53, 0x13,
+        0xDD, 0xEA, 0x5E, 0x56, 0xF8, 0x92, 0xE7, 0x03
+      }
+    };
 
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "dDKOoD3e");
@@ -36,16 +58,8 @@ namespace CommunityPatch.Patches {
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
-      var bytes = TargetMethodInfo.GetCilBytes();
-      if (bytes == null) return false;
-
-      var hash = bytes.GetSha256();
-      return hash.SequenceEqual(new byte[] {
-        0xb4, 0x8e, 0x91, 0x0e, 0x9f, 0x71, 0xc0, 0xf8,
-        0x15, 0xa7, 0x63, 0xb0, 0x0b, 0x56, 0x76, 0xd2,
-        0x02, 0xb5, 0xa7, 0x61, 0x3a, 0x52, 0x58, 0x23,
-        0x5e, 0xbf, 0x3f, 0xb6, 0xe4, 0x93, 0xee, 0xa1
-      });
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
+      return hash.MatchesAnySha256(Hashes);
     }
 
     public override void Apply(Game game) {
@@ -69,7 +83,7 @@ namespace CommunityPatch.Patches {
         _perk.SecondaryRole, _perk.SecondaryBonus,
         _perk.IncrementType
       );
-      
+
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
@@ -79,10 +93,11 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
       var result = __result;
 
-      var explainedNumber = new ExplainedNumber(result, explanation, null);
+      var explainedNumber = new ExplainedNumber(result, explanation);
 
       var perk = ActivePatch._perk;
 

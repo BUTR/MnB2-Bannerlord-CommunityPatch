@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <PlatformTarget>x64</PlatformTarget>
+        <RootNamespace />
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Steamworks.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Mono.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\CommunityPatch\CommunityPatch.csproj" />
+    </ItemGroup>
+
+</Project>

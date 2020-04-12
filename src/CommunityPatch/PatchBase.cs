@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 using TaleWorlds.Core;
 
@@ -16,6 +18,8 @@ namespace CommunityPatch {
     public abstract bool Applied { get; protected set; }
 
     public abstract void Reset();
+
+    public abstract IEnumerable<MethodBase> GetMethodsChecked();
 
   }
 
