@@ -19,21 +19,20 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowCavalryPerkPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     private static PerkObject _crossbowCavalry;
-    
+
     public override void Reset() {
       _crossbowCavalry = PerkObject.FindFirst(perk => perk.Name.GetID() == "sHXLjzCb");
       base.Reset();
     }
+
     public override void Apply(Game game) {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(ItemMenuVmAddWeaponItemFlags, new HarmonyMethod(PatchMethodInfo));
       base.Apply(game);
     }
-    
-    public override IEnumerable<MethodBase> GetMethodsChecked() {
-      yield return ItemMenuVmAddWeaponItemFlags;
 
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
       foreach (var mb in base.GetMethodsChecked())
         yield return mb;
     }
@@ -52,7 +51,7 @@ namespace CommunityPatch.Patches {
       => VersionComparer.GreaterThan(GameVersion, ApplicationVersion.FromString("e1.0.0"));
 
     // ReSharper disable once InconsistentNaming
-    protected override void Apply(Agent __instance,
+    protected override void OnWeaponEquipped(Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
       ref WeaponStatsData[] weaponStatsData,
@@ -86,15 +85,7 @@ namespace CommunityPatch.Patches {
       ref GameEntity weaponEntity,
       bool removeOldWeaponFromScene,
       bool isWieldedOnSpawn)
-      => WeaponEquippedPrefix(ref __instance,
-        equipmentSlot,
-        ref weaponData,
-        ref weaponStatsData,
-        ref ammoWeaponData,
-        ref ammoWeaponStatsData,
-        ref weaponEntity,
-        removeOldWeaponFromScene,
-        isWieldedOnSpawn);
+      => ActivePatch.OnWeaponEquipped(__instance, equipmentSlot, ref weaponData, ref weaponStatsData, ref ammoWeaponData, ref ammoWeaponStatsData, weaponEntity);
 
   }
 
