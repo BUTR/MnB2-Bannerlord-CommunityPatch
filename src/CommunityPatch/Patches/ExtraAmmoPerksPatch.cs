@@ -74,11 +74,7 @@ namespace CommunityPatch.Patches {
       if (hero.GetPerkValue(DefaultPerks.Bow.BattleEquipped)) {
         extraAmmo += 6;
       }
-  
-      /*
-      TODO: Mount agent is not ready during InitializeMissionEquipment.
-      TODO: Patching later functions is trouble because MissionWeapon is a struct, so everything is a value, not a reference.
-      TODO: So task is at Mission::SpawnAgent (where mount agent is set), track down references to WeaponMission and update ammo.        
+      
       if (hasMount) {
         if (hero.GetPerkValue(DefaultPerks.Riding.SpareArrows)) {
           extraAmmo += 3;
@@ -89,7 +85,6 @@ namespace CommunityPatch.Patches {
           extraAmmo += 2;
         }
       }
-      */
       return extraAmmo;
     }
     
@@ -103,8 +98,20 @@ namespace CommunityPatch.Patches {
       if (hero.GetPerkValue(DefaultPerks.Throwing.BattleReady)) {
         extraAmmo += 2;
       }
+      
+      if (hasMount) {
+        if (hero.GetPerkValue(DefaultPerks.Riding.SpareThrowingWeapon)) {
+          extraAmmo += 1;
+        }
+      }
+      else {
+        if (hero.GetPerkValue(DefaultPerks.Athletics.ExtraThrowingWeapons)) {
+          extraAmmo += 1;
+        }
+      }
       return extraAmmo;
     }
+
     private static void Postfix(Agent __instance) {
       if (!__instance.IsHero) {
         return;
@@ -114,26 +121,31 @@ namespace CommunityPatch.Patches {
         var property = typeof(MissionEquipment)
           .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
         var missionWeapons = (MissionWeapon[]) property.GetValue(__instance.Equipment);
-        for (int i = 0; i < missionWeapons.Length; i++) { 
+
+        //At this point agent.HasMount wasn't initialized, and trying to modify ammo in later functions causes problems
+        var item = __instance.SpawnEquipment[EquipmentIndex.ArmorItemEndSlot].Item;
+        var hasMount = item != null && item.HasHorseComponent;
+
+        for (var i = 0; i < missionWeapons.Length; i++) {
           if (!missionWeapons[i].Weapons.IsEmpty()) {
             var weaponComponentData = missionWeapons[i].Weapons[0];
             if (weaponComponentData != null) {
               var hero = charObj.HeroObject;
               short extraAmmo = 0;
-              
+
               if (weaponComponentData.WeaponClass == WeaponClass.Arrow) {
-                extraAmmo = ApplyArrowPerks(hero, false);
+                extraAmmo = ApplyArrowPerks(hero, hasMount);
               }
               else if (weaponComponentData.WeaponClass == WeaponClass.ThrowingAxe ||
                 weaponComponentData.WeaponClass == WeaponClass.ThrowingKnife ||
                 weaponComponentData.WeaponClass == WeaponClass.Javelin) {
-                extraAmmo = ApplyThrowingAmmoPerks(hero,false);
+                extraAmmo = ApplyThrowingAmmoPerks(hero, hasMount);
               }
 
               if (extraAmmo > 0) {
                 var maxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
                 var ammoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                var newMaxAmmo = (short) ((short)maxAmmoField.GetValue(missionWeapons[i]) + extraAmmo);
+                var newMaxAmmo = (short) ((short) maxAmmoField.GetValue(missionWeapons[i]) + extraAmmo);
                 object boxed = missionWeapons[i];
                 ammoField.SetValue(boxed, newMaxAmmo);
                 maxAmmoField.SetValue(boxed, newMaxAmmo);
@@ -144,48 +156,5 @@ namespace CommunityPatch.Patches {
         }
       }
     }
-    /*
-
-    // ReSharper disable once InconsistentNaming
-    private static void Postfix(Agent __result) {
-      if (!__result.IsHero) {
-        return;
-      }
-
-      if (__result.Character is CharacterObject charObj) {
-        var property = typeof(MissionEquipment)
-            .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
-        var missionWeapons = (MissionWeapon[]) property.GetValue(__result.Equipment);
-        for (int i = 0; i < missionWeapons.Length; i++) { 
-          if (!missionWeapons[i].Weapons.IsEmpty()) {
-            var weaponComponentData = missionWeapons[i].Weapons[0];
-            if (weaponComponentData != null) {
-              var hero = charObj.HeroObject;
-              short extraAmmo = 0;
-              
-              if (weaponComponentData.WeaponClass == WeaponClass.Arrow) {
-                extraAmmo = ApplyArrowPerks(hero, __result.HasMount);
-              }
-              else if (weaponComponentData.WeaponClass == WeaponClass.ThrowingAxe ||
-                weaponComponentData.WeaponClass == WeaponClass.ThrowingKnife ||
-                weaponComponentData.WeaponClass == WeaponClass.Javelin) {
-                extraAmmo = ApplyThrowingAmmoPerks(hero, __result.HasMount);
-              }
-
-              if (extraAmmo > 0) {
-                var maxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                var ammoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                var newMaxAmmo = (short) ((short)maxAmmoField.GetValue(missionWeapons[i]) + extraAmmo);
-                object boxed = missionWeapons[i];
-                ammoField.SetValue(boxed, newMaxAmmo);
-                maxAmmoField.SetValue(boxed, newMaxAmmo);
-                missionWeapons[i] = (MissionWeapon) boxed;
-              }
-            }
-          }
-        }
-      }
-    }
-    */
   }
 }
