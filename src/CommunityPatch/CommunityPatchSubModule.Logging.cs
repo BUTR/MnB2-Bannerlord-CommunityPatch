@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -67,6 +68,12 @@ namespace CommunityPatch {
     [Conditional("DEBUG")]
     public static void Print(string msg)
       => Debugger.Log(0, nameof(CommunityPatch), msg + Eol);
+
+    internal static readonly LinkedList<Exception> RecordedFirstChanceExceptions
+      = new LinkedList<Exception>();
+
+    internal static readonly LinkedList<Exception> RecordedUnhandledExceptions
+      = new LinkedList<Exception>();
 
   }
 

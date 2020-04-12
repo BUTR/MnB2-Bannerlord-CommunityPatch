@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+using TaleWorlds.Core;
+
+namespace CommunityPatch {
+
+  public partial class CommunityPatchSubModule {
+
+    internal static readonly OptionsFile Options = new OptionsFile(nameof(CommunityPatch) + ".txt");
+
+    internal static bool DisableIntroVideo {
+      get => Options.Get<bool>(nameof(DisableIntroVideo));
+      set => Options.Set(nameof(DisableIntroVideo), value);
+    }
+
+    internal static bool RecordFirstChanceExceptions {
+      get => Options.Get<bool>(nameof(RecordFirstChanceExceptions));
+      set => Options.Set(nameof(RecordFirstChanceExceptions), value);
+    }
+
+    private void ShowModOptions() {
+      var elements = new List<InquiryElement>();
+
+      elements.Add(new InquiryElement(
+        nameof(DisableIntroVideo),
+        DisableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
+        null
+      ));
+
+      elements.Add(new InquiryElement(
+        nameof(RecordFirstChanceExceptions),
+        RecordFirstChanceExceptions ? "Ignore First Chance Exceptions" : "Record First Chance Exceptions",
+        null
+      ));
+      elements.Add(new InquiryElement(
+        nameof(CopyDiagnosticsToClipboard),
+        "Copy Diagnostics to Clipboard",
+        null
+      ));
+      elements.Add(new InquiryElement(
+        "IntentionallyUnhandled",
+        "Throw Unhandled Exception",
+        null
+      ));
+      InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
+        "Mod Options",
+        "Community Patch Mod Options:",
+        elements,
+        true,
+        true,
+        "Apply",
+        "Return",
+        list => {
+          var selected = (string) list[0].Identifier;
+          switch (selected) {
+            case nameof(DisableIntroVideo):
+              DisableIntroVideo = !DisableIntroVideo;
+              ShowMessage($"Intro Videos: {(DisableIntroVideo ? "Disabled" : "Enabled")}.");
+              Options.Save();
+              break;
+            case nameof(RecordFirstChanceExceptions):
+              RecordFirstChanceExceptions = !RecordFirstChanceExceptions;
+              ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
+              Options.Save();
+              break;
+            case nameof(CopyDiagnosticsToClipboard):
+              CopyDiagnosticsToClipboard();
+              break;
+            default:
+              throw new NotImplementedException(selected);
+          }
+        }, null));
+    }
+
+  }
+
+}
