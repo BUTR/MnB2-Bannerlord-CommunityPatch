@@ -45,28 +45,6 @@ namespace CommunityPatch.Patches {
           .Invoke(weapon, new object[] {HeroHasPerk(character, _mountedArcher) ? "bow" : weapon.ItemUsage});
     }
 
-    protected override void OnWeaponEquipped(Agent __instance,
-      EquipmentIndex equipmentSlot,
-      ref WeaponData weaponData,
-      ref WeaponStatsData[] weaponStatsData,
-      ref WeaponData ammoWeaponData,
-      ref WeaponStatsData[] ammoWeaponStatsData,
-      GameEntity weaponEntity) {
-      if (weaponStatsData == null)
-        return;
-
-      for (var i = 0; i < weaponStatsData.Length; i++) {
-        var weapon = weaponStatsData[i];
-        if (weapon.ItemUsageIndex != MBItem.GetItemUsageIndex("long_bow")
-          || !HeroHasPerk(__instance.Character, _mountedArcher))
-          continue;
-
-        var updatedWeapon = weapon;
-        updatedWeapon.ItemUsageIndex = MBItem.GetItemUsageIndex("bow");
-        weaponStatsData[i] = updatedWeapon;
-      }
-    }
-
     protected override bool AppliesToVersion(Game game)
       => CommunityPatchSubModule.VersionComparer.GreaterThan(CommunityPatchSubModule.GameVersion, ApplicationVersion.FromString("e1.0.0"));
 
@@ -81,8 +59,21 @@ namespace CommunityPatch.Patches {
       ref WeaponStatsData[] ammoWeaponStatsData,
       ref GameEntity weaponEntity,
       bool removeOldWeaponFromScene,
-      bool isWieldedOnSpawn)
-      => ActivePatch.OnWeaponEquipped(__instance, equipmentSlot, ref weaponData, ref weaponStatsData, ref ammoWeaponData, ref ammoWeaponStatsData, weaponEntity);
+      bool isWieldedOnSpawn) {
+      if (weaponStatsData == null)
+        return;
+
+      for (var i = 0; i < weaponStatsData.Length; i++) {
+        var weapon = weaponStatsData[i];
+        if (weapon.ItemUsageIndex != MBItem.GetItemUsageIndex("long_bow")
+          || !HeroHasPerk(__instance.Character, _mountedArcher))
+          continue;
+
+        var updatedWeapon = weapon;
+        updatedWeapon.ItemUsageIndex = MBItem.GetItemUsageIndex("bow");
+        weaponStatsData[i] = updatedWeapon;
+      }
+    }
 
   }
 
