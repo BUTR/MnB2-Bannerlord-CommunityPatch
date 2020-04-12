@@ -10,7 +10,7 @@ namespace CommunityPatch {
 
     internal static readonly Harmony Harmony = new Harmony(nameof(CommunityPatch));
 
-    public static IDictionary<Type, IPatch> ActivePatches
+    public static readonly IDictionary<Type, IPatch> ActivePatches
       = new Dictionary<Type, IPatch>();
 
     private static void ApplyPatches(Game game) {
