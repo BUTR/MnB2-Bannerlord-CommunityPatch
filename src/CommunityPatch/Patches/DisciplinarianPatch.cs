@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
@@ -9,8 +12,7 @@ namespace CommunityPatch.Patches {
 
     public bool Applied { get; private set; }
 
-    private readonly PerkObject _perk
-        = PerkObject.FindFirst(x => x.Name.GetID() == "ER3ieXOb");
+    private PerkObject _perk;
 
     public bool IsApplicable(Game game)
       => _perk?.PrimaryRole == SkillEffect.PerkRole.Personal;
@@ -36,11 +38,16 @@ namespace CommunityPatch.Patches {
         _perk.PrimaryRole, _perk.PrimaryBonus,
         _perk.IncrementType
       );
-      
+
       Applied = true;
     }
-    
-    public void Reset() {}
+
+    public void Reset()
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "ER3ieXOb");
+
+    public IEnumerable<MethodBase> GetMethodsChecked() {
+      yield break;
+    }
 
   }
 

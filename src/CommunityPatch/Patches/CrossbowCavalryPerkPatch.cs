@@ -10,27 +10,27 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using static CommunityPatch.CommunityPatchSubModule;
 
 namespace CommunityPatch.Patches {
 
-  public class RidingCrossbowExpert : AgentWeaponEquippedPatch<RidingCrossbowExpert> {
+  public class CrossbowCavalryPerkPatch : AgentWeaponEquippedPatch<CrossbowCavalryPerkPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(RidingCrossbowExpert).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowCavalryPerkPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    private static PerkObject _crossbowExpert;
-
+    private static PerkObject _crossbowCavalry;
+    
     public override void Reset() {
-      _crossbowExpert = PerkObject.FindFirst(perk => perk.Name.GetID() == "T4fREm7U");
+      _crossbowCavalry = PerkObject.FindFirst(perk => perk.Name.GetID() == "sHXLjzCb");
       base.Reset();
     }
-
     public override void Apply(Game game) {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(ItemMenuVmAddWeaponItemFlags, new HarmonyMethod(PatchMethodInfo));
       base.Apply(game);
     }
-
+    
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return ItemMenuVmAddWeaponItemFlags;
 
@@ -41,13 +41,17 @@ namespace CommunityPatch.Patches {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
-      if (weapon.WeaponClass == WeaponClass.Crossbow) // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
-        weapon.WeaponFlags = HeroHasPerk(character, _crossbowExpert) ? weapon.WeaponFlags & ~WeaponFlags.CantReloadOnHorseback : weapon.WeaponFlags;
+
+      // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
+      if (weapon.WeaponClass == WeaponClass.Crossbow
+        && HeroHasPerk(character, _crossbowCavalry))
+        weapon.WeaponFlags &= ~WeaponFlags.CantReloadOnHorseback;
     }
 
     protected override bool AppliesToVersion(Game game)
-      => CommunityPatchSubModule.VersionComparer.GreaterThan(CommunityPatchSubModule.GameVersion, ApplicationVersion.FromString("e1.0.0"));
+      => VersionComparer.GreaterThan(GameVersion, ApplicationVersion.FromString("e1.0.0"));
 
+    // ReSharper disable once InconsistentNaming
     protected override void Apply(Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
@@ -61,7 +65,7 @@ namespace CommunityPatch.Patches {
       for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
         if (weapon.WeaponClass != (int) WeaponClass.Crossbow
-          || !HeroHasPerk(__instance.Character, _crossbowExpert))
+          || !HeroHasPerk(__instance.Character, _crossbowCavalry))
           continue;
 
         var updatedWeapon = weapon;

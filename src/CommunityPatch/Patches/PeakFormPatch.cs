@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Helpers;
 using TaleWorlds.CampaignSystem;
@@ -20,7 +21,20 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(PeakFormPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
+    }
+    
     private PerkObject _perk;
+
+    private static readonly byte[][] Hashes = {
+      new byte[] {
+        0xb4, 0x8e, 0x91, 0x0e, 0x9f, 0x71, 0xc0, 0xf8,
+        0x15, 0xa7, 0x63, 0xb0, 0x0b, 0x56, 0x76, 0xd2,
+        0x02, 0xb5, 0xa7, 0x61, 0x3a, 0x52, 0x58, 0x23,
+        0x5e, 0xbf, 0x3f, 0xb6, 0xe4, 0x93, 0xee, 0xa1
+      }
+    };
 
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "fBgGbxaw");
@@ -36,17 +50,9 @@ namespace CommunityPatch.Patches {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
-
-      var bytes = TargetMethodInfo.GetCilBytes();
-      if (bytes == null) return false;
-
-      var hash = bytes.GetSha256();
-      return hash.SequenceEqual(new byte[] {
-        0xb4, 0x8e, 0x91, 0x0e, 0x9f, 0x71, 0xc0, 0xf8,
-        0x15, 0xa7, 0x63, 0xb0, 0x0b, 0x56, 0x76, 0xd2,
-        0x02, 0xb5, 0xa7, 0x61, 0x3a, 0x52, 0x58, 0x23,
-        0x5e, 0xbf, 0x3f, 0xb6, 0xe4, 0x93, 0xee, 0xa1
-      });
+      
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
+      return hash.MatchesAnySha256(Hashes);
     }
 
     public override void Apply(Game game) {
@@ -72,14 +78,15 @@ namespace CommunityPatch.Patches {
       );
 
       if (Applied) return;
-      
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
-      
+
       Applied = true;
     }
 
     // ReSharper disable once InconsistentNaming
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
       var result = __result;
 

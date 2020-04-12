@@ -1,5 +1,6 @@
 using System;
-using System.Linq;
+using System.Numerics;
+using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -7,7 +8,7 @@ using HardwareProviders.CPU;
 using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
-using TaleWorlds.MountAndBlade;
+using Module = TaleWorlds.MountAndBlade.Module;
 
 namespace CommunityPatch {
 
@@ -76,7 +77,7 @@ namespace CommunityPatch {
             sb.Append(" *Selected*");
           sb.AppendLine();
           sb.Append("    ").Append(mi.Name);
-          if (!string.IsNullOrWhiteSpace(mi.Alias))
+          if (!String.IsNullOrWhiteSpace(mi.Alias))
             sb.Append(" (").Append(mi.Alias).Append(")");
           if (mi.IsOfficial)
             sb.Append(" *Official*");
@@ -118,6 +119,8 @@ namespace CommunityPatch {
         sb.AppendFormat($"  GC LOH Compact Mode: {GCSettings.LargeObjectHeapCompactionMode}").AppendLine();
         sb.AppendFormat($"  Operating System: {RuntimeInformation.OSDescription}").AppendLine();
         sb.AppendFormat($"  Framework Compatibility: {RuntimeInformation.FrameworkDescription}").AppendLine();
+        sb.AppendFormat($"  Hardware Accelerated Vector: {(Vector.IsHardwareAccelerated ? "Yes" : "No")}").AppendLine();
+        sb.AppendFormat($"  Vector Size: {Vector<byte>.Count * 8} bits").AppendLine();
       }
       catch (Exception ex) {
         sb.Append("  *** ERROR: ").Append(ex.GetType().Name).Append(": ").AppendLine(ex.Message);
