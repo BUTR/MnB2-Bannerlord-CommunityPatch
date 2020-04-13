@@ -35,6 +35,8 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Tax Collector
     * Warmonger
     * Enhanced Mines
+  * Policies
+    * Land Grants For Veterans
 * Learning Rate explanation
 * Item Comparison perk-based coloring
 * Party Morale bonus being too low for >10 food variety
