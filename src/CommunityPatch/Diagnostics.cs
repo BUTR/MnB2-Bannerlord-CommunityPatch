@@ -1,18 +1,22 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using HardwareProviders.CPU;
+using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
-using TaleWorlds.MountAndBlade;
 using static CommunityPatch.CommunityPatchSubModule;
+using Module = TaleWorlds.MountAndBlade.Module;
+using Path = TaleWorlds.Engine.Path;
 
 namespace CommunityPatch {
 
@@ -102,10 +106,36 @@ namespace CommunityPatch {
       sb.AppendLine();
 
       try {
+        sb.AppendLine("Community Patch Information:");
+        var i = 0;
+        foreach (var patch in CommunityPatchSubModule.Patches) {
+          var type = patch.GetType();
+          sb.Append("  ").Append(++i).Append(". ").Append(type.Name);
+          if (ActivePatches.ContainsKey(type))
+            sb.Append(" *Active*");
+          if (patch.IsApplicable(Game.Current))
+            sb.Append(" *Applicable*");
+          if (patch.Applied)
+            sb.Append(" *Applied*");
+          sb.AppendLine();
+        }
+      }
+      catch (Exception ex) {
+        sb.Append("  *** ERROR: ").Append(ex.GetType().Name).Append(": ").AppendLine(ex.Message);
+      }
+
+      sb.AppendLine();
+
+      try {
         sb.AppendLine("Loaded SubModules:");
         var i = 0;
-        foreach (var sm in Module.CurrentModule.SubModules)
-          sb.Append("  ").Append(++i).Append(". ").AppendLine(sm.GetType().AssemblyQualifiedName);
+        foreach (var sm in Module.CurrentModule.SubModules) {
+          var type = sm.GetType();
+          var asm = type.Assembly;
+          sb.Append("  ").Append(++i).Append(". ").AppendLine(type.AssemblyQualifiedName);
+          foreach (var version in asm.GetCustomAttributes<AssemblyInformationalVersionAttribute>())
+            sb.Append("    ").AppendLine(version.InformationalVersion);
+        }
       }
       catch (Exception ex) {
         sb.Append("  *** ERROR: ").Append(ex.GetType().Name).Append(": ").AppendLine(ex.Message);
@@ -167,11 +197,26 @@ namespace CommunityPatch {
       sb.AppendLine();
 
       try {
-        Input.SetClipboardText(sb.ToString());
-        ShowMessage("Diagnostics copied to system clipboard.");
+        var reportStr = sb.ToString();
+
+        try {
+          Input.SetClipboardText(reportStr);
+          ShowMessage("Diagnostics copied to system clipboard.");
+        }
+        catch (Exception ex) {
+          ShowMessage($"Writing to system clipboard failed!\n{ex.GetType().Name}: {ex.Message}");
+          ShowMessage("Saving to \"My Documents\\Mount and Blade II Bannerlord\\diagnostic-report.txt\"");
+          try {
+            var docsMnb2 = new Uri(System.IO.Path.Combine(PathHelpers.GetConfigsDir(), "..")).LocalPath;
+            File.WriteAllText(System.IO.Path.Combine(docsMnb2, "diagnostic-report.txt"), reportStr);
+          }
+          catch (Exception ex2) {
+            ShowMessage($"Failed to save diagnostic report!\n{ex2.GetType().Name}: {ex2.Message}");
+          }
+        }
       }
       catch (Exception ex) {
-        ShowMessage($"Writing to system clipboard failed!\n{ex.GetType().Name}: {ex.Message}");
+        ShowMessage($"Failed to generate string from diagnostic report string buffer!\n{ex.GetType().Name}: {ex.Message}");
       }
     }
 
