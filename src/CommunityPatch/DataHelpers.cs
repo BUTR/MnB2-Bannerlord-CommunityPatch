@@ -7,28 +7,6 @@ namespace CommunityPatch {
 
   internal static class DataHelpers {
 
-#if DEBUG
-    public static string GetFormattedCsHexArray(this byte[] bytes) {
-      var sb = new StringBuilder();
-
-      sb.AppendLine("new byte[] {");
-      sb.AppendFormat("  // ").AppendLine(CommunityPatchSubModule.GameVersion.ToString());
-      sb.AppendFormat($"  0x{bytes[0]:X2}");
-      for (var i = 1; i < bytes.Length; ++i) {
-        if (i % 8 == 0)
-          sb.AppendLine(",").Append("  ");
-        else
-          sb.Append(", ");
-        sb.AppendFormat($"0x{bytes[i]:X2}");
-      }
-
-      sb.AppendLine();
-      sb.AppendLine("}");
-
-      return sb.ToString();
-    }
-#endif
-
     public static readonly int VectorSizeBytes = Vector<byte>.Count;
 
     public static unsafe bool MatchesAnySha256(this byte[] bytes, params byte[][] others) {
@@ -49,7 +27,7 @@ namespace CommunityPatch {
       }
 
 #if DEBUG
-      CommunityPatchSubModule.Print("Unmatched hash: " + bytes.GetFormattedCsHexArray());
+      CommunityPatchSubModule.Print("Unmatched hash: " + BitConverter.ToString(bytes));
 #endif
 
       return false;
