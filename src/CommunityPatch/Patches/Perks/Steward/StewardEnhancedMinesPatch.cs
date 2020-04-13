@@ -23,8 +23,22 @@ namespace CommunityPatch.Patches {
         .GetMethod("CalculateVillageTaxFromIncome", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(StewardEnhancedMinesPatch).GetMethod("Postfix", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-
+    
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
+    }
+    
     private PerkObject _perk;
+
+    private static readonly byte[][] Hashes = {
+      new byte[] {
+        // e1.1.0.224785
+        0x83, 0xCF, 0x66, 0x4A, 0x31, 0x3B, 0xF7, 0x98,
+        0xBE, 0xB8, 0x98, 0xA4, 0x85, 0x4D, 0xED, 0xA2,
+        0xCE, 0x37, 0xC1, 0x0E, 0x34, 0x2C, 0xB8, 0x84,
+        0x0E, 0xB2, 0x61, 0xA8, 0xB5, 0x97, 0x93, 0x08
+      }
+    };
 
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "6oE7rB6q");
@@ -38,24 +52,9 @@ namespace CommunityPatch.Patches {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
-
-      var bytes = TargetMethodInfo.GetCilBytes();
-      if (bytes == null) return false;
-
-      var hash = bytes.GetSha256();
-      return hash.SequenceEqual(new byte[] {
-        //e 1.0.10
-        0x9c,0xef,0x1b,0xea,0x89,0xf0,0x47,0xcd,
-        0xe7,0xda,0x5c,0x76,0x9b,0xb7,0x3f,0x17,
-        0x87,0xe3,0x91,0x2a,0x21,0xce,0xfb,0x8e,
-        0x6e,0xfc,0xe3,0xf3,0x92,0xeb,0x9d,0xa4
-      }) || 
-      hash.SequenceEqual(new byte[] {
-        0x69,0x6f,0x6f,0xbc,0x27,0x36,0x72,0x47,
-        0x54,0x6c,0x67,0x83,0x3c,0xd1,0xed,0x5e,
-        0xd4,0x1a,0x42,0x51,0x28,0x80,0x5e,0x52,
-        0x12,0xa6,0x21,0xdb,0x02,0x13,0x4c,0x05
-      });
+      
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
+      return hash.MatchesAnySha256(Hashes);
     }
 
     public override void Apply(Game game) {
