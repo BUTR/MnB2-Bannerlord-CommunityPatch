@@ -7,9 +7,9 @@ using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  sealed class AgriculturePatch : PatchBase<AgriculturePatch> {
+  public sealed class AgriculturePatch : PatchBase<AgriculturePatch> {
 
     public override bool Applied { get; protected set; }
 

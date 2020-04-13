@@ -4,9 +4,9 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Social.Leadership {
 
-  internal class DisciplinarianPatch : IPatch {
+  public sealed class DisciplinarianPatch : IPatch {
 
     public bool Applied { get; private set; }
 

@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  class LearningRateExplainerPatch : IPatch {
+  public sealed class LearningRateExplainerPatch : IPatch {
 
     public bool Applied { get; private set; }
 

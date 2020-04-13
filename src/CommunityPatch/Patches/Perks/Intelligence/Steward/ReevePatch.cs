@@ -7,15 +7,15 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  class StewardReevePatch : IPatch {
+  public sealed class ReevePatch : IPatch {
 
     public bool Applied { get; private set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(Clan).GetMethod("get_CompanionLimit", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(StewardReevePatch).GetMethod(nameof(CompanionLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(ReevePatch).GetMethod(nameof(CompanionLimitPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

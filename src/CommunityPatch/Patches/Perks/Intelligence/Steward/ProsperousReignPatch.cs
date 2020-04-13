@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  sealed class ProsperousReignPatch : PatchBase<ProsperousReignPatch> {
+  public sealed class ProsperousReignPatch : PatchBase<ProsperousReignPatch> {
 
     public override bool Applied { get; protected set; }
 

@@ -12,9 +12,9 @@ using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using static CommunityPatch.CommunityPatchSubModule;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Control.Crossbow {
 
-  public class CrossbowCavalryPerkPatch : AgentWeaponEquippedPatch<CrossbowCavalryPerkPatch> {
+  public sealed class CrossbowCavalryPerkPatch : AgentWeaponEquippedPatch<CrossbowCavalryPerkPatch> {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowCavalryPerkPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 

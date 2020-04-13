@@ -7,15 +7,15 @@ using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  internal class StewardSupremeAuthorityPatch : PatchBase<StewardSupremeAuthorityPatch> {
+  public sealed class SupremeAuthorityPatch : PatchBase<SupremeAuthorityPatch> {
 
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultClanPoliticsModel).GetMethod("CalculateInfluenceChangeInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(StewardSupremeAuthorityPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(SupremeAuthorityPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
