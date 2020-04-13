@@ -18,11 +18,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
         .GetMethod("CalculateVillageTaxFromIncome", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(EnhancedMinesPatch).GetMethod("Postfix", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
-    
+
     private PerkObject _perk;
 
     private static readonly byte[][] Hashes = {
@@ -47,7 +47,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
-      
+
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
     }
@@ -83,10 +83,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false)) {
         return;
       }
-      if (village.VillageType.PrimaryProduction.IsFood) 
+
+      if (village.VillageType.PrimaryProduction.IsFood)
         return;
+
       var explainedNumber = new ExplainedNumber(__result, null);
-      explainedNumber.AddFactor(perk.PrimaryBonus,perk.Description);
+      explainedNumber.AddFactor(perk.PrimaryBonus, perk.Description);
       __result = (int) explainedNumber.ResultNumber;
     }
 

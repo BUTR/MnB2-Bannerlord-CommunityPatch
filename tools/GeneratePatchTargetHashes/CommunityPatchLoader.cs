@@ -25,7 +25,7 @@ internal static class CommunityPatchLoader {
 
     return sb.ToString();
   }
-  
+
   [PublicAPI]
   public static string GetFormattedHexOfCilSignatureSha256(string typeName, string methodName) {
     var type = Type.GetType(typeName);
