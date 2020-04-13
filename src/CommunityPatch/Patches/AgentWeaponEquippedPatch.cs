@@ -101,7 +101,7 @@ namespace CommunityPatch.Patches {
       if (!hash2.MatchesAnySha256(HashesAgentWeaponEquipped))
         return false;
 
-      return !AppliesToVersion(game);
+      return AppliesToVersion(game);
     }
 
     // ReSharper disable once InconsistentNaming
