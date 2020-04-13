@@ -1,12 +1,8 @@
 using System;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using CommunityPatch;
 using JetBrains.Annotations;
-using Mono;
-using Mono.Cecil;
-using Mono.Cecil.Metadata;
 
 internal static class CommunityPatchLoader {
 

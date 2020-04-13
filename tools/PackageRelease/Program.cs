@@ -3,8 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using Microsoft.Build.Definition;
-using Microsoft.Build.Evaluation;
 
 internal static class Program {
 
