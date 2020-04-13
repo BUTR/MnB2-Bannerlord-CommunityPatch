@@ -62,7 +62,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        postfix: new HarmonyMethod(PatchMethodInfo));
+        new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
