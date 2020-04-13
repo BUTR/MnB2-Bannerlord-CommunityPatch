@@ -1,15 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.XPath;
 using HarmonyLib;
-using TaleWorlds.Library;
-using TaleWorlds.MountAndBlade;
-using Module = TaleWorlds.MountAndBlade.Module;
 
 namespace CommunityPatch {
 
@@ -23,7 +14,7 @@ namespace CommunityPatch {
       };
       AppDomain.CurrentDomain.UnhandledException += (sender, args) => {
         RecordedUnhandledExceptions.AddLast((Exception) args.ExceptionObject);
-        CopyDiagnosticsToClipboard();
+        Diagnostics.CopyToClipboard();
       };
 
       try {
@@ -44,7 +35,7 @@ namespace CommunityPatch {
         return;
 
       RecordedUnhandledExceptions.AddLast(__exception);
-      CopyDiagnosticsToClipboard();
+      Diagnostics.CopyToClipboard();
     }
 
   }

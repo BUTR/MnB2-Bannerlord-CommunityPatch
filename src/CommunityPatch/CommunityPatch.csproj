@@ -4,7 +4,8 @@
         <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
         <MSBuildWarningsAsMessages>MSB3106;MSB3277</MSBuildWarningsAsMessages>
         <Configurations>Release;Debug</Configurations>
-        <Platforms>x64</Platforms>
+        <Platform>x64</Platform>
+        <PlatformTarget>x64</PlatformTarget>
         <RootNamespace />
         <Version>0.0.2</Version>
         <Title>Community Patch</Title>
@@ -14,8 +15,9 @@
         <LangVersion>8</LangVersion>
         <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
         <MnB2BannerlordLauncher>$(MnB2BannerlordBinDir)/TaleWorlds.MountAndBlade.Launcher.exe</MnB2BannerlordLauncher>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
             <HintPath>%(Identity)</HintPath>
@@ -26,6 +28,10 @@
             <Private>False</Private>
         </Reference>
         <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Steamworks.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Mono.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
@@ -52,5 +58,8 @@
         </PackageReference>
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
         <PackageReference Include="Tomlyn" Version="0.1.2" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Patches\Perks\Intelligence" />
     </ItemGroup>
 </Project>

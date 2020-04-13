@@ -1,8 +1,6 @@
-using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
@@ -13,7 +11,7 @@ using Harmony = HarmonyLib.Harmony;
 
 namespace CommunityPatch.Patches {
 
-  public class ItemComparisonColorPatch : IPatch {
+  public sealed class ItemComparisonColorPatch : IPatch {
 
     public bool Applied { get; private set; }
 
@@ -21,31 +19,46 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(ItemComparisonColorPatch).GetMethod(nameof(GetColorFromComparisonPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
+    public IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
+    }
+
+    private static readonly byte[][] Hashes = {
+      new byte[] {
+        // e1.1.0.224785
+        0x37, 0x16, 0xDE, 0xA4, 0x54, 0x11, 0x5A, 0xB1,
+        0xDE, 0xD1, 0x49, 0xD8, 0x2A, 0x34, 0x62, 0x9F,
+        0x57, 0x48, 0x0C, 0x19, 0xBD, 0x33, 0xF9, 0xA1,
+        0xD5, 0x4C, 0xA4, 0xA6, 0xF8, 0x4B, 0x4F, 0x9D
+      },
+      new byte[] {
+        // e1.0.5
+        0xA6, 0x6C, 0x13, 0x03, 0x36, 0x3C, 0x4D, 0x65,
+        0x58, 0x5A, 0x7F, 0x29, 0x2A, 0x0F, 0x9E, 0xE7,
+        0xF7, 0x19, 0xDF, 0xB7, 0xDF, 0x41, 0x65, 0xEF,
+        0x4D, 0xB0, 0xD8, 0x6C, 0x5E, 0xDE, 0x23, 0x96
+      }
+    };
+
     public bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
-      var bytes = TargetMethodInfo.GetCilBytes();
-      if (bytes == null) return false;
-
-     var hash = bytes.GetSha256();
-      return hash.SequenceEqual(new byte[] {
-        0x4C, 0x29, 0xDC, 0x2D, 0x78, 0x89, 0xA7, 0xA8,
-        0xC6, 0xDA, 0x84, 0xDB, 0x07, 0x2E, 0x7D, 0xB4,
-        0x99, 0xED, 0xB2, 0xB9, 0xC4, 0xBB, 0xAD, 0xE4,
-        0xC9, 0xD1, 0xC8, 0x0F, 0xD7, 0x8C, 0x25, 0x15
-      });
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
+      return hash.MatchesAnySha256(Hashes);
     }
 
     public void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
     // ReSharper disable once InconsistentNaming
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool GetColorFromComparisonPatched(int result, bool isCompared, out Color __result) {
       if (MobileParty.MainParty == null) {
         __result = Colors.Black;
@@ -75,8 +88,9 @@ namespace CommunityPatch.Patches {
       __result = UIColors.PositiveIndicator;
       return false;
     }
-    
-    public void Reset() {}
+
+    public void Reset() {
+    }
 
   }
 

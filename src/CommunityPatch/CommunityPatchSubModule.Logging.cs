@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using JetBrains.Annotations;
 using TaleWorlds.Engine;
 
@@ -7,11 +9,26 @@ namespace CommunityPatch {
 
   public partial class CommunityPatchSubModule {
 
+    private static string Eol => Environment.NewLine;
+
     [PublicAPI]
     [Conditional("TRACE")]
     public static void Error(Exception ex, string msg = null) {
       if (msg != null)
         Error(msg);
+
+      switch (ex) {
+        case TargetInvocationException tie1:
+          Error(tie1.InnerException, msg);
+          return;
+        case TypeInitializationException tie2:
+          Error(tie2.InnerException, msg);
+          return;
+        case AggregateException aex:
+          foreach (var iex in aex.InnerExceptions)
+            Error(iex.InnerException, msg);
+          return;
+      }
 
       var st = new StackTrace(ex, true);
       var f = st.GetFrame(0);
@@ -19,8 +36,8 @@ namespace CommunityPatch {
 
       MBDebug.ConsolePrint(exMsg);
       MBDebug.ConsolePrint(ex.StackTrace);
-      Debugger.Log(3, "CommunityPatch", exMsg + '\n');
-      Debugger.Log(3, "CommunityPatch", ex.StackTrace + '\n');
+      Debugger.Log(3, nameof(CommunityPatch), exMsg + Eol);
+      Debugger.Log(3, nameof(CommunityPatch), ex.StackTrace + Eol);
     }
 
     [PublicAPI]
@@ -39,7 +56,7 @@ namespace CommunityPatch {
       if (msg == null)
         return;
 
-      Debugger.Log(3, "CommunityPatch", msg);
+      Debugger.Log(3, nameof(CommunityPatch), msg);
     }
 
     [PublicAPI]
@@ -50,7 +67,13 @@ namespace CommunityPatch {
     [PublicAPI]
     [Conditional("DEBUG")]
     public static void Print(string msg)
-      => Debugger.Log(0, "CommunityPatch", msg + '\n');
+      => Debugger.Log(0, nameof(CommunityPatch), msg + Eol);
+
+    internal static readonly LinkedList<Exception> RecordedFirstChanceExceptions
+      = new LinkedList<Exception>();
+
+    internal static readonly LinkedList<Exception> RecordedUnhandledExceptions
+      = new LinkedList<Exception>();
 
   }
 

@@ -1,22 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
 using HarmonyLib;
-using Helpers;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
-using TaleWorlds.Library;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  internal class MaxFoodVarietyPartyMoralePatch : PatchBase<MaxFoodVarietyPartyMoralePatch> {
+  public sealed class MaxFoodVarietyPartyMoralePatch : PatchBase<MaxFoodVarietyPartyMoralePatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,28 +18,32 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(MaxFoodVarietyPartyMoralePatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
+    }
+
+    private static readonly byte[][] Hashes = {
+      new byte[] {
+        // e1.1.0.224785
+        0x7B, 0x08, 0xE2, 0x53, 0x78, 0x94, 0x9A, 0x7A,
+        0x5D, 0x36, 0x5F, 0xA4, 0x39, 0xF2, 0xF0, 0xE9,
+        0xE5, 0x6E, 0x08, 0x46, 0xD0, 0x30, 0x94, 0x58,
+        0x1F, 0xF6, 0x18, 0xBC, 0x19, 0xCC, 0x0C, 0xAB
+      }
+    };
+
     public override void Reset() {
-      
     }
 
     public override bool IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
-      var bytes = TargetMethodInfo.GetCilBytes();
-      if (bytes == null) return false;
-
-      var hash = bytes.GetSha256();
-      return hash.SequenceEqual(new byte[] {
-        0xd6,0xe5,0xcd,0xda,0xc0,0xa1,0x38,0x58,
-        0xfa,0xb7,0x0c,0x92,0xc4,0x51,0x1e,0xee,
-        0x5e,0x05,0x66,0xe4,0x83,0xfc,0xc6,0x97,
-        0x22,0x7b,0x0a,0xde,0xd5,0x38,0xd6,0xc8
-      });
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
+      return hash.MatchesAnySha256(Hashes);
     }
 
     public override void Apply(Game game) {
@@ -58,9 +55,10 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(MobileParty party, ref ExplainedNumber result) {
       if (party.ItemRoster.FoodVariety > 10) {
-        result.Add(party.ItemRoster.FoodVariety - 4f,GameTexts.FindText("str_food_bonus_morale", (string) null));
+        result.Add(party.ItemRoster.FoodVariety - 4f, GameTexts.FindText("str_food_bonus_morale", (string) null));
       }
     }
 

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using JetBrains.Annotations;
-using TaleWorlds.Engine;
 using Tomlyn;
 using Tomlyn.Syntax;
 using Path = System.IO.Path;
@@ -19,7 +18,7 @@ namespace CommunityPatch {
 
     [PublicAPI]
     public OptionsFile(string fileName) {
-      _path = Path.Combine(Utilities.GetConfigsPath(), fileName);
+      _path = Path.Combine(PathHelpers.GetBinSubDir(), fileName);
       if (!File.Exists(_path)) {
         _toml = new DocumentSyntax();
         return;
