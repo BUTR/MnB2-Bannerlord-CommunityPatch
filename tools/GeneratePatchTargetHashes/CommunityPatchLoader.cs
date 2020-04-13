@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Text;
 using CommunityPatch;
 using JetBrains.Annotations;
 using Mono;
@@ -9,6 +10,26 @@ using Mono.Cecil.Metadata;
 
 internal static class CommunityPatchLoader {
 
+  public static string GetFormattedCsHexArray(this byte[] bytes) {
+    var sb = new StringBuilder();
+
+    sb.AppendLine("new byte[] {");
+    sb.AppendFormat("  // ").AppendLine(CommunityPatchSubModule.GameVersion.ToString());
+    sb.AppendFormat($"  0x{bytes[0]:X2}");
+    for (var i = 1; i < bytes.Length; ++i) {
+      if (i % 8 == 0)
+        sb.AppendLine(",").Append("  ");
+      else
+        sb.Append(", ");
+      sb.AppendFormat($"0x{bytes[i]:X2}");
+    }
+
+    sb.AppendLine();
+    sb.AppendLine("}");
+
+    return sb.ToString();
+  }
+  
   [PublicAPI]
   public static string GetFormattedHexOfCilSignatureSha256(string typeName, string methodName) {
     var type = Type.GetType(typeName);
