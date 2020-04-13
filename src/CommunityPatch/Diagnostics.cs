@@ -1,19 +1,24 @@
 using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using HardwareProviders.CPU;
 using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
-using Module = TaleWorlds.MountAndBlade.Module;
+using TaleWorlds.MountAndBlade;
+using static CommunityPatch.CommunityPatchSubModule;
 
 namespace CommunityPatch {
 
-  public partial class CommunityPatchSubModule {
+  public static class Diagnostics {
 
-    public static void CopyDiagnosticsToClipboard() {
+    public static void CopyToClipboard() {
       var sb = new StringBuilder();
 
       try {
@@ -131,12 +136,27 @@ namespace CommunityPatch {
         sb.AppendLine("  CPU Info:");
         for (var i = 0; i < cpus.Length; ++i) {
           var cpu = cpus[i];
-          var coreCount = cpu.CoreClocks.Length;
+          cpu.Update();
+          var coreCount = cpu.CoreCount;
+
+          for (var c = 0; c < coreCount; ++c) {
+            cpu.ActivateSensor(cpu.CoreClocks[c]);
+            cpu.ActivateSensor(cpu.CoreTemperatures[c]);
+          }
+
+          Thread.Sleep(100);
+
           sb.Append("    ").Append(i + 1).Append(". ").Append(cpu.Name).Append(" with ").Append(coreCount).AppendLine(" cores:");
           for (var c = 0; c < coreCount; ++c) {
-            sb.Append("      ").Append(c + 1).Append(". ").Append(cpu.CoreClocks[c].Value).Append("MHz ")
-              .Append(cpu.CoreTemperatures[c].Value).Append("°C");
+            sb.Append("      ").Append(c + 1).Append(". ")
+              .Append(cpu.CoreClocks[c].Max?.ToString(CultureInfo.InvariantCulture) ?? "(?)").Append(" MHz ")
+              .Append(cpu.CoreTemperatures[c].Max?.ToString(CultureInfo.InvariantCulture) ?? "(?)").Append(" °C");
             sb.AppendLine();
+          }
+
+          for (var c = 0; c < coreCount; ++c) {
+            cpu.DeactivateSensor(cpu.CoreClocks[c]);
+            cpu.DeactivateSensor(cpu.CoreTemperatures[c]);
           }
         }
       }

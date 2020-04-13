@@ -57,7 +57,7 @@ namespace CommunityPatch {
       base.OnSubModuleLoad();
     }
 
-    private static void ShowMessage(string msg) {
+    internal static void ShowMessage(string msg) {
       InformationManager.DisplayMessage(new InformationMessage(msg));
       Print(msg);
     }

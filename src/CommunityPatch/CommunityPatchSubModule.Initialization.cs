@@ -14,7 +14,7 @@ namespace CommunityPatch {
       };
       AppDomain.CurrentDomain.UnhandledException += (sender, args) => {
         RecordedUnhandledExceptions.AddLast((Exception) args.ExceptionObject);
-        CopyDiagnosticsToClipboard();
+        Diagnostics.CopyToClipboard();
       };
 
       try {
@@ -35,7 +35,7 @@ namespace CommunityPatch {
         return;
 
       RecordedUnhandledExceptions.AddLast(__exception);
-      CopyDiagnosticsToClipboard();
+      Diagnostics.CopyToClipboard();
     }
 
   }

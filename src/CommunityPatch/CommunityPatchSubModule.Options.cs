@@ -33,15 +33,17 @@ namespace CommunityPatch {
         null
       ));
       elements.Add(new InquiryElement(
-        nameof(CopyDiagnosticsToClipboard),
+        nameof(Diagnostics.CopyToClipboard),
         "Copy Diagnostics to Clipboard",
         null
       ));
+#if DEBUG
       elements.Add(new InquiryElement(
         "IntentionallyUnhandled",
         "Throw Unhandled Exception",
         null
       ));
+#endif
       InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
         "Mod Options",
         "Community Patch Mod Options:",
@@ -63,8 +65,8 @@ namespace CommunityPatch {
               ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
               Options.Save();
               break;
-            case nameof(CopyDiagnosticsToClipboard):
-              CopyDiagnosticsToClipboard();
+            case nameof(Diagnostics.CopyToClipboard):
+              Diagnostics.CopyToClipboard();
               break;
             default:
               throw new NotImplementedException(selected);
