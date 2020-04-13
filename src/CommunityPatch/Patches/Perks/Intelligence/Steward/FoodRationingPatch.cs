@@ -65,10 +65,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(ref float __result, Town town, StatExplainer tooltipStringBuilder) {
       var perk = ActivePatch._perk;
-      var leader = town.Settlement?.OwnerClan?.Leader;
-      var settlement = town.Owner?.Settlement;
+      if (!town.IsUnderSiege)
+        return;
 
-      if (leader == null || settlement == null || !leader.GetPerkValue(perk) || !settlement.IsUnderSiege)
+      var leader = town.Settlement?.OwnerClan?.Leader;
+      if (leader == null || !leader.GetPerkValue(perk))
         return;
 
       var explainedNumber = new ExplainedNumber(__result, tooltipStringBuilder);
