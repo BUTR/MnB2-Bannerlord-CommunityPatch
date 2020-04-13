@@ -4,7 +4,7 @@ using TaleWorlds.Core;
 
 namespace CommunityPatch.Patches {
 
-  public class VassalReleasePatch : IPatch {
+  public sealed class VassalReleasePatch : IPatch {
 
     public bool Applied { get; private set; }
 

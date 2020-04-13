@@ -56,7 +56,7 @@ namespace CommunityPatch {
         var patchInterfaceType = typeof(IPatch);
         _patches = new LinkedList<IPatch>();
 
-        foreach (var type in typeof(CommunityPatchSubModule).Assembly.GetTypes()) {
+        foreach (var type in typeof(CommunityPatchSubModule).Assembly.GetExportedTypes()) {
           if (type.IsInterface || type.IsAbstract)
             continue;
           if (!patchInterfaceType.IsAssignableFrom(type))

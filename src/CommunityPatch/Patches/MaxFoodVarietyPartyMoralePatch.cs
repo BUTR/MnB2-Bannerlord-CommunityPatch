@@ -9,7 +9,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  internal class MaxFoodVarietyPartyMoralePatch : PatchBase<MaxFoodVarietyPartyMoralePatch> {
+  public sealed class MaxFoodVarietyPartyMoralePatch : PatchBase<MaxFoodVarietyPartyMoralePatch> {
 
     public override bool Applied { get; protected set; }
 

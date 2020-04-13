@@ -8,9 +8,9 @@ using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  sealed class WarmongerPatch : PatchBase<WarmongerPatch> {
+  public sealed class WarmongerPatch : PatchBase<WarmongerPatch> {
 
     public override bool Applied { get; protected set; }
 

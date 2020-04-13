@@ -10,7 +10,7 @@ using Harmony = HarmonyLib.Harmony;
 
 namespace CommunityPatch.Patches {
 
-  public class LordConversationsCampaignBehaviorPatch : IPatch {
+  public sealed class LordConversationsCampaignBehaviorPatch : IPatch {
 
     public bool Applied { get; private set; }
 

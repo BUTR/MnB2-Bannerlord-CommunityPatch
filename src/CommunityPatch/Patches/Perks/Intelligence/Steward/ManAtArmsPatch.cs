@@ -8,15 +8,15 @@ using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  sealed class BannerlordPatch : PatchBase<BannerlordPatch> {
+  public sealed class ManAtArmsPatch : PatchBase<ManAtArmsPatch> {
 
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultPartySizeLimitModel).GetMethod("CalculateMobilePartyMemberSizeLimit", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(BannerlordPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(ManAtArmsPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -42,7 +42,7 @@ namespace CommunityPatch.Patches {
     };
 
     public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "MMv0U5Yr");
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "WVLzi1fa");
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -69,11 +69,12 @@ namespace CommunityPatch.Patches {
         return;
 
       var extra = party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus;
-      if (extra > 0) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
-        explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
-        __result = (int) explainedNumber.ResultNumber;
-      }
+      if (extra < float.Epsilon)
+        return;
+
+      var explainedNumber = new ExplainedNumber(__result, explanation);
+      explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
+      __result = (int) explainedNumber.ResultNumber;
     }
 
   }

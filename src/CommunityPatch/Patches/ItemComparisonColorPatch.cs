@@ -11,7 +11,7 @@ using Harmony = HarmonyLib.Harmony;
 
 namespace CommunityPatch.Patches {
 
-  public class ItemComparisonColorPatch : IPatch {
+  public sealed class ItemComparisonColorPatch : IPatch {
 
     public bool Applied { get; private set; }
 

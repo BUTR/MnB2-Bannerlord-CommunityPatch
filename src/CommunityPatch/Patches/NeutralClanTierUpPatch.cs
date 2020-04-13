@@ -9,7 +9,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  internal class NeutralClanTierUpPatch : PatchBase<NeutralClanTierUpPatch> {
+  public sealed class NeutralClanTierUpPatch : PatchBase<NeutralClanTierUpPatch> {
 
     public override bool Applied { get; protected set; }
 

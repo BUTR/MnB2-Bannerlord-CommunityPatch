@@ -1,25 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using HarmonyLib;
-using Helpers;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using HarmonyLib;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  internal class HealthyScoutPatch : PatchBase<HealthyScoutPatch> {
+  public sealed class AssessorPatch : PatchBase<AssessorPatch> {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultCharacterStatsModel)
-      .GetMethod(nameof(DefaultCharacterStatsModel.MaxHitpoints), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo =
+      Type.GetType("TaleWorlds.CampaignSystem.SandBox.GameComponents.DefaultSettlementTaxModel, TaleWorlds.CampaignSystem")?
+        .GetMethod("CalculateDailyTaxInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(HealthyScoutPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(AssessorPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -30,23 +29,19 @@ namespace CommunityPatch.Patches {
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
-        0x92, 0xC3, 0x48, 0x33, 0x3C, 0x1A, 0x39, 0x52,
-        0xE5, 0x8B, 0xE4, 0x3E, 0xBD, 0x86, 0xFC, 0xA7,
-        0x56, 0x27, 0xD9, 0x3A, 0xA5, 0x53, 0xC4, 0xDF,
-        0xE2, 0x7B, 0x97, 0xBC, 0xB1, 0xAE, 0x36, 0x5E
+        0x52, 0xFC, 0xCB, 0x7C, 0xF9, 0x90, 0xBB, 0xAD,
+        0xDE, 0xDB, 0x69, 0xE9, 0x9A, 0x41, 0x28, 0x04,
+        0x7C, 0xE9, 0xDE, 0xBB, 0xD5, 0xD0, 0xCA, 0x3B,
+        0x4B, 0xE3, 0x19, 0x42, 0x1E, 0x36, 0xC8, 0xB2
       }
     };
 
     public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "dDKOoD3e");
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "xIL6vOgI");
 
     public override bool IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (!(_perk.PrimaryRole == SkillEffect.PerkRole.PartyMember
-        && _perk.PrimaryBonus == 0.15f))
-        return false;
-
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
@@ -56,15 +51,12 @@ namespace CommunityPatch.Patches {
     }
 
     public override void Apply(Game game) {
-      // Dear TaleWorlds; Value should probably be publicly exposed, maybe by a method
-      // and maybe marked [Obsolete] if you want to avoid your developers doing dirty deeds
       var textObjStrings = TextObject.ConvertToStringList(
         new List<TextObject> {
           _perk.Name,
           _perk.Description
         }
       );
-
       // most of the properties of skills have private setters, yet Initialize is public
       _perk.Initialize(
         textObjStrings[0],
@@ -72,31 +64,29 @@ namespace CommunityPatch.Patches {
         _perk.Skill,
         (int) _perk.RequiredSkillValue,
         _perk.AlternativePerk,
-        SkillEffect.PerkRole.Personal, 8f,
+        _perk.PrimaryRole, 0.1f,
         _perk.SecondaryRole, _perk.SecondaryBonus,
-        _perk.IncrementType
+        SkillEffect.EffectIncrementType.AddFactor
       );
-
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
-
       Applied = true;
     }
 
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
-      var result = __result;
-
-      var explainedNumber = new ExplainedNumber(result, explanation);
-
+    private static void Postfix(ref int __result, Town town, StatExplainer explanation) {
       var perk = ActivePatch._perk;
+      if (!(town?.Governor?.GetPerkValue(perk) ?? false))
+        return;
 
-      PerkHelper.AddPerkBonusForCharacter(perk, character, ref explainedNumber);
-
-      __result = MBMath.Round(explainedNumber.ResultNumber);
+      var explainedNumber = new ExplainedNumber(__result, explanation);
+      if (explainedNumber.BaseNumber > 0) {
+        explainedNumber.AddFactor(perk.PrimaryBonus, perk.Name);
+        __result = (int) explainedNumber.ResultNumber;
+      }
     }
 
   }

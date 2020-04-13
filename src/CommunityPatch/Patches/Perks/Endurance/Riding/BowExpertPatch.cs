@@ -11,16 +11,16 @@ using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  public class BowMountedArcherPatch : AgentWeaponEquippedPatch<BowMountedArcherPatch> {
+  public sealed class BowExpertPatch : AgentWeaponEquippedPatch<BowExpertPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(BowMountedArcherPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(BowExpertPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-    private static PerkObject _mountedArcher;
+    private static PerkObject _bowExpert;
 
     public override void Reset() {
-      _mountedArcher = PerkObject.FindFirst(perk => perk.Name.GetID() == "eU0uANvZ");
+      _bowExpert = PerkObject.FindFirst(perk => perk.Name.GetID() == "cKTeea27");
       base.Reset();
     }
 
@@ -39,10 +39,9 @@ namespace CommunityPatch.Patches {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
-      // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
-      if (weapon.ItemUsage == "long_bow")
+      if (weapon.ItemUsage == "long_bow") // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
         WeaponComponentDataItemUsageMethod
-          .Invoke(weapon, new object[] {HeroHasPerk(character, _mountedArcher) ? "bow" : weapon.ItemUsage});
+          .Invoke(weapon, new[] {HeroHasPerk(character, _bowExpert) ? "bow" : weapon.ItemUsage});
     }
 
     protected override bool AppliesToVersion(Game game)
@@ -66,7 +65,7 @@ namespace CommunityPatch.Patches {
       for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
         if (weapon.ItemUsageIndex != MBItem.GetItemUsageIndex("long_bow")
-          || !HeroHasPerk(__instance.Character, _mountedArcher))
+          || !HeroHasPerk(__instance.Character, _bowExpert))
           continue;
 
         var updatedWeapon = weapon;

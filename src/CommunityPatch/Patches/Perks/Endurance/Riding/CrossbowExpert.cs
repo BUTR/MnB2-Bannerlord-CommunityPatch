@@ -11,11 +11,11 @@ using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  public class RidingCrossbowExpert : AgentWeaponEquippedPatch<RidingCrossbowExpert> {
+  public sealed class CrossbowExpert : AgentWeaponEquippedPatch<CrossbowExpert> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(RidingCrossbowExpert).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowExpert).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     private static PerkObject _crossbowExpert;
 
