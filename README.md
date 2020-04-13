@@ -29,6 +29,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Nourish Settlement
     * Prominence
     * Prosperous Reign
+    * Reconstruction
     * Reeve
     * Ruler
     * Supreme Authority
