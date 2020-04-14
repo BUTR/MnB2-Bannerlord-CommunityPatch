@@ -113,11 +113,11 @@ namespace CommunityPatch.Patches {
         var item = __instance.SpawnEquipment[EquipmentIndex.ArmorItemEndSlot].Item;
         var hasMount = item != null && item.HasHorseComponent;
 
+        var hero = charObj.HeroObject;
         for (var i = 0; i < missionWeapons.Length; i++) {
           if (!missionWeapons[i].Weapons.IsEmpty()) {
             var weaponComponentData = missionWeapons[i].Weapons[0];
             if (weaponComponentData != null) {
-              var hero = charObj.HeroObject;
               short extraAmmo = 0;
 
               if (weaponComponentData.WeaponClass == WeaponClass.Arrow) {
