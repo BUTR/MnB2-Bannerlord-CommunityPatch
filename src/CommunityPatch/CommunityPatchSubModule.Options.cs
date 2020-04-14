@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TaleWorlds.Core;
+using TaleWorlds.Localization;
 
 namespace CommunityPatch {
 
@@ -18,7 +19,7 @@ namespace CommunityPatch {
       set => Options.Set(nameof(RecordFirstChanceExceptions), value);
     }
 
-    private void ShowOptions() {
+    internal void ShowOptions() {
       // ReSharper disable once UseObjectOrCollectionInitializer
       var elements = new List<InquiryElement>();
 
@@ -46,13 +47,13 @@ namespace CommunityPatch {
       ));
 #endif
       InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
-        "Community Patch Options",
-        "Pick an option:",
+        new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(),
+        new TextObject("{=PickAnOption}Pick an option:").ToString(),
         elements,
         true,
         true,
-        "Apply",
-        "Return",
+        new TextObject("{=BAaS5Dkc}Apply").ToString(),
+        null,
         HandleOptionChoice,
         null
       ));

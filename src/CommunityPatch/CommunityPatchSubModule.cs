@@ -71,12 +71,18 @@ namespace CommunityPatch {
         if (_groupedOptionsMenus != null)
           return;
 
+        var skippedFirst = false;
         _groupedOptionsMenus = new List<InitialStateOption>();
         for (var i = 0; i < menu.Length; i++) {
           var item = menu[i];
           if (!Is3rdPartyOption(item))
             continue;
 
+          if (!skippedFirst) {
+            skippedFirst = true;
+            continue;
+          }
+          
           _groupedOptionsMenus.Add(item);
           menu[i] = null;
         }
@@ -89,7 +95,7 @@ namespace CommunityPatch {
         Module.CurrentModule.AddInitialStateOption(new InitialStateOption(
           "MoreOptions",
           new TextObject("{=MoreOptions}More Options"),
-          9998, ShowMoreMainMenuOptions, false));
+          10001, ShowMoreMainMenuOptions, false));
       }
     }
 
@@ -113,9 +119,6 @@ namespace CommunityPatch {
 
     internal void ShowMoreMainMenuOptions()
       => ShowOptions(_groupedOptionsMenus);
-
-    internal void ShowMore3rdPartyOptions()
-      => ShowOptions(Get3rdPartyOptionsMenus());
 
     internal void ShowOptions(List<InitialStateOption> moreOptions)
       => InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
@@ -197,7 +200,7 @@ namespace CommunityPatch {
     public static void Postfix(EscapeMenuVM __instance, ref MBBindingList<EscapeMenuItemVM> ____menuItems, IEnumerable<EscapeMenuItemVM> items, TextObject title = null) {
       var list = ____menuItems.ToList();
 
-      var groupedOptionsMenus = new List<EscapeMenuItemVM>();
+      var customOptions = new List<EscapeMenuItemVM>();
       for (var i = 0; i < list.Count; i++) {
         var item = list[i];
 
@@ -216,9 +219,10 @@ namespace CommunityPatch {
         if (optAsmName.StartsWith("StoryMode."))
           continue;
 
-        groupedOptionsMenus.Add(item);
+        customOptions.Add(item);
         list[i] = null;
       }
+
 
       var newList = new MBBindingList<EscapeMenuItemVM>();
 
@@ -227,20 +231,23 @@ namespace CommunityPatch {
           newList.Add(item);
       }
 
-      if (groupedOptionsMenus.Count == 0) {
-        newList.Add(new EscapeMenuItemVM(new TextObject("{=MoreOptions}More Options"),
-          _ => CommunityPatchSubModule.Current.ShowMore3rdPartyOptions(),
-          _groupEscMenuOptsKey, false));
+
+      if (customOptions.Count <= 1) {
+
+        newList.Add(new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
+          _ => CommunityPatchSubModule.Current.ShowOptions(), _groupEscMenuOptsKey, false));
+        
         ____menuItems = newList;
         return;
+
       }
 
       newList.Add(new EscapeMenuItemVM(new TextObject("{=MoreOptions}More Options"), _ => {
         var options = new List<InquiryElement> {
-          new InquiryElement(_groupEscMenuOptsKey, new TextObject("{=MoreOptions}More Options").ToString(), null)
+          new InquiryElement(_groupEscMenuOptsKey, new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(), null)
         };
 
-        foreach (var item in groupedOptionsMenus) {
+        foreach (var item in customOptions) {
           var id = EscapeMenuItemVmIdentifier.GetValue(item);
           options.Add(new InquiryElement(id, item.ActionText, null, !item.IsDisabled, null));
         }
@@ -256,11 +263,11 @@ namespace CommunityPatch {
           selection => {
             var picked = selection.FirstOrDefault()?.Identifier;
             if (picked == _groupEscMenuOptsKey) {
-              CommunityPatchSubModule.Current.ShowMore3rdPartyOptions();
+              CommunityPatchSubModule.Current.ShowOptions();
               return;
             }
 
-            foreach (var item in groupedOptionsMenus) {
+            foreach (var item in customOptions) {
               var id = EscapeMenuItemVmIdentifier.GetValue(item);
               if (picked != id)
                 continue;
