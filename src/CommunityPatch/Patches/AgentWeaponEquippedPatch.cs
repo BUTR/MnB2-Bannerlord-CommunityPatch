@@ -106,10 +106,8 @@ namespace CommunityPatch.Patches {
 
     protected abstract bool AppliesToVersion(Game game);
 
-    protected static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk) {
-      var heroObject = character.IsHero ? (CharacterObject) character : null;
-      return heroObject?.GetPerkValue(perk) ?? false;
-    }
+    protected static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk)
+      => (character as CharacterObject)?.GetPerkValue(perk) ?? false;
 
     public override void Reset() {
     }
