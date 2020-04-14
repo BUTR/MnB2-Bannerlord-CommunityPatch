@@ -63,9 +63,15 @@ namespace CommunityPatch {
         .Concat(_groupedOptionsMenus ?? (IEnumerable<InitialStateOption>) Array.Empty<InitialStateOption>())
         .ToList();
 
+    private static bool _alreadyCleanedUpMainMenu = false;
+
     internal List<InitialStateOption> _groupedOptionsMenus;
 
     private void CleanUpMainMenu() {
+      if (_alreadyCleanedUpMainMenu)
+        return;
+
+      _alreadyCleanedUpMainMenu = true;
       var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
       if (menu.Length > 8) {
         if (_groupedOptionsMenus != null)
@@ -82,7 +88,7 @@ namespace CommunityPatch {
             skippedFirst = true;
             continue;
           }
-          
+
           _groupedOptionsMenus.Add(item);
           menu[i] = null;
         }
@@ -223,7 +229,6 @@ namespace CommunityPatch {
         list[i] = null;
       }
 
-
       var newList = new MBBindingList<EscapeMenuItemVM>();
 
       foreach (var item in list) {
@@ -231,15 +236,12 @@ namespace CommunityPatch {
           newList.Add(item);
       }
 
-
       if (customOptions.Count <= 1) {
-
         newList.Add(new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
           _ => CommunityPatchSubModule.Current.ShowOptions(), _groupEscMenuOptsKey, false));
-        
+
         ____menuItems = newList;
         return;
-
       }
 
       newList.Add(new EscapeMenuItemVM(new TextObject("{=MoreOptions}More Options"), _ => {
