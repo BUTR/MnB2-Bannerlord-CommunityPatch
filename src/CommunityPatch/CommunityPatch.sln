@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackageRelease", "..\..\too
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneratePatchTargetHashes", "..\..\tools\GeneratePatchTargetHashes\GeneratePatchTargetHashes.csproj", "{AC3538B8-1B44-4B2B-B1EF-F847F8717BB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnblockFile", "..\..\tools\UnblockFile\UnblockFile.csproj", "{4793D0A3-F69A-4055-89EB-EF793107D0E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -26,5 +28,9 @@ Global
 		{AC3538B8-1B44-4B2B-B1EF-F847F8717BB3}.Debug|x64.Build.0 = Debug|Any CPU
 		{AC3538B8-1B44-4B2B-B1EF-F847F8717BB3}.Release|x64.ActiveCfg = Release|Any CPU
 		{AC3538B8-1B44-4B2B-B1EF-F847F8717BB3}.Release|x64.Build.0 = Release|Any CPU
+		{4793D0A3-F69A-4055-89EB-EF793107D0E1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4793D0A3-F69A-4055-89EB-EF793107D0E1}.Debug|x64.Build.0 = Debug|Any CPU
+		{4793D0A3-F69A-4055-89EB-EF793107D0E1}.Release|x64.ActiveCfg = Release|Any CPU
+		{4793D0A3-F69A-4055-89EB-EF793107D0E1}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

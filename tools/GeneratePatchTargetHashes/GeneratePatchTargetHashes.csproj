@@ -25,9 +25,9 @@
             <Private>False</Private>
         </Reference>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\..\src\CommunityPatch\CommunityPatch.csproj" />
+        <ProjectReference Include="..\..\src\CommunityPatch\CommunityPatch.csproj" />
     </ItemGroup>
 
 </Project>

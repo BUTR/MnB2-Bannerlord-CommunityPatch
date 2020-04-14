@@ -18,7 +18,7 @@ namespace CommunityPatch {
 
     [PublicAPI]
     public OptionsFile(string fileName) {
-      _path = Path.Combine(PathHelpers.GetBinSubDir(), fileName);
+      _path = Path.Combine(PathHelpers.GetConfigsDir(), fileName);
       if (!File.Exists(_path)) {
         _toml = new DocumentSyntax();
         return;
