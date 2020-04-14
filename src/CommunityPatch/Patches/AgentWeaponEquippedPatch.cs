@@ -82,7 +82,7 @@ namespace CommunityPatch.Patches {
       yield return AgentWeaponEquipped;
     }
 
-    public override bool IsApplicable(Game game) {
+    public override bool? IsApplicable(Game game) {
       var patchInfo1 = Harmony.GetPatchInfo(ItemMenuVmAddWeaponItemFlags);
       if (AlreadyPatchedByOthers(patchInfo1))
         return false;

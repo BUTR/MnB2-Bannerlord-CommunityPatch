@@ -39,12 +39,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "fBgGbxaw");
 
-    public override bool IsApplicable(Game game)
+    public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
       if (_perk == null)
-        return false;
-      if (_perk.PrimaryBonus != 0f)
         return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -52,7 +50,13 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
         return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      if (!hash.MatchesAnySha256(Hashes))
+        return false;
+      
+      if (_perk.PrimaryBonus != 0f)
+        return null;
+
+      return true;
     }
 
     public override void Apply(Game game) {

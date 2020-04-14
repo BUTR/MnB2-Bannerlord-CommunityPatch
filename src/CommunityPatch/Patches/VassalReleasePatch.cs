@@ -8,7 +8,7 @@ namespace CommunityPatch.Patches {
 
     public bool Applied { get; private set; }
 
-    public bool IsApplicable(Game game)
+    public bool? IsApplicable(Game game)
       => Campaign.Current.ConversationManager.
 
     public void Apply(Game game) {

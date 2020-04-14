@@ -11,7 +11,7 @@ namespace CommunityPatch {
     public static TPatch ActivePatch
       => (TPatch) CommunityPatchSubModule.ActivePatches[typeof(TPatch)];
 
-    public abstract bool IsApplicable(Game game);
+    public abstract bool? IsApplicable(Game game);
 
     public abstract void Apply(Game game);
 

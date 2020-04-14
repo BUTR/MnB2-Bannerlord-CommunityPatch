@@ -35,7 +35,7 @@ namespace CommunityPatch.Patches {
     public override void Reset() {
     }
 
-    public override bool IsApplicable(Game game)
+    public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);

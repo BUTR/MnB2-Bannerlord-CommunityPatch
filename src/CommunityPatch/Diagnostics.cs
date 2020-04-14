@@ -113,8 +113,11 @@ namespace CommunityPatch {
           sb.Append("  ").Append(++i).Append(". ").Append(type.Name);
           if (ActivePatches.ContainsKey(type))
             sb.Append(" *Active*");
-          if (patch.IsApplicable(Game.Current))
+          var applicability = patch.IsApplicable(Game.Current);
+          if (applicability ?? false)
             sb.Append(" *Applicable*");
+          if (applicability == null)
+            sb.Append(" *Maybe Applicable*");
           if (patch.Applied)
             sb.Append(" *Applied*");
           sb.AppendLine();
@@ -130,11 +133,16 @@ namespace CommunityPatch {
         sb.AppendLine("Loaded SubModules:");
         var i = 0;
         foreach (var sm in Module.CurrentModule.SubModules) {
-          var type = sm.GetType();
-          var asm = type.Assembly;
-          sb.Append("  ").Append(++i).Append(". ").AppendLine(type.AssemblyQualifiedName);
-          foreach (var version in asm.GetCustomAttributes<AssemblyInformationalVersionAttribute>())
-            sb.Append("    ").AppendLine(version.InformationalVersion);
+          try {
+            var type = sm.GetType();
+            var asm = type.Assembly;
+            sb.Append("  ").Append(++i).Append(". ").AppendLine(type.AssemblyQualifiedName);
+            foreach (var version in asm.GetCustomAttributes<AssemblyInformationalVersionAttribute>())
+              sb.Append("    v").AppendLine(version.InformationalVersion);
+          }
+          catch (Exception ex) {
+            sb.Append("  *** ERROR: ").Append(ex.GetType().Name).Append(": ").AppendLine(ex.Message);
+          }
         }
       }
       catch (Exception ex) {

@@ -18,7 +18,8 @@ namespace CommunityPatch {
       set => Options.Set(nameof(RecordFirstChanceExceptions), value);
     }
 
-    private void ShowModOptions() {
+    private void ShowOptions() {
+      // ReSharper disable once UseObjectOrCollectionInitializer
       var elements = new List<InquiryElement>();
 
       elements.Add(new InquiryElement(
@@ -45,33 +46,39 @@ namespace CommunityPatch {
       ));
 #endif
       InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
-        "Mod Options",
-        "Community Patch Mod Options:",
+        "Community Patch Options",
+        "Pick an option:",
         elements,
         true,
         true,
         "Apply",
         "Return",
-        list => {
-          var selected = (string) list[0].Identifier;
-          switch (selected) {
-            case nameof(DisableIntroVideo):
-              DisableIntroVideo = !DisableIntroVideo;
-              ShowMessage($"Intro Videos: {(DisableIntroVideo ? "Disabled" : "Enabled")}.");
-              Options.Save();
-              break;
-            case nameof(RecordFirstChanceExceptions):
-              RecordFirstChanceExceptions = !RecordFirstChanceExceptions;
-              ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
-              Options.Save();
-              break;
-            case nameof(Diagnostics.CopyToClipboard):
-              Diagnostics.CopyToClipboard();
-              break;
-            default:
-              throw new NotImplementedException(selected);
-          }
-        }, null));
+        HandleOptionChoice,
+        null
+      ));
+    }
+
+    private void HandleOptionChoice(List<InquiryElement> list) {
+      var selected = (string) list[0].Identifier;
+      switch (selected) {
+        case nameof(DisableIntroVideo):
+          DisableIntroVideo = !DisableIntroVideo;
+          ShowMessage($"Intro Videos: {(DisableIntroVideo ? "Disabled" : "Enabled")}.");
+          Options.Save();
+          break;
+
+        case nameof(RecordFirstChanceExceptions):
+          RecordFirstChanceExceptions = !RecordFirstChanceExceptions;
+          ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
+          Options.Save();
+          break;
+
+        case nameof(Diagnostics.CopyToClipboard):
+          Diagnostics.CopyToClipboard();
+          break;
+
+        default: throw new NotImplementedException(selected);
+      }
     }
 
   }
