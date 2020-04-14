@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
@@ -8,17 +10,29 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  sealed class ExtraAmmoPerksPatch : PatchBase<ExtraAmmoPerksPatch> {
+  public sealed class ExtraAmmoPerksPatch : PatchBase<ExtraAmmoPerksPatch> {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod("InitializeMissionEquipment", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(ExtraAmmoPerksPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-
-
+    
+    private static readonly byte[][] Hashes = {
+      new byte[] {
+        // e1.1.0.225190
+        0xE5, 0x73, 0x59, 0x27, 0xE5, 0xF6, 0x83, 0x53,
+        0xAB, 0x6C, 0x24, 0x67, 0xBE, 0x5B, 0xB4, 0x71,
+        0xFF, 0x4E, 0x22, 0x8E, 0x30, 0xDE, 0x8A, 0xF4,
+        0xFB, 0x87, 0xF4, 0x1C, 0xF1, 0xCB, 0xEE, 0xD0
+      }
+    };
 
     public override void Reset(){}
+
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -27,41 +41,14 @@ namespace CommunityPatch.Patches {
         postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
-
+    
     public override bool IsApplicable(Game game) {
-      /*
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
-      var bytes = TargetMethodInfo.GetCilBytes();
-      if (bytes == null) return false;
-
-      var hash = bytes.GetSha256();
-      return hash.SequenceEqual(new byte[] {
-          // e.1.0.7
-          0x4B, 0x26, 0xD4, 0x1E, 0xF7, 0xCF, 0x5B, 0x15,
-          0xE1, 0x24, 0x74, 0x8D, 0xE9, 0x46, 0x36, 0x80,
-          0x6A, 0x91, 0x65, 0x5D, 0x7A, 0x6C, 0x3F, 0x43,
-          0xD2, 0x7B, 0x80, 0xA7, 0x3E, 0xF0, 0x10, 0xF6
-        })
-        || hash.SequenceEqual(new byte[] {
-          // e.1.0.8
-          0xB5, 0xEE, 0x39, 0xE3, 0xF3, 0xDF, 0x4C, 0xE2,
-          0xC0, 0xAF, 0xD3, 0x1B, 0x5F, 0x6D, 0x36, 0x11,
-          0x76, 0x0B, 0xA3, 0xA4, 0x45, 0xB1, 0xF8, 0x57,
-          0x72, 0xA3, 0x60, 0x08, 0xC4, 0x44, 0x22, 0x89
-        })
-        || hash.SequenceEqual(new byte[] {
-          // e.1.0.9
-          0x1a,0xb6,0xf4,0xca,0xac,0xb6,0x6a,0x88,
-          0x93,0xf4,0xde,0x2b,0x5b,0xa2,0x4a,0x45,
-          0x64,0xc6,0x26,0x37,0x69,0x7c,0x03,0x7c,
-          0xf7,0x53,0x85,0xfc,0x14,0x54,0x5d,0x72
-        });
-        */
-      return true;
-       
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
+      return hash.MatchesAnySha256(Hashes);
     }
 
     static short ApplyArrowPerks(Hero hero, bool hasMount) {
