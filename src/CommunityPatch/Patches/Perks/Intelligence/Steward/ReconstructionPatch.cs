@@ -66,7 +66,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       Applied = true;
     }
 
-    public override bool IsApplicable(Game game) {
+    public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
