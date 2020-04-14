@@ -19,17 +19,17 @@ namespace CommunityPatch.Patches.Policies {
     private static readonly MethodInfo TargetMethodInfo1 =
       Type.GetType("TaleWorlds.CampaignSystem.SandBox.GameComponents.DefaultSettlementTaxModel, TaleWorlds.CampaignSystem")?
         .GetMethod("CalculateDailyTaxInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    
-    private static readonly MethodInfo TargetMethodInfo2 = 
+
+    private static readonly MethodInfo TargetMethodInfo2 =
       typeof(DefaultSettlementMilitiaModel).GetMethod("CalculateMilitiaSpawnRate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    
-    private static readonly MethodInfo PatchMethodInfo1Prefix = 
+
+    private static readonly MethodInfo PatchMethodInfo1Prefix =
       typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Prefix1), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
-    private static readonly MethodInfo PatchMethodInfo1Postfix = 
+
+    private static readonly MethodInfo PatchMethodInfo1Postfix =
       typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix1), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-   
-    private static readonly MethodInfo PatchMethodInfo2 = 
+
+    private static readonly MethodInfo PatchMethodInfo2 =
       typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix2), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -37,27 +37,27 @@ namespace CommunityPatch.Patches.Policies {
       yield return TargetMethodInfo2;
     }
 
-    private static readonly byte[][] Hashes = {
+    private static readonly byte[][] Hashes1 = {
       new byte[] {
         // CalculateDailyTaxInternal e1.0.10
         0x52, 0xFC, 0xCB, 0x7C, 0xF9, 0x90, 0xBB, 0xAD,
         0xDE, 0xDB, 0x69, 0xE9, 0x9A, 0x41, 0x28, 0x04,
         0x7C, 0xE9, 0xDE, 0xBB, 0xD5, 0xD0, 0xCA, 0x3B,
         0x4B, 0xE3, 0x19, 0x42, 0x1E, 0x36, 0xC8, 0xB2
+      }
+    };
 
-      },
+    private static readonly byte[][] Hashes2 = {
       new byte[] {
         // CalculateMilitiaSpawnRate e1.0.10
         0xE4, 0x38, 0xF5, 0x91, 0x73, 0x90, 0x52, 0x1E,
         0xCF, 0xC5, 0xE4, 0xCE, 0x3B, 0xA6, 0x3E, 0xFD,
         0x41, 0x26, 0x50, 0xDD, 0x95, 0xC8, 0xC0, 0x86,
         0x81, 0x4C, 0x02, 0xC8, 0xA9, 0xDA, 0xCA, 0xBE
-
       }
     };
 
     public override void Reset() {
-      
     }
 
     public override void Apply(Game game) {
@@ -79,7 +79,7 @@ namespace CommunityPatch.Patches.Policies {
         return false;
 
       var hash1 = TargetMethodInfo1.MakeCilSignatureSha256();
-      if (!hash1.MatchesAnySha256(Hashes))
+      if (!hash1.MatchesAnySha256(Hashes1))
         return false;
       
       var patchInfo2 = Harmony.GetPatchInfo(TargetMethodInfo2);
@@ -87,7 +87,7 @@ namespace CommunityPatch.Patches.Policies {
         return false;
 
       var hash2 = TargetMethodInfo1.MakeCilSignatureSha256();
-       return hash2.MatchesAnySha256(Hashes);
+      return hash2.MatchesAnySha256(Hashes2);
     }
     
     // ReSharper disable once InconsistentNaming
