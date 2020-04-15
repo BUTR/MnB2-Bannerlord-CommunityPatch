@@ -41,6 +41,10 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="..\..\..\..\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
         <Reference Include="$(PkgLib_Harmony)\lib\net472\0Harmony.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>True</Private>
