@@ -9,7 +9,6 @@ using Sigil;
 using Sigil.NonGeneric;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
 using static CommunityPatch.CommunityPatchSubModule;
 
 namespace CommunityPatch {
@@ -199,27 +198,6 @@ namespace CommunityPatch {
       Error($"Save Id not resolved: {saveIdStr}");
       return typeDef;
     }
-
-  }
-
-  public abstract class SaveIdTypeMissingQuest : QuestBase {
-
-    protected SaveIdTypeMissingQuest(string questId, Hero questGiver, CampaignTime duration, int rewardGold, string saveId)
-      : base(questId, questGiver, duration, rewardGold) {
-      var msg = FormattableString.Invariant($"Missing SaveId {saveId} for Quest: {questId}.");
-
-      Title = new TextObject($"<{msg}>");
-    }
-
-    protected override void SetDialogs() {
-    }
-
-    protected override void InitializeQuestOnGameLoad() {
-    }
-
-    public override TextObject Title { get; }
-
-    public override bool IsRemainingTimeHidden => false;
 
   }
 
