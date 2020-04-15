@@ -56,6 +56,8 @@ namespace CommunityPatch {
       if (msg == null)
         return;
 
+      if (!msg.EndsWith("\n"))
+        msg += Eol;
       Debugger.Log(3, nameof(CommunityPatch), msg);
     }
 

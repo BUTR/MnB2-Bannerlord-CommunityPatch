@@ -30,6 +30,39 @@ namespace CommunityPatch {
 
     private static string _systemReportCache;
 
+    private static Thread _queuedReportThread;
+
+    private static DateTimeOffset _lastQueuedReport = DateTimeOffset.UtcNow;
+
+    private static readonly TimeSpan QueuedReportThrottleTime = TimeSpan.FromMinutes(1);
+
+    private static readonly TimeSpan QueuedReportWaitInterval = TimeSpan.FromSeconds(5);
+
+    private static readonly TimeSpan MaxQueuedReportWaitTime = TimeSpan.FromMinutes(3);
+
+    public static void QueueGenerateReport() {
+      _lastQueuedReport = DateTimeOffset.UtcNow;
+
+      if (_queuedReportThread != null)
+        return;
+
+      _queuedReportThread = new Thread(() => {
+        var started = DateTimeOffset.UtcNow;
+        while (DateTimeOffset.UtcNow - _lastQueuedReport < QueuedReportThrottleTime) {
+          Thread.Sleep(QueuedReportWaitInterval);
+          if (DateTimeOffset.UtcNow - started > MaxQueuedReportWaitTime)
+            break;
+        }
+
+        SynchronizationContext.Current.Post(_ => {
+          GenerateReport();
+          _queuedReportThread = null;
+        }, null);
+      }) {Name = "Queued Diagnostic Report", IsBackground = true};
+
+      _queuedReportThread.Start();
+    }
+
     public static void GenerateReport() {
       var sb = new StringBuilder();
 
@@ -251,7 +284,7 @@ namespace CommunityPatch {
       sb.AppendLine();
 
       try {
-        _systemReportCache = sb.ToString(start, sb.Length);
+        _systemReportCache = sb.ToString(start, sb.Length - start);
       }
       catch {
         // out of memory?
