@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -40,19 +41,28 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "dDKOoD3e");
 
-    public override bool IsApplicable(Game game)
+    public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (!(_perk.PrimaryRole == SkillEffect.PerkRole.PartyMember
-        && _perk.PrimaryBonus == 0.15f))
-        return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      if (!hash.MatchesAnySha256(Hashes))
+        return false;
+
+      try {
+        if (!(_perk.PrimaryRole == SkillEffect.PerkRole.PartyMember
+          && _perk.PrimaryBonus == 0.15f))
+          return null;
+      }
+      catch (Exception) {
+        return null;
+      }
+
+      return true;
     }
 
     public override void Apply(Game game) {

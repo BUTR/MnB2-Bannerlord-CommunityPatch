@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using JetBrains.Annotations;
 
 namespace Com {
 
@@ -116,23 +117,30 @@ namespace Com {
   [Guid("0968E258-16C7-4DBA-AA86-462DD61E31A3")] // CLSID_PersistentZoneIdentifier
   public class PersistentZoneIdentifier : IPersistFile, IZoneIdentifier {
 
-    public virtual extern void GetClassID(out Guid pClassID);
+    public virtual extern void GetClassID(out Guid pClassId);
 
-    public virtual extern void GetCurFile(out string ppszFileName);
+    public virtual extern void GetCurFile(out string fileName);
 
     public virtual extern int IsDirty();
 
-    public virtual extern void Load(string pszFileName, int dwMode);
+    public virtual extern void Load(string fileName, int storageMode);
 
-    public virtual extern void Save(string? pszFileName, bool fRemember);
+    public virtual extern void Save(string fileName, bool remember);
 
-    public virtual extern void SaveCompleted(string pszFileName);
+    public virtual extern void SaveCompleted(string fileName);
 
     public virtual extern UrlZone GetId();
 
     public virtual extern void Remove();
 
     public virtual extern void SetId(UrlZone id);
+
+  }
+
+  public static class PersistentZoneIdentifierExtensions {
+
+    public static void Load(this PersistentZoneIdentifier pzi, string fileName, StorageMode storageMode)
+      => pzi.Load(fileName, (int) storageMode);
 
   }
 

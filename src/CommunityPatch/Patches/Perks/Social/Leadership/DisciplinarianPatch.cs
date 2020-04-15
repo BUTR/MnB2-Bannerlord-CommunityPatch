@@ -12,7 +12,7 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
 
     private PerkObject _perk;
 
-    public bool IsApplicable(Game game)
+    public bool? IsApplicable(Game game)
       => _perk?.PrimaryRole == SkillEffect.PerkRole.Personal;
 
     public void Apply(Game game) {

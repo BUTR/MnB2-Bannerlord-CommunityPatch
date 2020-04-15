@@ -6,7 +6,9 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using HardwareProviders.CPU;
@@ -22,7 +24,46 @@ namespace CommunityPatch {
 
   public static class Diagnostics {
 
-    public static void CopyToClipboard() {
+    private static readonly byte[] RandomIntBuf = new byte[4];
+
+    private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
+
+    private static string _systemReportCache;
+
+    private static Thread _queuedReportThread;
+
+    private static DateTimeOffset _lastQueuedReport = DateTimeOffset.UtcNow;
+
+    private static readonly TimeSpan QueuedReportThrottleTime = TimeSpan.FromMinutes(1);
+
+    private static readonly TimeSpan QueuedReportWaitInterval = TimeSpan.FromSeconds(5);
+
+    private static readonly TimeSpan MaxQueuedReportWaitTime = TimeSpan.FromMinutes(3);
+
+    public static void QueueGenerateReport() {
+      _lastQueuedReport = DateTimeOffset.UtcNow;
+
+      if (_queuedReportThread != null)
+        return;
+
+      _queuedReportThread = new Thread(() => {
+        var started = DateTimeOffset.UtcNow;
+        while (DateTimeOffset.UtcNow - _lastQueuedReport < QueuedReportThrottleTime) {
+          Thread.Sleep(QueuedReportWaitInterval);
+          if (DateTimeOffset.UtcNow - started > MaxQueuedReportWaitTime)
+            break;
+        }
+
+        SynchronizationContext.Current.Post(_ => {
+          GenerateReport();
+          _queuedReportThread = null;
+        }, null);
+      }) {Name = "Queued Diagnostic Report", IsBackground = true};
+
+      _queuedReportThread.Start();
+    }
+
+    public static void GenerateReport() {
       var sb = new StringBuilder();
 
       try {
@@ -113,8 +154,11 @@ namespace CommunityPatch {
           sb.Append("  ").Append(++i).Append(". ").Append(type.Name);
           if (ActivePatches.ContainsKey(type))
             sb.Append(" *Active*");
-          if (patch.IsApplicable(Game.Current))
+          var applicability = patch.IsApplicable(Game.Current);
+          if (applicability ?? false)
             sb.Append(" *Applicable*");
+          if (applicability == null)
+            sb.Append(" *Maybe Applicable*");
           if (patch.Applied)
             sb.Append(" *Applied*");
           sb.AppendLine();
@@ -130,11 +174,16 @@ namespace CommunityPatch {
         sb.AppendLine("Loaded SubModules:");
         var i = 0;
         foreach (var sm in Module.CurrentModule.SubModules) {
-          var type = sm.GetType();
-          var asm = type.Assembly;
-          sb.Append("  ").Append(++i).Append(". ").AppendLine(type.AssemblyQualifiedName);
-          foreach (var version in asm.GetCustomAttributes<AssemblyInformationalVersionAttribute>())
-            sb.Append("    ").AppendLine(version.InformationalVersion);
+          try {
+            var type = sm.GetType();
+            var asm = type.Assembly;
+            sb.Append("  ").Append(++i).Append(". ").AppendLine(type.AssemblyQualifiedName);
+            foreach (var version in asm.GetCustomAttributes<AssemblyInformationalVersionAttribute>())
+              sb.Append("    v").AppendLine(version.InformationalVersion);
+          }
+          catch (Exception ex) {
+            sb.Append("  *** ERROR: ").Append(ex.GetType().Name).Append(": ").AppendLine(ex.Message);
+          }
         }
       }
       catch (Exception ex) {
@@ -143,6 +192,44 @@ namespace CommunityPatch {
 
       sb.AppendLine();
 
+      AppendSystemReport(sb);
+
+      try {
+        var reportStr = sb.ToString();
+
+        ShowMessage("Saving to \"My Documents\\Mount and Blade II Bannerlord\\diagnostic-report.txt\"");
+
+        try {
+          var docsMnb2 = new Uri(System.IO.Path.Combine(PathHelpers.GetConfigsDir(), "..")).LocalPath;
+          var now = DateTime.UtcNow;
+          Random.GetNonZeroBytes(RandomIntBuf);
+          var randomInt = Unsafe.ReadUnaligned<uint>(ref RandomIntBuf[0]);
+          File.WriteAllText(System.IO.Path.Combine(docsMnb2, $"diagnostic-report.{now.Year:0000}{now.Month:00}{now.Day:00}{now.Hour:00}{now.Minute:00}{now.Second:00}{now.Millisecond}.{randomInt:X8}.txt"), reportStr);
+        }
+        catch (Exception ex2) {
+          ShowMessage($"Failed to save diagnostic report!\n{ex2.GetType().Name}: {ex2.Message}");
+        }
+
+        try {
+          Input.SetClipboardText(reportStr);
+          ShowMessage("Diagnostics also copied to system clipboard.");
+        }
+        catch (Exception ex) {
+          ShowMessage($"Writing to system clipboard failed!\n{ex.GetType().Name}: {ex.Message}");
+        }
+      }
+      catch (Exception ex) {
+        ShowMessage($"Failed to generate string from diagnostic report string buffer!\n{ex.GetType().Name}: {ex.Message}");
+      }
+    }
+
+    private static void AppendSystemReport(StringBuilder sb) {
+      if (_systemReportCache != null) {
+        sb.Append(_systemReportCache);
+        return;
+      }
+
+      var start = sb.Length;
       try {
         sb.AppendLine("System Info:");
         sb.Append("  ").AppendLine(Utilities.GetPCInfo().Replace("\n", "\n  "));
@@ -197,26 +284,10 @@ namespace CommunityPatch {
       sb.AppendLine();
 
       try {
-        var reportStr = sb.ToString();
-
-        try {
-          Input.SetClipboardText(reportStr);
-          ShowMessage("Diagnostics copied to system clipboard.");
-        }
-        catch (Exception ex) {
-          ShowMessage($"Writing to system clipboard failed!\n{ex.GetType().Name}: {ex.Message}");
-          ShowMessage("Saving to \"My Documents\\Mount and Blade II Bannerlord\\diagnostic-report.txt\"");
-          try {
-            var docsMnb2 = new Uri(System.IO.Path.Combine(PathHelpers.GetConfigsDir(), "..")).LocalPath;
-            File.WriteAllText(System.IO.Path.Combine(docsMnb2, "diagnostic-report.txt"), reportStr);
-          }
-          catch (Exception ex2) {
-            ShowMessage($"Failed to save diagnostic report!\n{ex2.GetType().Name}: {ex2.Message}");
-          }
-        }
+        _systemReportCache = sb.ToString(start, sb.Length - start);
       }
-      catch (Exception ex) {
-        ShowMessage($"Failed to generate string from diagnostic report string buffer!\n{ex.GetType().Name}: {ex.Message}");
+      catch {
+        // out of memory?
       }
     }
 

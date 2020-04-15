@@ -39,7 +39,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "xIL6vOgI");
 
-    public override bool IsApplicable(Game game)
+    public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);

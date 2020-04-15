@@ -13,9 +13,9 @@ using TaleWorlds.MountAndBlade;
 
 namespace CommunityPatch.Patches.Perks.Control.Bow {
 
-  public sealed class MountedArcherPatch : AgentWeaponEquippedPatch<MountedArcherPatch> {
+  public sealed class BowMountedArcherPatch : AgentWeaponEquippedPatch<BowMountedArcherPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(MountedArcherPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(BowMountedArcherPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     private static PerkObject _mountedArcher;
 

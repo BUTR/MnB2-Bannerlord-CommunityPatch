@@ -88,7 +88,7 @@ namespace CommunityPatch.Patches {
       Applied = true;
     }
 
-    public bool IsApplicable(Game game) {
+    public bool? IsApplicable(Game game) {
       {
         var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo1);
         if (AlreadyPatchedByOthers(patchInfo))

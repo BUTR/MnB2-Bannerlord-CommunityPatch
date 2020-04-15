@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -12,6 +13,9 @@ namespace CommunityPatch {
 
   [PublicAPI]
   public partial class CommunityPatchSubModule : MBSubModuleBase {
+
+    internal static CommunityPatchSubModule Current
+      => Module.CurrentModule.SubModules.OfType<CommunityPatchSubModule>().FirstOrDefault();
 
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
@@ -31,6 +35,8 @@ namespace CommunityPatch {
         }
       }
 
+      MenuCleaner.CleanUpMainMenu();
+
       if (DisableIntroVideo) {
         try {
           typeof(Module)
@@ -47,13 +53,22 @@ namespace CommunityPatch {
 
     protected override void OnSubModuleLoad() {
       var module = Module.CurrentModule;
+
+      try {
+        Harmony.PatchAll(typeof(CommunityPatchSubModule).Assembly);
+      }
+      catch (Exception ex) {
+        Error(ex, "Could not apply all generic attribute-based harmony patches.");
+      }
+
       module.AddInitialStateOption(new InitialStateOption(
-        "ModOptions",
-        new TextObject("Mod Options"),
-        10001,
-        ShowModOptions,
+        "CommunityPatchOptions",
+        new TextObject("{=CommunityPatchOptions}Community Patch Options"),
+        9998,
+        ShowOptions,
         false
       ));
+
       base.OnSubModuleLoad();
     }
 
