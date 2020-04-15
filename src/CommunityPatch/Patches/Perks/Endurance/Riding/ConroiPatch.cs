@@ -63,10 +63,14 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       var perk = ActivePatch._perk;
 
       var extra = perk.PrimaryBonus * party.MemberRoster.Count(x => x.Character.IsHero && x.Character.HeroObject.GetPerkValue(perk));
-      if (extra <= 0) 
+      if (extra <= 0)
         return;
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
+      var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
+      if (baseLine != null)
+        explanation.Lines.Remove(baseLine);
+
       explainedNumber.Add(extra, perk.Name);
       __result = (int) explainedNumber.ResultNumber;
     }

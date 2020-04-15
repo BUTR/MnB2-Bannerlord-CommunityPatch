@@ -84,6 +84,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
       if (explainedNumber.BaseNumber > 0) {
+        var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
+        if (baseLine != null)
+          explanation.Lines.Remove(baseLine);
+
         explainedNumber.AddFactor(perk.PrimaryBonus, perk.Name);
         __result = (int) explainedNumber.ResultNumber;
       }

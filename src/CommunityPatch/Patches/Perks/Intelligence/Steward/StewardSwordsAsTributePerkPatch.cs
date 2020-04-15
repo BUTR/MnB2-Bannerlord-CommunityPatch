@@ -75,16 +75,18 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
         return;
 
       var kingdomClans = hero.Clan?.Kingdom?.Clans;
-
       if (kingdomClans == null)
         return;
 
       var extra = (int) Math.Max(0, (kingdomClans.Count() - 1) * perk.PrimaryBonus);
-
       if (extra <= 0)
         return;
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
+      var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
+      if (baseLine != null)
+        explanation.Lines.Remove(baseLine);
+
       explainedNumber.Add(extra, perk.Name);
       __result = (int) explainedNumber.ResultNumber;
     }
