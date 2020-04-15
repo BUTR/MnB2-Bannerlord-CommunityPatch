@@ -73,7 +73,7 @@ namespace CommunityPatch.Patches.Policies {
       Applied = true;
     }
 
-    public override bool IsApplicable(Game game) {
+    public override bool? IsApplicable(Game game) {
       var patchInfo1 = Harmony.GetPatchInfo(TargetMethodInfo1);
       if (AlreadyPatchedByOthers(patchInfo1))
         return false;
