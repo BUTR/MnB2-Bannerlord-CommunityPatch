@@ -236,7 +236,7 @@ namespace CommunityPatch {
           newList.Add(item);
       }
 
-      if (customOptions.Count <= 1) {
+      if (customOptions.Count <= 0) {
         newList.Add(new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
           _ => CommunityPatchSubModule.Current.ShowOptions(), _groupEscMenuOptsKey, false));
 
