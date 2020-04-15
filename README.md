@@ -20,6 +20,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Bow Expert
     * Conroi
     * Crossbow Expert
+    * Filled To Brim
     * Squires
   * Bow
     * Mounted Archer
