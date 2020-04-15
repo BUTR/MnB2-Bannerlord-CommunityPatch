@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
@@ -10,14 +11,12 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  public sealed class ExtraAmmoPerksPatch : PatchBase<ExtraAmmoPerksPatch> {
+  public abstract class ExtraAmmoPerksPatch<TPatch> : PatchBase<TPatch> where  TPatch : ExtraAmmoPerksPatch<TPatch> {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    protected static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(ExtraAmmoPerksPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -33,14 +32,6 @@ namespace CommunityPatch.Patches {
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
-
-    public override void Apply(Game game) {
-      if (Applied) return;
-
-      CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        postfix: new HarmonyMethod(PatchMethodInfo));
-      Applied = true;
-    }
     
     public override bool IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -49,6 +40,11 @@ namespace CommunityPatch.Patches {
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
+    }
+
+    protected static bool HasMount(Agent agent) {
+      var item = agent.SpawnEquipment[EquipmentIndex.ArmorItemEndSlot].Item;
+      return item != null && item.HasHorseComponent;
     }
 
     static short ApplyArrowPerks(Hero hero, bool hasMount) {
@@ -99,45 +95,24 @@ namespace CommunityPatch.Patches {
       return extraAmmo;
     }
 
-    private static void Postfix(Agent __instance) {
-      if (!__instance.IsHero) {
-        return;
-      }
-
-      if (__instance.Character is CharacterObject charObj) {
+    protected static void ApplyPerk(Agent agent, int ammoAmount, Func<Hero, WeaponComponentData, bool> canApplyPerk) {
+      if (agent.IsHero && agent.Character is CharacterObject charObj) {
+        var hero = charObj.HeroObject;
         var property = typeof(MissionEquipment)
           .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
-        var missionWeapons = (MissionWeapon[]) property.GetValue(__instance.Equipment);
+        var missionWeapons = (MissionWeapon[]) property.GetValue(agent.Equipment);
 
-        //At this point agent.HasMount wasn't initialized, and trying to modify ammo in later functions causes problems
-        var item = __instance.SpawnEquipment[EquipmentIndex.ArmorItemEndSlot].Item;
-        var hasMount = item != null && item.HasHorseComponent;
-
-        var hero = charObj.HeroObject;
         for (var i = 0; i < missionWeapons.Length; i++) {
           if (!missionWeapons[i].Weapons.IsEmpty()) {
             var weaponComponentData = missionWeapons[i].Weapons[0];
-            if (weaponComponentData != null) {
-              short extraAmmo = 0;
-
-              if (weaponComponentData.WeaponClass == WeaponClass.Arrow) {
-                extraAmmo = ApplyArrowPerks(hero, hasMount);
-              }
-              else if (weaponComponentData.WeaponClass == WeaponClass.ThrowingAxe ||
-                weaponComponentData.WeaponClass == WeaponClass.ThrowingKnife ||
-                weaponComponentData.WeaponClass == WeaponClass.Javelin) {
-                extraAmmo = ApplyThrowingAmmoPerks(hero, hasMount);
-              }
-
-              if (extraAmmo > 0) {
+            if (weaponComponentData != null && canApplyPerk(hero, weaponComponentData)) {
                 var maxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
                 var ammoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                var newMaxAmmo = (short) ((short) maxAmmoField.GetValue(missionWeapons[i]) + extraAmmo);
+                var newMaxAmmo = (short) ((short) maxAmmoField.GetValue(missionWeapons[i]) + ammoAmount);
                 object boxed = missionWeapons[i];
                 ammoField.SetValue(boxed, newMaxAmmo);
                 maxAmmoField.SetValue(boxed, newMaxAmmo);
                 missionWeapons[i] = (MissionWeapon) boxed;
-              }
             }
           }
         }
