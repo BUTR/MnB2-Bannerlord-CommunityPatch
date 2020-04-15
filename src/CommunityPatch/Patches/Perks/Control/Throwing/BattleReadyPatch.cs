@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -21,6 +22,7 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
       WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Thrown &&
       hero.GetPerkValue(DefaultPerks.Throwing.BattleReady);
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) => ApplyPerk(__instance, 2, CanApplyPerk);
     
   }

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -22,6 +23,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows && 
       hero.GetPerkValue(DefaultPerks.Athletics.ExtraArrows);
       
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) {
       if (!HasMount(__instance)) {
         ApplyPerk(__instance, 2, CanApplyPerk);      
