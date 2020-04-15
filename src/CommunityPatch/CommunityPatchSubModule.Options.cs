@@ -19,6 +19,11 @@ namespace CommunityPatch {
       set => Options.Set(nameof(RecordFirstChanceExceptions), value);
     }
 
+    internal static bool SuppressTerminalTickExceptions {
+      get => Options.Get<bool>(nameof(SuppressTerminalTickExceptions));
+      set => Options.Set(nameof(SuppressTerminalTickExceptions), value);
+    }
+
     internal void ShowOptions() {
       // ReSharper disable once UseObjectOrCollectionInitializer
       var elements = new List<InquiryElement>();
@@ -34,8 +39,15 @@ namespace CommunityPatch {
         RecordFirstChanceExceptions ? "Ignore First Chance Exceptions" : "Record First Chance Exceptions",
         null
       ));
+
       elements.Add(new InquiryElement(
-        nameof(Diagnostics.CopyToClipboard),
+        nameof(SuppressTerminalTickExceptions),
+        SuppressTerminalTickExceptions ? "Don't Suppress Terminal Tick Exceptions" : "Suppress Terminal Tick Exceptions",
+        null
+      ));
+
+      elements.Add(new InquiryElement(
+        nameof(Diagnostics.GenerateReport),
         "Copy Diagnostics to Clipboard",
         null
       ));
@@ -74,8 +86,14 @@ namespace CommunityPatch {
           Options.Save();
           break;
 
-        case nameof(Diagnostics.CopyToClipboard):
-          Diagnostics.CopyToClipboard();
+        case nameof(Diagnostics.GenerateReport):
+          Diagnostics.GenerateReport();
+          break;
+
+        case nameof(SuppressTerminalTickExceptions):
+          SuppressTerminalTickExceptions = !SuppressTerminalTickExceptions;
+          ShowMessage($"Terminal Tick Exceptions: {(SuppressTerminalTickExceptions ? "Suppressed" : "Allowed")}.");
+          Options.Save();
           break;
 
         default: throw new NotImplementedException(selected);

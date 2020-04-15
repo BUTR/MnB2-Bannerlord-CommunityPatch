@@ -6,7 +6,9 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using HardwareProviders.CPU;
@@ -22,7 +24,13 @@ namespace CommunityPatch {
 
   public static class Diagnostics {
 
-    public static void CopyToClipboard() {
+    private static readonly byte[] RandomIntBuf = new byte[4];
+
+    private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
+
+    private static string _systemReportCache;
+
+    public static void GenerateReport() {
       var sb = new StringBuilder();
 
       try {
@@ -151,6 +159,44 @@ namespace CommunityPatch {
 
       sb.AppendLine();
 
+      AppendSystemReport(sb);
+
+      try {
+        var reportStr = sb.ToString();
+
+        ShowMessage("Saving to \"My Documents\\Mount and Blade II Bannerlord\\diagnostic-report.txt\"");
+
+        try {
+          var docsMnb2 = new Uri(System.IO.Path.Combine(PathHelpers.GetConfigsDir(), "..")).LocalPath;
+          var now = DateTime.UtcNow;
+          Random.GetNonZeroBytes(RandomIntBuf);
+          var randomInt = Unsafe.ReadUnaligned<uint>(ref RandomIntBuf[0]);
+          File.WriteAllText(System.IO.Path.Combine(docsMnb2, $"diagnostic-report.{now.Year:0000}{now.Month:00}{now.Day:00}{now.Hour:00}{now.Minute:00}{now.Second:00}{now.Millisecond}.{randomInt:X8}.txt"), reportStr);
+        }
+        catch (Exception ex2) {
+          ShowMessage($"Failed to save diagnostic report!\n{ex2.GetType().Name}: {ex2.Message}");
+        }
+
+        try {
+          Input.SetClipboardText(reportStr);
+          ShowMessage("Diagnostics also copied to system clipboard.");
+        }
+        catch (Exception ex) {
+          ShowMessage($"Writing to system clipboard failed!\n{ex.GetType().Name}: {ex.Message}");
+        }
+      }
+      catch (Exception ex) {
+        ShowMessage($"Failed to generate string from diagnostic report string buffer!\n{ex.GetType().Name}: {ex.Message}");
+      }
+    }
+
+    private static void AppendSystemReport(StringBuilder sb) {
+      if (_systemReportCache != null) {
+        sb.Append(_systemReportCache);
+        return;
+      }
+
+      var start = sb.Length;
       try {
         sb.AppendLine("System Info:");
         sb.Append("  ").AppendLine(Utilities.GetPCInfo().Replace("\n", "\n  "));
@@ -205,26 +251,10 @@ namespace CommunityPatch {
       sb.AppendLine();
 
       try {
-        var reportStr = sb.ToString();
-
-        try {
-          Input.SetClipboardText(reportStr);
-          ShowMessage("Diagnostics copied to system clipboard.");
-        }
-        catch (Exception ex) {
-          ShowMessage($"Writing to system clipboard failed!\n{ex.GetType().Name}: {ex.Message}");
-          ShowMessage("Saving to \"My Documents\\Mount and Blade II Bannerlord\\diagnostic-report.txt\"");
-          try {
-            var docsMnb2 = new Uri(System.IO.Path.Combine(PathHelpers.GetConfigsDir(), "..")).LocalPath;
-            File.WriteAllText(System.IO.Path.Combine(docsMnb2, "diagnostic-report.txt"), reportStr);
-          }
-          catch (Exception ex2) {
-            ShowMessage($"Failed to save diagnostic report!\n{ex2.GetType().Name}: {ex2.Message}");
-          }
-        }
+        _systemReportCache = sb.ToString(start, sb.Length);
       }
-      catch (Exception ex) {
-        ShowMessage($"Failed to generate string from diagnostic report string buffer!\n{ex.GetType().Name}: {ex.Message}");
+      catch {
+        // out of memory?
       }
     }
 
