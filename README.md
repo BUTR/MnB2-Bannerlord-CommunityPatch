@@ -7,19 +7,28 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 
 * Perks
   * Athletics
+    * Extra Arrows
+    * Extra Throwing Weapon
     * Peak Form
   * Leadership
     * Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub>
   * Scouting
     * Healthy Scout
   * Riding
+    * Spare Arrows
+    * Spare Throwing Weapon
     * Bow Expert
     * Crossbow Expert
     * Squires
   * Bow
     * Mounted Archer
+    * Large Quiver
+    * Battle Equipped
   * Crossbow
     * Crossbow Cavalry
+  * Throwing
+    * Fully Armed
+    * Battle Ready
   * Steward
     * Agrarian
     * Assessor

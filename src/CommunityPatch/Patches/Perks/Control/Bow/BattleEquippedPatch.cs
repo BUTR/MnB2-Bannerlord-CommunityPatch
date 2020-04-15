@@ -1,5 +1,5 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -22,6 +22,7 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
       WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
       hero.GetPerkValue(DefaultPerks.Bow.BattleEquipped);
     
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) => ApplyPerk(__instance, 6, CanApplyPerk);
 
   }

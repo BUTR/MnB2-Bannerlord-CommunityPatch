@@ -33,7 +33,7 @@ namespace CommunityPatch.Patches {
       yield return TargetMethodInfo;
     }
     
-    public override bool IsApplicable(Game game) {
+    public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
@@ -45,54 +45,6 @@ namespace CommunityPatch.Patches {
     protected static bool HasMount(Agent agent) {
       var item = agent.SpawnEquipment[EquipmentIndex.ArmorItemEndSlot].Item;
       return item != null && item.HasHorseComponent;
-    }
-
-    static short ApplyArrowPerks(Hero hero, bool hasMount) {
-      short extraAmmo = 0;
-
-      if (hero.GetPerkValue(DefaultPerks.Bow.LargeQuiver)) {
-        extraAmmo += 3;
-      }
-
-      if (hero.GetPerkValue(DefaultPerks.Bow.BattleEquipped)) {
-        extraAmmo += 6;
-      }
-      
-      if (hasMount) {
-        if (hero.GetPerkValue(DefaultPerks.Riding.SpareArrows)) {
-          extraAmmo += 3;
-        }
-      }
-      else {
-        if (hero.GetPerkValue(DefaultPerks.Athletics.ExtraArrows)) {
-          extraAmmo += 2;
-        }
-      }
-      return extraAmmo;
-    }
-    
-    static short ApplyThrowingAmmoPerks(Hero hero, bool hasMount) {
-      short extraAmmo = 0;
-
-      if (hero.GetPerkValue(DefaultPerks.Throwing.FullyArmed)) {
-        extraAmmo += 1;
-      }
-
-      if (hero.GetPerkValue(DefaultPerks.Throwing.BattleReady)) {
-        extraAmmo += 2;
-      }
-      
-      if (hasMount) {
-        if (hero.GetPerkValue(DefaultPerks.Riding.SpareThrowingWeapon)) {
-          extraAmmo += 1;
-        }
-      }
-      else {
-        if (hero.GetPerkValue(DefaultPerks.Athletics.ExtraThrowingWeapons)) {
-          extraAmmo += 1;
-        }
-      }
-      return extraAmmo;
     }
 
     protected static void ApplyPerk(Agent agent, int ammoAmount, Func<Hero, WeaponComponentData, bool> canApplyPerk) {
