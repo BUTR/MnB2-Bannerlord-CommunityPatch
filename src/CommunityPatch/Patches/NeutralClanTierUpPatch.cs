@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -34,15 +35,24 @@ namespace CommunityPatch.Patches {
     public override void Reset() {
     }
 
-    public override bool IsApplicable(Game game) {
+    public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
-      if (CampaignData.NeutralFaction.DefaultPartyTemplate != null)
-        return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      if (!hash.MatchesAnySha256(Hashes))
+        return false;
+
+      try {
+        if (CampaignData.NeutralFaction.DefaultPartyTemplate != null)
+          return false;
+      }
+      catch (Exception) {
+        return null;
+      }
+
+      return true;
     }
 
     public override void Apply(Game game) {

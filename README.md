@@ -13,8 +13,9 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
   * Scouting
     * Healthy Scout
   * Riding
-    * Crossbow Expert
     * Bow Expert
+    * Crossbow Expert
+    * Squires
   * Bow
     * Mounted Archer
   * Crossbow
@@ -23,20 +24,23 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Agrarian
     * Assessor
     * Bannerlord
+    * Enhanced Mines
+    * Food Rationing
     * Logistics Expert
     * Man-At-Arms
     * Nourish Settlement
     * Prominence
     * Prosperous Reign
+    * Reconstruction
     * Reeve
     * Ruler
     * Supreme Authority
     * Swords As Tribute
     * Tax Collector
     * Warmonger
-    * Enhanced Mines
-  * Policies
-    * Land Grants For Veterans
+    * War Rations
+* Policies
+  * Land Grants For Veterans
 * Learning Rate explanation
 * Item Comparison perk-based coloring
 * Party Morale bonus being too low for >10 food variety

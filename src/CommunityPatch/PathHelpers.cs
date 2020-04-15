@@ -21,6 +21,22 @@ namespace CommunityPatch {
       return _binSubDir;
     }
 
+    private static string _configsDir;
+
+    public static string GetConfigsDir() {
+      if (_configsDir != null)
+        return _configsDir;
+
+      try {
+        _configsDir = Utilities.GetConfigsPath();
+      }
+      catch (NullReferenceException) {
+        _configsDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Mount and Blade II Bannerlord", "Configs");
+      }
+
+      return _configsDir;
+    }
+
   }
 
 }

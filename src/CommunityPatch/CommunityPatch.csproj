@@ -7,7 +7,6 @@
         <Platform>x64</Platform>
         <PlatformTarget>x64</PlatformTarget>
         <RootNamespace />
-        <Version>0.0.2</Version>
         <Title>Community Patch</Title>
         <Authors>Tyler Young</Authors>
         <Company>The Mount &amp; Blade II: Bannerlord Community</Company>
@@ -16,6 +15,10 @@
         <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
         <MnB2BannerlordLauncher>$(MnB2BannerlordBinDir)/TaleWorlds.MountAndBlade.Launcher.exe</MnB2BannerlordLauncher>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch</RepositoryUrl>
+        <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+        <Version>0.1.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -35,7 +38,7 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="$(PkgLib_Harmony)\lib\net48\0Harmony.dll">
+        <Reference Include="$(PkgLib_Harmony)\lib\net472\0Harmony.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>True</Private>
         </Reference>
@@ -56,10 +59,23 @@
             <GeneratePathProperty>True</GeneratePathProperty>
             <NoWarn>NU1701</NoWarn>
         </PackageReference>
+        <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+        <PackageReference Include="Sigil" Version="5.0.0" />
+        <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
         <PackageReference Include="Tomlyn" Version="0.1.2" />
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Patches\Perks\Intelligence" />
     </ItemGroup>
+    
+    <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
+        <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
+        <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
+        <PropertyGroup>
+            <SourceRevisionId>$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
+        </PropertyGroup>
+        <Message Importance="high" Text="Shortened SCI Version: $(SourceRevisionId)" />
+    </Target>
 </Project>

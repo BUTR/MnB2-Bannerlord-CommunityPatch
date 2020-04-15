@@ -50,7 +50,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "SFjspNSf");
 
-    public override bool IsApplicable(Game game) {
+    public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;

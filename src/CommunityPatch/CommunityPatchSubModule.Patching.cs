@@ -25,7 +25,7 @@ namespace CommunityPatch {
         }
 
         try {
-          if (patch.IsApplicable(game)) {
+          if (patch.IsApplicable(game) ?? false) {
             try {
               patch.Apply(game);
             }

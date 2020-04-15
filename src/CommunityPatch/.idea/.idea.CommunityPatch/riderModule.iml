@@ -6,6 +6,7 @@
     <content url="file://$MODULE_DIR$/../.." />
     <content url="file://$MODULE_DIR$/../../../../tools/GeneratePatchTargetHashes" />
     <content url="file://$MODULE_DIR$/../../../../tools/PackageRelease" />
+    <content url="file://$MODULE_DIR$/../../../../tools/UnblockFile" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
