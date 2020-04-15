@@ -14,6 +14,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Healthy Scout
   * Riding
     * Bow Expert
+    * Conroi
     * Crossbow Expert
     * Squires
   * Bow
