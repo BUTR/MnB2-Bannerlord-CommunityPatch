@@ -3,7 +3,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
         <MSBuildWarningsAsMessages>MSB3106;MSB3277</MSBuildWarningsAsMessages>
-        <Configurations>Release;Debug</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <Platform>x64</Platform>
         <PlatformTarget>x64</PlatformTarget>
         <RootNamespace />
@@ -19,6 +19,7 @@
         <RepositoryUrl>https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch</RepositoryUrl>
         <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
         <Version>0.1.0</Version>
+        <Platforms>x64</Platforms>
     </PropertyGroup>
 
     <ItemGroup>

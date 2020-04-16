@@ -12,6 +12,8 @@ namespace CommunityPatch {
 
   public static class MenuCleaner {
 
+    private const int MaxMenuLength = 9;
+
     private static List<InitialStateOption> _modOptionsMenus;
 
     internal static List<InitialStateOption> GetThirdPartyOptionsMenus()
@@ -30,7 +32,7 @@ namespace CommunityPatch {
 
       _alreadyCleanedUpMainMenu = true;
       var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
-      if (menu.Length > 8) {
+      if (menu.Length > MaxMenuLength) {
         if (_groupedOptionsMenus != null)
           return;
 

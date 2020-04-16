@@ -24,6 +24,11 @@ namespace CommunityPatch {
       set => Options.Set(nameof(SuppressTerminalTickExceptions), value);
     }
 
+    internal static bool DontGroupThirdPartyMenuOptions {
+      get => Options.Get<bool>(nameof(DontGroupThirdPartyMenuOptions));
+      set => Options.Set(nameof(DontGroupThirdPartyMenuOptions), value);
+    }
+
     internal void ShowOptions() {
       // ReSharper disable once UseObjectOrCollectionInitializer
       var elements = new List<InquiryElement>();
@@ -45,6 +50,11 @@ namespace CommunityPatch {
         SuppressTerminalTickExceptions ? "Don't Suppress Terminal Tick Exceptions" : "Suppress Terminal Tick Exceptions",
         null
       ));
+      
+      elements.Add(new InquiryElement(
+        nameof(DontGroupThirdPartyMenuOptions),
+        DontGroupThirdPartyMenuOptions ? "Don't Group 3rd Party Menu Options" :"Group 3rd Party Menu Options",
+        null));
 
       elements.Add(new InquiryElement(
         nameof(Diagnostics.GenerateReport),
@@ -93,6 +103,12 @@ namespace CommunityPatch {
         case nameof(SuppressTerminalTickExceptions):
           SuppressTerminalTickExceptions = !SuppressTerminalTickExceptions;
           ShowMessage($"Terminal Tick Exceptions: {(SuppressTerminalTickExceptions ? "Suppressed" : "Allowed")}.");
+          Options.Save();
+          break;
+
+        case nameof(DontGroupThirdPartyMenuOptions):
+          DontGroupThirdPartyMenuOptions = !DontGroupThirdPartyMenuOptions;
+          ShowMessage($"3rd Party Menu Options: {(DontGroupThirdPartyMenuOptions ? "Loose" : "Grouped")}.");
           Options.Save();
           break;
 

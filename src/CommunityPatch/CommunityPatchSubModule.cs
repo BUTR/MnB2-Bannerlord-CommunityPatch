@@ -34,8 +34,8 @@ namespace CommunityPatch {
             module.AddInitialStateOption(opt);
         }
       }
-
-      MenuCleaner.CleanUpMainMenu();
+      if (!DontGroupThirdPartyMenuOptions)
+        MenuCleaner.CleanUpMainMenu();
 
       if (DisableIntroVideo) {
         try {
