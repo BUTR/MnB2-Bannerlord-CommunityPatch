@@ -75,7 +75,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
         if (baseLine != null)
           explanation.Lines.Remove(baseLine);
 
-        explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count(x => x.IsCastle || x.IsTown) * perk.PrimaryBonus, perk.Name);
+        explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count(x => !x.IsVillage) * perk.PrimaryBonus, perk.Name);
         __result = (int) explainedNumber.ResultNumber;
       }
     }
