@@ -11,6 +11,8 @@
         <Authors>Tyler Young</Authors>
         <Company>The Mount &amp; Blade II: Bannerlord Community</Company>
         <OutDir>../../bin/Win64_Shipping_Client</OutDir>
+        <OutputPath>../../bin/Win64_Shipping_Client</OutputPath>
+        <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
         <LangVersion>8</LangVersion>
         <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
         <MnB2BannerlordLauncher>$(MnB2BannerlordBinDir)/TaleWorlds.MountAndBlade.Launcher.exe</MnB2BannerlordLauncher>

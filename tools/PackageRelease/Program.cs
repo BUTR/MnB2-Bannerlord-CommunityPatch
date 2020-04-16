@@ -8,7 +8,7 @@ internal static class Program {
 
   private static void Main() {
     var asmDir = Path.GetDirectoryName(new Uri(typeof(Program).Assembly.CodeBase).LocalPath);
-    Environment.CurrentDirectory = new Uri(Path.Combine(asmDir, "..", "..", "..", "..", "..")).LocalPath;
+    Environment.CurrentDirectory = new Uri(Path.Combine(asmDir, "..", "..", "..", "..", "..", "..")).LocalPath;
     using (var proc = new Process()) {
       proc.StartInfo = new ProcessStartInfo {
         FileName = "git",
