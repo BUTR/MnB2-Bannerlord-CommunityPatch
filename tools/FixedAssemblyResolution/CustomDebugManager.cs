@@ -19,9 +19,9 @@ namespace FixedAssemblyResolution {
       => Trace.TraceWarning(message);
 
     public void Assert(bool condition, string message,
-      [CallerFilePath] string CallerFile = "",
-      [CallerMemberName] string CallerMethod = "",
-      [CallerLineNumber] int CallerLine = 0) {
+      [CallerFilePath] string callerFile = "",
+      [CallerMemberName] string callerMethod = "",
+      [CallerLineNumber] int callerLine = 0) {
       if (!condition)
         Trace.TraceError(message);
     }
