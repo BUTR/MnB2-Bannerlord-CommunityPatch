@@ -3,11 +3,13 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security;
+using JetBrains.Annotations;
 
 namespace Com {
 
   // STGM from objbase.h
   // https://docs.microsoft.com/en-us/windows/win32/stg/stgm-constants
+  [PublicAPI]
   [Flags]
   public enum StorageMode : int {
 
@@ -62,7 +64,8 @@ namespace Com {
 
   }
 
-// https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/ms537175(v%3Dvs.85)
+  // https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/ms537175(v%3Dvs.85)
+  [PublicAPI]
   public enum UrlZone {
 
     Invalid = -1,
@@ -79,7 +82,8 @@ namespace Com {
 
   }
 
-// UrlMon.Idl
+  // UrlMon.Idl
+  [PublicAPI]
   [ComImport]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [Guid("CD45F185-1B21-48E2-967B-EAD743A8914E")]
@@ -113,6 +117,7 @@ namespace Com {
   }
 
   // https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/ms537029(v=vs.85)?redirectedfrom=MSDN
+  [PublicAPI]
   [ClassInterface(ClassInterfaceType.None)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
@@ -148,6 +153,7 @@ namespace Com {
 
   }
 
+  [PublicAPI]
   public static class PersistentZoneIdentifierExtensions {
 
     public static void Load(this PersistentZoneIdentifier pzi, string fileName, StorageMode storageMode)
