@@ -12,11 +12,7 @@ namespace CommunityPatch {
 
   public static class MenuCleaner {
 
-    private const int MaxMenuLength = 9;
-
-    private const int DefaultMenuLength = 7;
-
-    private const int SkipOptionsWhenGrouping = MaxMenuLength - DefaultMenuLength;
+    private const int MaxMenuLength = 8;
 
     private static List<InitialStateOption> _modOptionsMenus;
 
@@ -26,7 +22,7 @@ namespace CommunityPatch {
         .Concat(_groupedOptionsMenus ?? (IEnumerable<InitialStateOption>) Array.Empty<InitialStateOption>())
         .ToList();
 
-    private static bool _alreadyCleanedUpMainMenu = false;
+    private static bool _alreadyCleanedUpMainMenu;
 
     internal static List<InitialStateOption> _groupedOptionsMenus;
 
@@ -36,36 +32,39 @@ namespace CommunityPatch {
 
       _alreadyCleanedUpMainMenu = true;
       var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
-      if (menu.Length > MaxMenuLength) {
-        if (_groupedOptionsMenus != null)
-          return;
 
-        var optionsToSkip = SkipOptionsWhenGrouping;
-        _groupedOptionsMenus = new List<InitialStateOption>();
-        for (var i = 0; i < menu.Length; i++) {
-          var item = menu[i];
-          if (!IsThirdPartyOption(item))
-            continue;
+      if (menu.Length <= MaxMenuLength)
+        return;
 
-          if (optionsToSkip > 0) {
-            --optionsToSkip;
-            continue;
-          }
+      if (_groupedOptionsMenus != null)
+        return;
 
-          _groupedOptionsMenus.Add(item);
-          menu[i] = null;
-        }
+      var menuLength = menu.Length;
 
-        Module.CurrentModule.ClearStateOptions();
-        foreach (var opt in menu)
-          if (opt != null)
-            Module.CurrentModule.AddInitialStateOption(opt);
+      _groupedOptionsMenus = new List<InitialStateOption>();
+      for (var i = menuLength - 1; i > 0; --i) {
+        var item = menu[i];
 
-        Module.CurrentModule.AddInitialStateOption(new InitialStateOption(
-          "MoreOptions",
-          new TextObject("{=MoreOptions}More Options"),
-          10001, ShowMoreMainMenuOptions, false));
+        if (!IsThirdPartyOption(item))
+          continue;
+
+        if (menuLength <= MaxMenuLength)
+          break;
+
+        _groupedOptionsMenus.Add(item);
+        menu[i] = null;
+        --menuLength;
       }
+
+      Module.CurrentModule.ClearStateOptions();
+      foreach (var opt in menu)
+        if (opt != null)
+          Module.CurrentModule.AddInitialStateOption(opt);
+
+      Module.CurrentModule.AddInitialStateOption(new InitialStateOption(
+        "MoreOptions",
+        new TextObject("{=MoreOptions}More Options"),
+        9999, ShowMoreMainMenuOptions, false));
     }
 
     private static bool IsThirdPartyOption(InitialStateOption item) {
@@ -73,15 +72,11 @@ namespace CommunityPatch {
         var act = (Action) InitOptActField.GetValue(item);
         var optAsm = act.Method.DeclaringType?.Assembly;
         var optAsmName = optAsm?.GetName().Name;
-        if (optAsmName == null)
-          return false;
-        if (optAsmName.StartsWith("TaleWorlds."))
-          return false;
-        if (optAsmName.StartsWith("SandBox."))
-          return false;
-        if (optAsmName.StartsWith("SandBoxCore."))
-          return false;
-        if (optAsmName.StartsWith("StoryMode."))
+        if (optAsmName == null
+          || optAsmName.StartsWith("TaleWorlds.")
+          || optAsmName.StartsWith("SandBox.")
+          || optAsmName.StartsWith("SandBoxCore.")
+          || optAsmName.StartsWith("StoryMode."))
           return false;
       }
       catch (Exception) {
@@ -98,8 +93,9 @@ namespace CommunityPatch {
       => InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
         new TextObject("{=MoreOptions}More Options").ToString(),
         null,
-        moreOptions.Select(x => new InquiryElement(x.Id, x.Name.ToString(), null)
-          )
+        moreOptions
+          .Select(x => new InquiryElement(x.Id, x.Name.ToString(), null))
+          .Where(x => !string.IsNullOrWhiteSpace(x.Title))
           .ToList(),
         true,
         true,

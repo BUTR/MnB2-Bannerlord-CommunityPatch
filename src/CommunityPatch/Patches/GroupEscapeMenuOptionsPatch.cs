@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.Core;
@@ -36,20 +37,21 @@ namespace CommunityPatch.Patches {
       for (var i = 0; i < list.Count; i++) {
         var item = list[i];
 
-        var act = (Action<object>) EscapeMenuItemVmOnExecute.GetValue(item);
-        var actAsm = act.Method.DeclaringType?.Assembly;
-        var optAsmName = actAsm?.GetName().Name;
+        try {
+          var act = (Action<object>) EscapeMenuItemVmOnExecute.GetValue(item);
+          var actAsm = act.Method.DeclaringType?.Assembly;
+          var optAsmName = actAsm?.GetName().Name;
 
-        if (optAsmName == null)
-          continue;
-        if (optAsmName.StartsWith("TaleWorlds."))
-          continue;
-        if (optAsmName.StartsWith("SandBox."))
-          continue;
-        if (optAsmName.StartsWith("SandBoxCore."))
-          continue;
-        if (optAsmName.StartsWith("StoryMode."))
-          continue;
+          if (optAsmName == null
+            || optAsmName.StartsWith("TaleWorlds.")
+            || optAsmName.StartsWith("SandBox.")
+            || optAsmName.StartsWith("SandBoxCore.")
+            || optAsmName.StartsWith("StoryMode."))
+            continue;
+        }
+        catch {
+          // yeah, it's 3rd party.
+        }
 
         customOptions.Add(item);
         list[i] = null;
@@ -63,22 +65,21 @@ namespace CommunityPatch.Patches {
       }
 
       if (customOptions.Count <= 0) {
-        newList.Add(new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
+        newList.Insert(newList.Count - 2, new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
           _ => CommunityPatchSubModule.Current.ShowOptions(), _groupEscMenuOptsKey, false));
 
         ____menuItems = newList;
         return;
       }
 
-      newList.Add(new EscapeMenuItemVM(new TextObject("{=MoreOptions}More Options"), _ => {
-        var options = new List<InquiryElement> {
-          new InquiryElement(_groupEscMenuOptsKey, new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(), null)
-        };
+      newList.Insert(newList.Count - 2, new EscapeMenuItemVM(new TextObject("{=MoreOptions}More Options"), _ => {
+        var options = new List<InquiryElement>();
 
         foreach (var item in customOptions) {
-          var id = EscapeMenuItemVmIdentifier.GetValue(item);
-          options.Add(new InquiryElement(id, item.ActionText, null, !item.IsDisabled, null));
+          options.Add(new InquiryElement(item, item.ActionText, null, !item.IsDisabled, null));
         }
+
+        options.Add(new InquiryElement(_groupEscMenuOptsKey, new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(), null));
 
         InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
           new TextObject("{=MoreOptions}More Options").ToString(),
@@ -95,14 +96,10 @@ namespace CommunityPatch.Patches {
               return;
             }
 
-            foreach (var item in customOptions) {
-              var id = EscapeMenuItemVmIdentifier.GetValue(item);
-              if (picked != id)
-                continue;
-
-              item.ExecuteAction();
-              return;
-            }
+            if (picked is EscapeMenuItemVM vm)
+              SynchronizationContext.Current.Post(_ => {
+                vm.ExecuteAction();
+              }, null);
           },
           null
         ), true);

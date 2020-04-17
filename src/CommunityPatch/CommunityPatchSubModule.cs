@@ -20,36 +20,6 @@ namespace CommunityPatch {
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
 
-    protected override void OnBeforeInitialModuleScreenSetAsRoot() {
-      var module = Module.CurrentModule;
-
-      {
-        // remove the space option that DeveloperConsole module adds
-        var spaceOpt = module.GetInitialStateOptionWithId("Space");
-        if (spaceOpt != null) {
-          var opts = module.GetInitialStateOptions()
-            .Where(opt => opt != spaceOpt).ToArray();
-          module.ClearStateOptions();
-          foreach (var opt in opts)
-            module.AddInitialStateOption(opt);
-        }
-      }
-      if (!DontGroupThirdPartyMenuOptions)
-        MenuCleaner.CleanUpMainMenu();
-
-      if (DisableIntroVideo) {
-        try {
-          typeof(Module)
-            .GetField("_splashScreenPlayed", BindingFlags.NonPublic | BindingFlags.Instance)
-            ?.SetValue(module, true);
-        }
-        catch (Exception ex) {
-          Error(ex, "Couldn't disable intro video.");
-        }
-      }
-
-      base.OnBeforeInitialModuleScreenSetAsRoot();
-    }
 
     protected override void OnSubModuleLoad() {
       var module = Module.CurrentModule;
@@ -70,6 +40,38 @@ namespace CommunityPatch {
       ));
 
       base.OnSubModuleLoad();
+    }
+    
+    protected override void OnBeforeInitialModuleScreenSetAsRoot() {
+      var module = Module.CurrentModule;
+
+      {
+        // remove the space option that DeveloperConsole module adds
+        var spaceOpt = module.GetInitialStateOptionWithId("Space");
+        if (spaceOpt != null) {
+          var opts = module.GetInitialStateOptions()
+            .Where(opt => opt != spaceOpt).ToArray();
+          module.ClearStateOptions();
+          foreach (var opt in opts)
+            module.AddInitialStateOption(opt);
+        }
+      }
+
+      if (!DontGroupThirdPartyMenuOptions)
+        MenuCleaner.CleanUpMainMenu();
+
+      if (DisableIntroVideo) {
+        try {
+          typeof(Module)
+            .GetField("_splashScreenPlayed", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?.SetValue(module, true);
+        }
+        catch (Exception ex) {
+          Error(ex, "Couldn't disable intro video.");
+        }
+      }
+
+      base.OnBeforeInitialModuleScreenSetAsRoot();
     }
 
     internal static void ShowMessage(string msg) {

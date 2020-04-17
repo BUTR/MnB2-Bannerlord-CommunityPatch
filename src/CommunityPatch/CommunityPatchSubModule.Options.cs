@@ -53,7 +53,7 @@ namespace CommunityPatch {
       
       elements.Add(new InquiryElement(
         nameof(DontGroupThirdPartyMenuOptions),
-        DontGroupThirdPartyMenuOptions ? "Don't Group 3rd Party Menu Options" :"Group 3rd Party Menu Options",
+        DontGroupThirdPartyMenuOptions ? "Group 3rd Party Menu Options" :"Don't Group 3rd Party Menu Options",
         null));
 
       elements.Add(new InquiryElement(
