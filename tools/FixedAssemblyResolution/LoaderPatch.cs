@@ -1,17 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
 using HarmonyLib;
-using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade.Launcher;
 using TaleWorlds.MountAndBlade.Launcher.UserDatas;
-using Module = TaleWorlds.MountAndBlade.Module;
 using Path = System.IO.Path;
 
 namespace FixedAssemblyResolution {
@@ -77,6 +72,8 @@ namespace FixedAssemblyResolution {
       }
     }
 
+    
+    // this bit is based on @Fumblesneeze's loader
     public static List<ModuleInfo> SortByDependencies(IEnumerable<ModuleInfo> mods) {
       var unresolvedMods = new Queue<ModuleInfo>(mods);
       var addedMods = new HashSet<string>();

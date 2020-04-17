@@ -2,10 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
-using psai.net;
-using TaleWorlds.Library;
-using TaleWorlds.MountAndBlade;
-using Debug = System.Diagnostics.Debug;
 
 namespace FixedAssemblyResolution {
 
