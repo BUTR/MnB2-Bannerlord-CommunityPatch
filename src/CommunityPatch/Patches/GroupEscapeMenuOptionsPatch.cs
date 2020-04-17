@@ -6,9 +6,12 @@ using System.Threading;
 using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.Core;
+using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade.ViewModelCollection;
+using Module = TaleWorlds.MountAndBlade.Module;
+using Path = System.IO.Path;
 
 namespace CommunityPatch.Patches {
 
@@ -46,8 +49,10 @@ namespace CommunityPatch.Patches {
             || optAsmName.StartsWith("TaleWorlds.")
             || optAsmName.StartsWith("SandBox.")
             || optAsmName.StartsWith("SandBoxCore.")
-            || optAsmName.StartsWith("StoryMode."))
-            continue;
+            || optAsmName.StartsWith("StoryMode.")) {
+            if (PathHelpers.IsOfficialAssembly(actAsm))
+              continue;
+          }
         }
         catch {
           // yeah, it's 3rd party.

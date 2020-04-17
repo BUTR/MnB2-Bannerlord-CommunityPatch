@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
@@ -50,10 +51,10 @@ namespace CommunityPatch {
         SuppressTerminalTickExceptions ? "Don't Suppress Terminal Tick Exceptions" : "Suppress Terminal Tick Exceptions",
         null
       ));
-      
+
       elements.Add(new InquiryElement(
         nameof(DontGroupThirdPartyMenuOptions),
-        DontGroupThirdPartyMenuOptions ? "Group 3rd Party Menu Options" :"Don't Group 3rd Party Menu Options",
+        DontGroupThirdPartyMenuOptions ? "Group 3rd Party Menu Options" : "Don't Group 3rd Party Menu Options",
         null));
 
       elements.Add(new InquiryElement(
@@ -65,6 +66,11 @@ namespace CommunityPatch {
       elements.Add(new InquiryElement(
         "IntentionallyUnhandled",
         "Throw Unhandled Exception",
+        null
+      ));
+      elements.Add(new InquiryElement(
+        nameof(CauseStackOverflow),
+        "Cause Stack Overflow",
         null
       ));
 #endif
@@ -112,9 +118,20 @@ namespace CommunityPatch {
           Options.Save();
           break;
 
+#if DEBUG
+        case nameof(CauseStackOverflow):
+          CauseStackOverflow();
+          break;
+#endif
+
         default: throw new NotImplementedException(selected);
       }
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    // ReSharper disable once FunctionRecursiveOnAllPaths
+    private void CauseStackOverflow()
+      => CauseStackOverflow();
 
   }
 

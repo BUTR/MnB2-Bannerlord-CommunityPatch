@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnblockFile", "..\..\tools\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocateSteamApp", "..\..\tools\LocateSteamApp\LocateSteamApp.csproj", "{DD798B2B-ACEA-4968-9325-9DE8FBD29DD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixedAssemblyResolution", "..\..\tools\FixedAssemblyResolution\FixedAssemblyResolution.csproj", "{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -38,5 +40,9 @@ Global
 		{DD798B2B-ACEA-4968-9325-9DE8FBD29DD3}.Debug|x64.Build.0 = Debug|Any CPU
 		{DD798B2B-ACEA-4968-9325-9DE8FBD29DD3}.Release|x64.ActiveCfg = Release|Any CPU
 		{DD798B2B-ACEA-4968-9325-9DE8FBD29DD3}.Release|x64.Build.0 = Release|Any CPU
+		{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}.Debug|x64.ActiveCfg = Debug|x64
+		{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}.Debug|x64.Build.0 = Debug|x64
+		{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}.Release|x64.ActiveCfg = Release|x64
+		{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal

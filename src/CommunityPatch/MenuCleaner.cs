@@ -77,7 +77,8 @@ namespace CommunityPatch {
           || optAsmName.StartsWith("SandBox.")
           || optAsmName.StartsWith("SandBoxCore.")
           || optAsmName.StartsWith("StoryMode."))
-          return false;
+          if (PathHelpers.IsOfficialAssembly(optAsm))
+            return false;
       }
       catch (Exception) {
         return true;
