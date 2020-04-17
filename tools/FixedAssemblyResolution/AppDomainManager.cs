@@ -12,8 +12,8 @@ namespace FixedAssemblyResolution {
     private static extern bool AllocConsole();
 
     public override void InitializeNewDomain(AppDomainSetup appDomainInfo) {
-      AllocConsole();
-      Console.WriteLine("Diagnostic console allocated.");
+      if (AllocConsole())
+        Console.WriteLine("Diagnostic console allocated.");
 
       Trace.Listeners.Add(new ConsoleTraceListener(true));
 
@@ -31,11 +31,14 @@ namespace FixedAssemblyResolution {
 
         AssemblyResolver.Init();
 
-        if (name == "TaleWorlds.Library")
-          CustomDebugManager.Init();
-
-        if (name == "TaleWorlds.MountAndBlade.Launcher")
-          LoaderPatch.Init();
+        switch (name) {
+          case "TaleWorlds.Library":
+            CustomDebugManager.Init();
+            break;
+          case "TaleWorlds.MountAndBlade.Launcher":
+            LoaderPatch.Init();
+            break;
+        }
       };
     }
 
