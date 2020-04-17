@@ -77,11 +77,6 @@
         </Compile>
     </ItemGroup>
     
-    
-    <ItemGroup>
-        <Folder Include="Patches\Perks\Intelligence" />
-    </ItemGroup>
-    
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
         <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
         <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
