@@ -87,7 +87,8 @@ namespace FixedAssemblyResolution {
 
             var absPath = new Uri(Path.Combine(Environment.CurrentDirectory, modPath)).LocalPath;
 
-            SecurityHelpers.UnblockFile(absPath);
+            if (SecurityHelpers.UnblockFile(absPath))
+              Console.WriteLine("Unblocked: " + absPath);
 
             Console.WriteLine("Resolved: " + absPath);
 
@@ -140,13 +141,14 @@ namespace FixedAssemblyResolution {
               continue;
 
             var modPath = Path.Combine(modDir, "bin", Common.ConfigName, name.Name + ".dll");
-            
+
             if (!File.Exists(modPath))
               continue;
 
             var absPath = new Uri(Path.Combine(Environment.CurrentDirectory, modPath)).LocalPath;
 
-            SecurityHelpers.UnblockFile(absPath);
+            if (SecurityHelpers.UnblockFile(absPath))
+              Console.WriteLine("Unblocked: " + absPath);
 
             Console.WriteLine("Resolved: " + absPath);
 

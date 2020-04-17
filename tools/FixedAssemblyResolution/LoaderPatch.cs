@@ -68,7 +68,8 @@ namespace FixedAssemblyResolution {
       foreach (var file in Directory.EnumerateFiles(binDir)) {
         var ext = Path.GetExtension(file);
         if (ext == ".dll")
-          SecurityHelpers.UnblockFile(file);
+          if (SecurityHelpers.UnblockFile(file))
+            Console.WriteLine("Unblocked: " + file);
       }
     }
 
