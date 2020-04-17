@@ -1,0 +1,119 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using HarmonyLib;
+using Helpers;
+using TaleWorlds.CampaignSystem;
+using TaleWorlds.Core;
+using TaleWorlds.Localization;
+using static CommunityPatch.HarmonyHelpers;
+
+namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
+
+  public class ImperialFirePatch : PatchBase<ImperialFirePatch> {
+    public override bool Applied { get; protected set; }
+
+    private static readonly MethodInfo AttackerTargetMethodInfo =
+      Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
+        .GetMethod("GetAllAttackerRangedMachines", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    
+    private static readonly MethodInfo DefenderTargetMethodInfo =
+      Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
+        .GetMethod("GetAllDefenderMachines", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ImperialFirePatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return AttackerTargetMethodInfo;
+      yield return DefenderTargetMethodInfo;
+    }
+
+    private PerkObject _perk;
+
+    private static readonly byte[][] AttackerHashes = {
+      new byte[] {
+        // e1.1.0.225190
+        0xAC, 0x2D, 0x81, 0xE5, 0xC9, 0xA7, 0x97, 0x09,
+        0xE0, 0xD6, 0x9A, 0x22, 0xC8, 0x86, 0x28, 0x1F,
+        0x4A, 0x7B, 0x18, 0x9F, 0xCF, 0x27, 0xD8, 0xBC,
+        0x84, 0xD2, 0xD4, 0x6D, 0xC1, 0x30, 0x36, 0x43
+      }
+    };
+    
+    private static readonly byte[][] DefenderHashes = {
+      new byte[] {
+        // e1.1.0.225190
+        0x36, 0x8E, 0x5A, 0x15, 0x31, 0xDC, 0xB0, 0x6F,
+        0x0C, 0xD1, 0x55, 0xAF, 0x85, 0xC6, 0xD5, 0x8F,
+        0x60, 0x3F, 0x74, 0xDD, 0xF2, 0x4E, 0xC8, 0xD2,
+        0xC9, 0xAA, 0xEA, 0xE8, 0x66, 0x60, 0xE7, 0x57
+      }
+    };
+
+    public override void Reset()
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "UaZSa5mY");
+
+    public override bool? IsApplicable(Game game)
+      // ReSharper disable once CompareOfFloatsByEqualityOperator
+    {
+      if (_perk == null) return false;
+      if (_perk.PrimaryBonus != 0.3f) return false;
+      
+      var attackerPatchInfo = Harmony.GetPatchInfo(AttackerTargetMethodInfo);
+      if (AlreadyPatchedByOthers(attackerPatchInfo)) return false;
+      
+      var defenderPatchInfo = Harmony.GetPatchInfo(DefenderTargetMethodInfo);
+      if (AlreadyPatchedByOthers(defenderPatchInfo)) return false;
+
+      var attackerHash = AttackerTargetMethodInfo.MakeCilSignatureSha256();
+      var defenderHash = DefenderTargetMethodInfo.MakeCilSignatureSha256();
+      return attackerHash.MatchesAnySha256(AttackerHashes) && defenderHash.MatchesAnySha256(DefenderHashes);
+    }
+
+    public override void Apply(Game game) {
+      var textObjStrings = TextObject.ConvertToStringList(
+        new List<TextObject> {
+          _perk.Name,
+          _perk.Description
+        }
+      );
+      // most of the properties of skills have private setters, yet Initialize is public
+      _perk.Initialize(
+        textObjStrings[0],
+        textObjStrings[1],
+        _perk.Skill,
+        (int) _perk.RequiredSkillValue,
+        _perk.AlternativePerk,
+        _perk.PrimaryRole, 1f,
+        _perk.SecondaryRole, _perk.SecondaryBonus
+      );
+      if (Applied) return;
+
+      CommunityPatchSubModule.Harmony.Patch(AttackerTargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
+      CommunityPatchSubModule.Harmony.Patch(DefenderTargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
+      Applied = true;
+    }
+
+    // ReSharper disable once InconsistentNaming
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void Postfix(ref IEnumerable<SiegeEngineType> __result) {
+      if (Hero.MainHero == null) return;
+      
+      var perk = ActivePatch._perk;
+      var partyMemberValue = new ExplainedNumber(0f);
+      PerkHelper.AddPerkBonusForParty(perk, Hero.MainHero.PartyBelongedTo, ref partyMemberValue);
+      
+      if (partyMemberValue.ResultNumber >= .99) return;
+
+      __result = RemoveFireEngines(__result);
+    }
+    
+    private static IEnumerable<SiegeEngineType> RemoveFireEngines(IEnumerable<SiegeEngineType> engineTypes) 
+      => engineTypes.Where(x => 
+        x != DefaultSiegeEngineTypes.FireBallista &&
+        x != DefaultSiegeEngineTypes.FireCatapult &&
+        x != DefaultSiegeEngineTypes.FireOnager);
+  }
+}
