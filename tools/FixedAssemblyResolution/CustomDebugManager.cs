@@ -18,7 +18,10 @@ namespace FixedAssemblyResolution {
     public void ShowWarning(string message)
       => Trace.TraceWarning(message);
 
-    public void Assert(bool condition, string message, [CallerFilePath] string CallerFile = "", [CallerMemberName] string CallerMethod = "", [CallerLineNumber] int CallerLine = 0) {
+    public void Assert(bool condition, string message,
+      [CallerFilePath] string CallerFile = "",
+      [CallerMemberName] string CallerMethod = "",
+      [CallerLineNumber] int CallerLine = 0) {
       if (!condition)
         Trace.TraceError(message);
     }
@@ -26,7 +29,7 @@ namespace FixedAssemblyResolution {
     public void Print(string message, int logLevel = 0, TaleWorlds.Library.Debug.DebugColor color = TaleWorlds.Library.Debug.DebugColor.White, ulong debugFilter = 17592186044416) {
       switch (logLevel) {
         default:
-          Trace.TraceError($"({logLevel}) {message}");
+          Trace.TraceError($"LEVEL{logLevel}: {message}");
           break;
         case 1: // errors
           Trace.TraceError(message);
