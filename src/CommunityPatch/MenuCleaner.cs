@@ -14,6 +14,10 @@ namespace CommunityPatch {
 
     private const int MaxMenuLength = 9;
 
+    private const int DefaultMenuLength = 7;
+
+    private const int SkipOptionsWhenGrouping = MaxMenuLength - DefaultMenuLength;
+
     private static List<InitialStateOption> _modOptionsMenus;
 
     internal static List<InitialStateOption> GetThirdPartyOptionsMenus()
@@ -36,15 +40,15 @@ namespace CommunityPatch {
         if (_groupedOptionsMenus != null)
           return;
 
-        var skippedFirst = false;
+        var optionsToSkip = SkipOptionsWhenGrouping;
         _groupedOptionsMenus = new List<InitialStateOption>();
         for (var i = 0; i < menu.Length; i++) {
           var item = menu[i];
           if (!IsThirdPartyOption(item))
             continue;
 
-          if (!skippedFirst) {
-            skippedFirst = true;
+          if (optionsToSkip > 0) {
+            --optionsToSkip;
             continue;
           }
 
@@ -65,19 +69,24 @@ namespace CommunityPatch {
     }
 
     private static bool IsThirdPartyOption(InitialStateOption item) {
-      var act = (Action) InitOptActField.GetValue(item);
-      var optAsm = act.Method.DeclaringType?.Assembly;
-      var optAsmName = optAsm?.GetName().Name;
-      if (optAsmName == null)
-        return false;
-      if (optAsmName.StartsWith("TaleWorlds."))
-        return false;
-      if (optAsmName.StartsWith("SandBox."))
-        return false;
-      if (optAsmName.StartsWith("SandBoxCore."))
-        return false;
-      if (optAsmName.StartsWith("StoryMode."))
-        return false;
+      try {
+        var act = (Action) InitOptActField.GetValue(item);
+        var optAsm = act.Method.DeclaringType?.Assembly;
+        var optAsmName = optAsm?.GetName().Name;
+        if (optAsmName == null)
+          return false;
+        if (optAsmName.StartsWith("TaleWorlds."))
+          return false;
+        if (optAsmName.StartsWith("SandBox."))
+          return false;
+        if (optAsmName.StartsWith("SandBoxCore."))
+          return false;
+        if (optAsmName.StartsWith("StoryMode."))
+          return false;
+      }
+      catch (Exception) {
+        return true;
+      }
 
       return true;
     }
