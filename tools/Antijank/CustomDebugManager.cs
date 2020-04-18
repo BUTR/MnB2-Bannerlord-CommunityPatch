@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.Diagnostics.Runtime;
 using TaleWorlds.Library;
 
 namespace Antijank {
@@ -8,8 +10,46 @@ namespace Antijank {
 
     private static readonly CustomDebugManager Instance = new CustomDebugManager();
 
-    static CustomDebugManager()
-      => TaleWorlds.Library.Debug.DebugManager = Instance;
+    private static DataTarget _attachedDt;
+
+    private static DataTarget _inProcDt;
+
+    private static ClrRuntime _debugRt;
+
+    private static ClrInfo _clrInfo;
+
+    static CustomDebugManager() {
+      TaleWorlds.Library.Debug.DebugManager = Instance;
+      
+      
+      
+      var pid = -1;
+      using (var proc = Process.GetCurrentProcess())
+        pid = proc.Id;
+
+      _attachedDt = DataTarget.PassiveAttachToProcess(pid);
+      _inProcDt = new DataTarget(new InProcDataReader(_attachedDt.DataReader));
+
+      _clrInfo = _inProcDt.ClrVersions.Single();
+      _debugRt = _clrInfo.CreateRuntime();
+      
+      /*
+      foreach (var thread in _debugRt.Threads) {
+        if (thread.IsUnstarted)
+          continue;
+
+        var i = 0;
+        foreach (var frame in thread.EnumerateStackTrace()) {
+          if (i++ < 100)
+            continue;
+
+          Debugger.Break();
+          break;
+        }
+      }
+      */
+
+    }
 
     public static void Init() {
       // run static init

@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using Module = TaleWorlds.MountAndBlade.Module;
+using ModuleInfo = TaleWorlds.Library.ModuleInfo;
 
 namespace Antijank {
 
   public static class AssemblyResolver {
 
-    public static Harmony Harmony = new Harmony("Antijank");
+    public static readonly Harmony Harmony = new Harmony(nameof(Antijank));
 
     static AssemblyResolver() {
       var domain = AppDomain.CurrentDomain;
@@ -33,6 +35,9 @@ namespace Antijank {
       };
 
       domain.FirstChanceException += (sender, args) => {
+        if (DisableFirstChanceExceptionPrinting)
+          return;
+
         Console.WriteLine("First Chance Exception:");
         var ex = args.Exception;
         Log(ex);
@@ -43,6 +48,9 @@ namespace Antijank {
         Console.ReadKey(true);
       };
     }
+
+    public static bool DisableFirstChanceExceptionPrinting { get; set; }
+      = !Environment.GetCommandLineArgs().Any(arg => arg.Equals("/fce", StringComparison.OrdinalIgnoreCase));
 
     private static void Log(Exception ex) {
       while (ex != null) {

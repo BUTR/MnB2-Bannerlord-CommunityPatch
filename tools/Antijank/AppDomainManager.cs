@@ -1,12 +1,20 @@
 using System;
 using System.Diagnostics;
+using System.Runtime;
 using System.Runtime.InteropServices;
+using System.Threading;
 using JetBrains.Annotations;
 
 namespace Antijank {
 
   [PublicAPI]
   public class AppDomainManager : System.AppDomainManager {
+
+    static AppDomainManager() {
+      GCSettings.LatencyMode = GCLatencyMode.LowLatency; 
+      ProfileOptimization.SetProfileRoot(Environment.CurrentDirectory);
+      ProfileOptimization.StartProfile(nameof(Antijank) + ".profile");
+    }
 
     [DllImport("kernel32")]
     private static extern bool AllocConsole();
@@ -41,6 +49,9 @@ namespace Antijank {
         }
       };
     }
+
+    public override HostExecutionContextManager HostExecutionContextManager
+      => WarpManager.Instance;
 
   }
 

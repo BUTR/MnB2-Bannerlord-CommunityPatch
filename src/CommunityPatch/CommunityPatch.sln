@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnblockFile", "..\..\tools\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocateSteamApp", "..\..\tools\LocateSteamApp\LocateSteamApp.csproj", "{DD798B2B-ACEA-4968-9325-9DE8FBD29DD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixedAssemblyResolution", "..\..\tools\FixedAssemblyResolution\FixedAssemblyResolution.csproj", "{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antijank", "..\..\tools\Antijank\Antijank.csproj", "{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
