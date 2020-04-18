@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
-namespace FixedAssemblyResolution {
+namespace Antijank {
 
   [PublicAPI]
   public class AppDomainManager : System.AppDomainManager {

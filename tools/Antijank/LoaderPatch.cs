@@ -9,7 +9,7 @@ using TaleWorlds.MountAndBlade.Launcher;
 using TaleWorlds.MountAndBlade.Launcher.UserDatas;
 using Path = System.IO.Path;
 
-namespace FixedAssemblyResolution {
+namespace Antijank {
 
   public static class LoaderPatch {
 

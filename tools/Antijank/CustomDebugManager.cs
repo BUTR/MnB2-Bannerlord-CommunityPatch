@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using TaleWorlds.Library;
 
-namespace FixedAssemblyResolution {
+namespace Antijank {
 
   public class CustomDebugManager : IDebugManager {
 

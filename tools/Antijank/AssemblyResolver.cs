@@ -7,11 +7,11 @@ using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using Module = TaleWorlds.MountAndBlade.Module;
 
-namespace FixedAssemblyResolution {
+namespace Antijank {
 
   public static class AssemblyResolver {
 
-    public static Harmony Harmony = new Harmony("FixedAssemblyResolution");
+    public static Harmony Harmony = new Harmony("Antijank");
 
     static AssemblyResolver() {
       var domain = AppDomain.CurrentDomain;

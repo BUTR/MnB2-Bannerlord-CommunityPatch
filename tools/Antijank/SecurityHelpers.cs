@@ -1,7 +1,7 @@
 using System.IO;
 using Com;
 
-namespace FixedAssemblyResolution {
+namespace Antijank {
 
   public static class SecurityHelpers {
 
