@@ -58,10 +58,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       if (hero != null && hero.GetPerkValue(DefaultPerks.Riding.NomadicTraditions)) {
         //have to recalculate cavalry and mounted footman bonuses, so repeat the code
         var party = mobileParty.Party;
-        var availableHorses = mobileParty.ItemRoster.NumberOfMounts;
-        var totalTroops = mobileParty.MemberRoster.TotalManCount + additionalTroopOnFootCount + additionalTroopOnHorseCount;
-        var mountedTroops = party.NumberOfMenWithHorse + additionalTroopOnHorseCount;
-        var troopsOnFoot = party.NumberOfMenWithoutHorse + additionalTroopOnFootCount;
+        float availableHorses = mobileParty.ItemRoster.NumberOfMounts;
+        int totalTroops = mobileParty.MemberRoster.TotalManCount + additionalTroopOnFootCount + additionalTroopOnHorseCount;
+        float mountedTroops = party.NumberOfMenWithHorse + additionalTroopOnHorseCount;
+        float troopsOnFoot = party.NumberOfMenWithoutHorse + additionalTroopOnFootCount;
         if (mobileParty.AttachedParties.Count != 0) {
           foreach (var mobileParty2 in mobileParty.AttachedParties) {
             totalTroops += mobileParty2.MemberRoster.TotalManCount;
@@ -70,17 +70,14 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
             availableHorses += mobileParty2.ItemRoster.NumberOfMounts;
           }
         }
-
-        int mountedFootman = Math.Min(availableHorses, troopsOnFoot);
-        var mountedFootmenRatioMethod = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetMountedFootmenRatioModifier", BindingFlags.Instance | BindingFlags.NonPublic);
-        var defaultMountedFootmanRatio = (float)mountedFootmenRatioMethod.Invoke(__instance, new object[] {totalTroops, mountedFootman});
-        //default Mounted Footman constant is 0.3, so just apply it again
-        var perkMountedFootmanRatio = defaultMountedFootmanRatio;
+        float mountedFootman = Math.Min(availableHorses, troopsOnFoot);
+        var mountedFootmanRatio = totalTroops == 0 ? 0 : mountedFootman / totalTroops;
+        //MountedFootman magic number: 0.3f. Target total bonus: (0.3 * 1.3) = 0.39. Perk base ratio: 0.09
+        var perkMountedFootmanRatio = 0.09f * mountedFootmanRatio;
         
-        var cavalryRatioMethod = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetCavalryRatioModifier", BindingFlags.Instance | BindingFlags.NonPublic);
-        var defaultCavalryRatio = (float)cavalryRatioMethod.Invoke(__instance, new object[] {totalTroops, mountedTroops});
-        //default Cavalry constant is 0.6, so do math
-        var perkCavalryRatio = Convert.ToSingle(0.3 * defaultCavalryRatio / 0.6);
+        var cavalryRatio = totalTroops == 0 ? 0 : mountedTroops / totalTroops;
+        //Cavalry magic number: 0.6f. Target total bonus: (0.6 * 1.3) = 0.78. Perk base ratio: 0.18
+        var perkCavalryRatio = 0.18f * cavalryRatio;
         
         var baseSpeedMethod = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculateBaseSpeedForParty", BindingFlags.Instance | BindingFlags.NonPublic);
         var baseSpeed = (float)baseSpeedMethod.Invoke(__instance, new object[] { totalTroops });
