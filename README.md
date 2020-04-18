@@ -56,7 +56,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 * Item Comparison perk-based coloring
 * Party Morale bonus being too low for >10 food variety
 * Fixed crash that occurs when the Neutral clan gains a clan tier
-* Fixed "Siege Expert" perk being unclickable behind "Legendary Smith" in the Smithing Perk tree.
+* Fixed "Siege Expert" perk being unclickable behind "Legendary Smith" in the Smithing Perk tree ("Siege Expert" effect is still not applied).
 
 ### Current Features
 * Enable and Disable the Intro Video
