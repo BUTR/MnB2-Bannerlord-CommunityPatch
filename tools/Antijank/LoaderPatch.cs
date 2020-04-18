@@ -73,7 +73,6 @@ namespace Antijank {
       }
     }
 
-    
     // this bit is based on @Fumblesneeze's loader
     public static List<ModuleInfo> SortByDependencies(IEnumerable<ModuleInfo> mods) {
       var unresolvedMods = new Queue<ModuleInfo>(mods);
