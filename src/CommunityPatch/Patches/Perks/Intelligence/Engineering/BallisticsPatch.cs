@@ -89,7 +89,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         _perk.Skill,
         (int) _perk.RequiredSkillValue,
         _perk.AlternativePerk,
-        _perk.PrimaryRole, _perk.PrimaryBonus,
+        SkillEffect.PerkRole.PartyLeader, _perk.PrimaryBonus,
         _perk.SecondaryRole, _perk.SecondaryBonus,
         _perk.IncrementType
       );
@@ -126,7 +126,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var perk = ActivePatch._perk;
 
       if (!IsCatapult(attackerEngineType)) return;
-      if (!DefendersHaveBallisticPerk(siegeEventSide.SiegeParties)) return;
+      if (!PartiesHaveBallisticPerk(siegeEventSide.SiegeParties)) return;
       
       var bonusDamage = attackerEngineType.Damage * perk.PrimaryBonus;
       damagedEngine.SetHitpoints(damagedEngine.Hitpoints - bonusDamage);
@@ -136,20 +136,17 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       => engine == DefaultSiegeEngineTypes.Catapult || engine == DefaultSiegeEngineTypes.FireCatapult;
     
     private static bool DefendersFromHeroSiegeHaveBallisticPerk() {
-      var perk = ActivePatch._perk;
-      
       if (Hero.MainHero == null) return false;
-      
-      if (Hero.MainHero.PartyBelongedTo.SiegeEvent == null || Hero.MainHero.PartyBelongedTo.Party.Side == BattleSideEnum.Defender) 
-        return Hero.MainHero.GetPerkValue(perk);
-      
-      var defenders = Hero.MainHero.PartyBelongedTo.SiegeEvent.Parties
-        .Where(x => x.Side == BattleSideEnum.Defender);
 
-      return DefendersHaveBallisticPerk(defenders);
+      var settlement = Hero.MainHero.CurrentSettlement ?? Hero.MainHero.PartyBelongedTo.BesiegedSettlement;
+      var siegeEvent = settlement.SiegeEvent;
+      var defenderSiegeEvent = siegeEvent.GetSiegeEventSide(BattleSideEnum.Defender);
+      var defenders = defenderSiegeEvent.SiegeParties;
+
+      return PartiesHaveBallisticPerk(defenders);
     }
 
-    private static bool DefendersHaveBallisticPerk(IEnumerable<PartyBase> defenders)
+    private static bool PartiesHaveBallisticPerk(IEnumerable<PartyBase> defenders)
       => defenders.Any(x => x.LeaderHero?.GetPerkValue(ActivePatch._perk) == true);
 
     private static TooltipProperty FindRangedAttackTooltipProperty(List<TooltipProperty> properties) 
