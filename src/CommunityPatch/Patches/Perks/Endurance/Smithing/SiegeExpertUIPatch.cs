@@ -6,7 +6,7 @@ using TaleWorlds.CampaignSystem;
 namespace CommunityPatch.Patches.Perks.Endurance.Smithing {
 
   [HarmonyPatch(typeof(DefaultPerks), "InitializePerks")]
-  public class SiegeExpertHiddenPerkPatch {
+  public class SiegeExpertUIPatch {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(DefaultPerks __instance) {
