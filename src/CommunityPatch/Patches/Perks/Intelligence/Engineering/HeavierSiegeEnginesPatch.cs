@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,16 +13,9 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
   public sealed class HeavierSiegeEnginesPatch : PatchBase<HeavierSiegeEnginesPatch> {
-
     public override bool Applied { get; protected set; }
-    
-    private static readonly MethodInfo TargetMethodInfo =
-      typeof(SiegeEvent).GetMethod("BombardHitEngine", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    
-    private static readonly MethodInfo TooltipTargetMethodInfo =
-      Type.GetType("SandBox.ViewModelCollection.SandBoxUIHelper, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
-        .GetMethod("GetSiegeEngineInProgressTooltip", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-
+    private static readonly MethodInfo TargetMethodInfo = typeof(SiegeEvent).GetMethod("BombardHitEngine", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TooltipTargetMethodInfo = SiegeTooltipHelper.TargetMethodInfo;
     private static readonly MethodInfo PatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
     private static readonly MethodInfo TooltipPatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(TooltipPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
@@ -34,6 +26,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     private PerkObject _perk;
 
+    private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -44,16 +37,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
     
-    private static readonly byte[][] TooltipHashes = {
-      new byte[] {
-        // e1.1.0.225190
-        0x68, 0xEE, 0xE7, 0xAD, 0xA8, 0x04, 0xCC, 0x5C,
-        0x5E, 0xBA, 0xB6, 0x3D, 0x93, 0xE0, 0x91, 0xC9,
-        0x32, 0x6F, 0x65, 0x2E, 0xAF, 0xBF, 0xF3, 0xBD,
-        0x51, 0x75, 0x34, 0x1A, 0xDC, 0x0D, 0xD3, 0x25
-      }
-    };
-
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "qXkWSgwA");
 
@@ -102,28 +85,27 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void Prefix(ISiegeEventSide siegeEventSide, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
-      CalculateBonusDamageAndRates(damagedEngine, siegeEventSide, out _, out var bonusDamageOnly);
+    public static void Prefix(ISiegeEventSide siegeEventSide, SiegeEngineType attackerEngineType, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
+      CalculateBonusDamageAndRates(attackerEngineType, siegeEventSide, out _, out var bonusDamageOnly);
       damagedEngine.SetHitpoints(damagedEngine.Hitpoints - bonusDamageOnly);
     }
     
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
-      if (engineInProgress?.SiegeEngine == null) return;
-      var siegeEventSide = GetConstructionSiegeEventSide(engineInProgress);
+      var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;
       
-      CalculateBonusDamageAndRates(engineInProgress, siegeEventSide, out var bonusRateOnly, out var bonusDamageOnly);
-      AddPerkTooltip(__result, bonusRateOnly);
-      UpdateRangedDamageTooltip(__result, bonusDamageOnly);
+      CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRateOnly, out var bonusDamageOnly);
+      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRateOnly);
+      SiegeTooltipHelper.UpdateRangedDamageTooltip(__result, bonusDamageOnly);
     }
 
     private static void CalculateBonusDamageAndRates(
-      SiegeEvent.SiegeEngineConstructionProgress engineInProgress,
+      SiegeEngineType siegeEngineType,
       ISiegeEventSide siegeEventSide, out float bonusRateOnly, out float bonusDamageOnly) 
     {
       var perk = ActivePatch._perk;
-      var baseDamage = engineInProgress.SiegeEngine.Damage;
+      var baseDamage = siegeEngineType.Damage;
       var partyMemberDamage = new ExplainedNumber(baseDamage);
       var partyMemberRate = new ExplainedNumber(100f);
       var parties = siegeEventSide.SiegeParties.Where(x => x.MobileParty != null);
@@ -137,42 +119,5 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       bonusRateOnly = partyMemberRate.ResultNumber - 100;
       bonusDamageOnly = partyMemberDamage.ResultNumber - baseDamage;
     }
-
-    private static void AddPerkTooltip(List<TooltipProperty> __result, float bonusRateOnly) {
-      var perk = ActivePatch._perk;
-      var tooltip = new TooltipProperty(perk.Name.ToString(), value: $"{bonusRateOnly:F1}%", 0);
-      __result.Add(tooltip);
-    }
-
-    private static SiegeEvent GetSiegeEvent() {
-      if (Hero.MainHero == null) return null;
-      var heroParty = Hero.MainHero.PartyBelongedTo;
-      return heroParty.BesiegedSettlement?.SiegeEvent ?? heroParty.BesiegerCamp.SiegeEvent;
-    }
-
-    private static ISiegeEventSide GetConstructionSiegeEventSide(SiegeEvent.SiegeEngineConstructionProgress construction) {
-      var siegeEvent = GetSiegeEvent();
-      if (siegeEvent == null) return null;
-
-      var attackerSide = siegeEvent.GetSiegeEventSide(BattleSideEnum.Attacker);
-      if (attackerSide.SiegeEngines.DeployedSiegeEngines.Contains(construction)) return attackerSide;
-      
-      var defenderSide = siegeEvent.GetSiegeEventSide(BattleSideEnum.Defender);
-      return defenderSide;
-    }
-    
-    private static void UpdateRangedDamageTooltip(List<TooltipProperty> __result, float bonusDamageOnly)
-    {
-      var rangedDamageProperty = FindRangedDamageTooltipProperty(__result);
-      if (rangedDamageProperty == null) return;
-
-      Double.TryParse(rangedDamageProperty.ValueLabel, out var currentRangedDamage);
-      var amplifiedRangedDamage = (int) (currentRangedDamage + bonusDamageOnly);
-      rangedDamageProperty.ValueLabel = amplifiedRangedDamage.ToString();
-    }
-    
-    private static TooltipProperty FindRangedDamageTooltipProperty(List<TooltipProperty> properties) 
-      =>  properties.FirstOrDefault(x => 
-        x.DefinitionLabel == GameTexts.FindText("str_projectile_damage").ToString());
   }
 }
