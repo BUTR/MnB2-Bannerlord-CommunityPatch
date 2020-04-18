@@ -46,6 +46,16 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       rangedDamageProperty.ValueLabel = amplifiedRangedDamage.ToString();
     }
     
+    public static void UpdateMaxHpTooltip(List<TooltipProperty> tooltips, float bonusHp)
+    {
+      var property = FindMaxHpTooltipProperty(tooltips);
+      if (property == null) return;
+
+      Double.TryParse(property.ValueLabel, out var currentHp);
+      var buffedHp = (int) (currentHp + bonusHp);
+      property.ValueLabel = buffedHp.ToString();
+    }
+    
     public static void AddPerkTooltip(List<TooltipProperty> tooltips, PerkObject perk, float bonusValue) {
       if (Math.Abs(bonusValue) < 0.05) return;
       var isRate = perk.IncrementType == SkillEffect.EffectIncrementType.AddFactor;
@@ -66,6 +76,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     private static TooltipProperty FindRangedDamageTooltipProperty(List<TooltipProperty> tooltips) 
       =>  tooltips.FirstOrDefault(x => 
         x.DefinitionLabel == GameTexts.FindText("str_projectile_damage").ToString());
+
+    private static TooltipProperty FindMaxHpTooltipProperty(List<TooltipProperty> tooltips)
+      => tooltips[3];
   }
 
 }
