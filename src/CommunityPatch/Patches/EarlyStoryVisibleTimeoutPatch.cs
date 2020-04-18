@@ -77,7 +77,7 @@ namespace CommunityPatch.Patches {
                                   - CampaignTime.Days(1);
       if (quest.QuestDueTime != newDueTime) {
         quest.ChangeQuestDueTime(newDueTime);
-        ShowNotification(new TextObject("{=!}Quest time remaining was updated."), "event:/ui/notification/quest_update");
+        ShowNotification(new TextObject("{=QuestTimeRemainingUpdated}Quest time remaining was updated."), "event:/ui/notification/quest_update");
       }
     }
 
