@@ -67,6 +67,10 @@ namespace CommunityPatch.Patches {
     
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool Prefix(PlayerEncounter __instance) {
+      if (CommunityPatchSubModule.DisableMenuWhenEncouteringAnArmy) {
+        return true;
+      }
+      
       if (EncounteredPartyField == null || MapEventStateField == null || StateHandledField == null || DefenderPartyField == null || MeetingDoneField == null) {
         CommunityPatchSubModule.Error($"{typeof(MenuWhenEncounteringAnArmyPatch).Name}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
         return true;
