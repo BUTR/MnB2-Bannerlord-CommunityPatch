@@ -50,8 +50,9 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Tax Collector
     * Warmonger
     * War Rations
-* Engineering
+  * Engineering
     * Ballistics
+    * Construction Expert
 * Policies
   * Land Grants For Veterans
 * Learning Rate explanation
