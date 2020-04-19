@@ -52,6 +52,11 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       Applied = true;
     }
 
+    private static float GetPerkBaseRatio(float magicNumber) {
+      var perkBonus = DefaultPerks.Riding.NomadicTraditions.PrimaryBonus;
+      return (magicNumber * (1 + perkBonus)) - magicNumber;
+    }
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(DefaultPartySpeedCalculatingModel __instance, ref StatExplainer explanation, ref float __result, MobileParty mobileParty, ref int additionalTroopOnFootCount, ref int additionalTroopOnHorseCount) {
       var hero = mobileParty.LeaderHero;
@@ -72,12 +77,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         }
         float mountedFootman = Math.Min(availableHorses, troopsOnFoot);
         var mountedFootmanRatio = totalTroops == 0 ? 0 : mountedFootman / totalTroops;
-        //MountedFootman magic number: 0.3f. Target total bonus: (0.3 * 1.3) = 0.39. Perk base ratio: 0.09
-        var perkMountedFootmanRatio = 0.09f * mountedFootmanRatio;
+        var perkMountedFootmanRatio = GetPerkBaseRatio(0.3f) * mountedFootmanRatio;
         
         var cavalryRatio = totalTroops == 0 ? 0 : mountedTroops / totalTroops;
-        //Cavalry magic number: 0.6f. Target total bonus: (0.6 * 1.3) = 0.78. Perk base ratio: 0.18
-        var perkCavalryRatio = 0.18f * cavalryRatio;
+        var perkCavalryRatio = GetPerkBaseRatio(0.6f) * cavalryRatio;
         
         var baseSpeedMethod = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculateBaseSpeedForParty", BindingFlags.Instance | BindingFlags.NonPublic);
         var baseSpeed = (float)baseSpeedMethod.Invoke(__instance, new object[] { totalTroops });
