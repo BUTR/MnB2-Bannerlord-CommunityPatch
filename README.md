@@ -6,6 +6,8 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 ### Current Fixes
 
 * Perks
+  * Two Handed
+    * Eviscerate
   * Athletics
     * Extra Arrows
     * Extra Throwing Weapon
