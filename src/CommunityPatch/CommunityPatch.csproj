@@ -25,23 +25,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\System.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Steamworks.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\Steamworks.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Mono.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\Mono.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\..\..\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
