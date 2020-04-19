@@ -86,7 +86,7 @@ namespace CommunityPatch.Patches.Policies {
       if (AlreadyPatchedByOthers(patchInfo2))
         return false;
 
-      var hash2 = TargetMethodInfo1.MakeCilSignatureSha256();
+      var hash2 = TargetMethodInfo2.MakeCilSignatureSha256();
       return hash2.MatchesAnySha256(Hashes2);
     }
     

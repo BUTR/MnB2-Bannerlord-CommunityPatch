@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <Configurations>Release;Debug</Configurations>
+        <Platforms>x64</Platforms>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Launcher.exe">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Steamworks.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Mono.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Bannerlord.exe.config" />
+      <Content Include="Bannerlord.exe.config">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="TaleWorlds.MountAndBlade.Launcher.exe.config" />
+      <Content Include="TaleWorlds.MountAndBlade.Launcher.exe.config">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Costura.Fody" Version="4.1.0" />
+      <PackageReference Include="Fody" Version="6.1.1" />
+      <PackageReference Include="InlineIL.Fody" Version="1.4.0" />
+      <PackageReference Include="Lib.Harmony" Version="2.0.0.9" />
+      <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="2.0.0-beta.20213.1" />
+      <PackageReference Include="Sigil" Version="5.0.0" />
+      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
+    </ItemGroup>
+    
+    <Target Name="CopyToGameDir" AfterTargets="Build">
+        <ItemGroup>
+            <FilesToCopy Include="$(OutputPath)\*.*" />
+        </ItemGroup>
+        <Message Importance="high" Text="Copying: @(FilesToCopy)" />
+        <Copy UseHardlinksIfPossible="true" SourceFiles="@(FilesToCopy)" DestinationFolder="..\..\..\..\bin\Win64_Shipping_Client\" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    </Target>
+</Project>

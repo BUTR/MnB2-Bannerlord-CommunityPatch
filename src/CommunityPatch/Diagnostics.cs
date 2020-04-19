@@ -12,11 +12,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using HardwareProviders.CPU;
+using HarmonyLib;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
 using static CommunityPatch.CommunityPatchSubModule;
+using Harmony = HarmonyLib.Harmony;
 using Module = TaleWorlds.MountAndBlade.Module;
 using Path = TaleWorlds.Engine.Path;
 
@@ -138,6 +140,56 @@ namespace CommunityPatch {
           var j = 0;
           foreach (var dep in mi.DependedModuleIds)
             sb.Append("    ").Append(++j).Append(". ").AppendLine(dep);
+        }
+      }
+      catch (Exception ex) {
+        sb.Append("  *** ERROR: ").Append(ex.GetType().Name).Append(": ").AppendLine(ex.Message);
+      }
+
+      sb.AppendLine();
+
+      try {
+        sb.AppendLine("Harmony Patch Information:");
+        var i = 0;
+        foreach (var patchedMethod in Harmony.GetAllPatchedMethods()) {
+          var patchInfo = Harmony.GetPatchInfo(patchedMethod);
+          sb.Append("  ").Append(++i).Append(". ").AppendLine(patchedMethod.FullDescription());
+
+          if (patchInfo.Prefixes.Count > 0) {
+            var j = 0;
+            sb.Append("    ").AppendLine("Prefixes:");
+            foreach (var patch in patchInfo.Prefixes) {
+              sb.Append("      ").Append(++j).Append(". ").AppendLine(patch.PatchMethod.FullDescription());
+              sb.Append("        ").AppendLine($"Owner: {patch.owner}, Priority: {patch.priority}");
+            }
+          }
+
+          if (patchInfo.Postfixes.Count > 0) {
+            var j = 0;
+            sb.Append("    ").AppendLine("Postfixes:");
+            foreach (var patch in patchInfo.Postfixes) {
+              sb.Append("      ").Append(++j).Append(". ").AppendLine(patch.PatchMethod.FullDescription());
+              sb.Append("        ").AppendLine($"Owner: {patch.owner}, Priority: {patch.priority}");
+            }
+          }
+
+          if (patchInfo.Finalizers.Count > 0) {
+            var j = 0;
+            sb.Append("    ").AppendLine("Finalizers:");
+            foreach (var patch in patchInfo.Finalizers) {
+              sb.Append("      ").Append(++j).Append(". ").AppendLine(patch.PatchMethod.FullDescription());
+              sb.Append("        ").AppendLine($"Owner: {patch.owner}, Priority: {patch.priority}");
+            }
+          }
+
+          if (patchInfo.Transpilers.Count > 0) {
+            var j = 0;
+            sb.Append("    ").AppendLine("Transpilers:");
+            foreach (var patch in patchInfo.Transpilers) {
+              sb.Append("      ").Append(++j).Append(". ").AppendLine(patch.PatchMethod.FullDescription());
+              sb.Append("        ").AppendLine($"Owner: {patch.owner}, Priority: {patch.priority}");
+            }
+          }
         }
       }
       catch (Exception ex) {
