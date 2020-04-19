@@ -72,14 +72,14 @@ namespace CommunityPatch.Patches {
         return true;
       }
       
-      PartyBase party1 = (PartyBase) EncounteredPartyField.GetValue(__instance);
-      if (party1.IsSettlement)
+      PartyBase attacker = (PartyBase) EncounteredPartyField.GetValue(__instance);
+      if (attacker.IsSettlement)
       {
-        foreach (PartyBase party2 in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties)
+        foreach (PartyBase defender in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties)
         {
-          if (!party2.IsSettlement)
+          if (!defender.IsSettlement)
           {
-            party1 = party2;
+            attacker = defender;
             break;
           }
         }
@@ -97,7 +97,7 @@ namespace CommunityPatch.Patches {
       else
       {
         MeetingDoneField.SetValue(__instance, true);
-        CampaignMission.OpenConversationMission(new ConversationCharacterData(CharacterObject.PlayerCharacter, PartyBase.MainParty, false, false, false, false), new ConversationCharacterData(party1.Leader, party1, false, false, false, false), "", "");
+        CampaignMission.OpenConversationMission(new ConversationCharacterData(CharacterObject.PlayerCharacter, PartyBase.MainParty, false, false, false, false), new ConversationCharacterData(attacker.Leader, attacker, false, false, false, false), "", "");
       }
       return false;
     }
