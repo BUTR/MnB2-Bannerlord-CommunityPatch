@@ -81,6 +81,10 @@ NexusMods: https://www.nexusmods.com/mountandblade2bannerlord/mods/186
 
 Bannerlord Mod.IO: https://bannerlord.mod.io/community-patch
 
+## Building
+
+Just open the \*.sln in Visual Studio and build normally. You will probably need to change the variable MnB2BannerlordBinDir in the \*.csproj file to the `bin\Win64_Shipping_Client` folder under your bannerlord installation. If editing the file directly the standard location is `C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client`
+
 ## Credits
 ##### Contributors
 * [🅠](https://www.nexusmods.com/users/958353) ([Discord](https://discordapp.com/users/475636674076868618))

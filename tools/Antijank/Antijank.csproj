@@ -6,26 +6,27 @@
         <Platforms>x64</Platforms>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>8</LangVersion>
+        <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\System.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Launcher.exe">
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.MountAndBlade.Launcher.exe">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Steamworks.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\Steamworks.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Mono.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\Mono.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
@@ -57,6 +58,6 @@
             <FilesToCopy Include="$(OutputPath)\*.*" />
         </ItemGroup>
         <Message Importance="high" Text="Copying: @(FilesToCopy)" />
-        <Copy UseHardlinksIfPossible="true" SourceFiles="@(FilesToCopy)" DestinationFolder="..\..\..\..\bin\Win64_Shipping_Client\" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+        <Copy UseHardlinksIfPossible="true" SourceFiles="@(FilesToCopy)" DestinationFolder="$(MnB2BannerlordBinDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
     </Target>
 </Project>
