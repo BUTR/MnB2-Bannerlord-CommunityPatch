@@ -59,6 +59,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 
 ### Current Features
 * Enable and Disable the Intro Video
+* Enable and Disable Menu when encountering a neutral or enemy army.
 * Copy Diagnostic Info to the Clipboard
 * Toggle recording First Chance Exception info (don't use unless troubleshooting bugs)
 * Automatically capture Diagnostic Info to the Clipboard when an Unhandled Exception crash occurs
