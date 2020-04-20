@@ -59,6 +59,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Everyday Engineer
     * Builder
     * Armorcraft
+    * Imperial Fire
   * Roguery
     * Party Raiding
     * Eye for Loot
