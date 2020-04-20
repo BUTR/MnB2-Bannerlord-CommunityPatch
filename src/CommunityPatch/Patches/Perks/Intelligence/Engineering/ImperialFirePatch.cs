@@ -100,14 +100,15 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref IEnumerable<SiegeEngineType> __result) {
       if (Hero.MainHero == null) return;
-      
+      if (AnyPartyMemberHasThePerkActive(Hero.MainHero.PartyBelongedTo)) return;
+      __result = RemoveFireEngines(__result);
+    }
+    
+    private static bool AnyPartyMemberHasThePerkActive(MobileParty party) {
       var perk = ActivePatch._perk;
       var partyMemberValue = new ExplainedNumber(0f);
       PerkHelper.AddPerkBonusForParty(perk, Hero.MainHero.PartyBelongedTo, ref partyMemberValue);
-      
-      if (partyMemberValue.ResultNumber >= .99) return;
-
-      __result = RemoveFireEngines(__result);
+      return partyMemberValue.ResultNumber.IsEqualOrBiggerThan(1f);
     }
     
     private static IEnumerable<SiegeEngineType> RemoveFireEngines(IEnumerable<SiegeEngineType> engineTypes) 
