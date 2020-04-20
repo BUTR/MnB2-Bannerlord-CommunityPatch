@@ -8,7 +8,6 @@
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64</Platforms>
         <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-        <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
     </PropertyGroup>
 
     <ItemGroup>
