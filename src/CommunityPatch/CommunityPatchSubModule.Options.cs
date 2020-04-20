@@ -15,9 +15,9 @@ namespace CommunityPatch {
       set => Options.Set(nameof(DisableIntroVideo), value);
     }
     
-    internal static bool DisableMenuWhenEncouteringAnArmy {
-      get => Options.Get<bool>(nameof(DisableMenuWhenEncouteringAnArmy));
-      set => Options.Set(nameof(DisableMenuWhenEncouteringAnArmy), value);
+    internal static bool EnableMenuWhenEncouteringAnArmy {
+      get => Options.Get<bool>(nameof(EnableMenuWhenEncouteringAnArmy));
+      set => Options.Set(nameof(EnableMenuWhenEncouteringAnArmy), value);
     }
 
     internal static bool RecordFirstChanceExceptions {
@@ -41,8 +41,8 @@ namespace CommunityPatch {
       ));
       
       elements.Add(new InquiryElement(
-        nameof(DisableMenuWhenEncouteringAnArmy),
-        DisableMenuWhenEncouteringAnArmy ? "Enable Menu When Encountering an Army" : "Disable Menu When Encountering an Army",
+        nameof(EnableMenuWhenEncouteringAnArmy),
+        EnableMenuWhenEncouteringAnArmy ? " Disable Menu When Encountering an Army" : "Enable Menu When Encountering an Army",
         null
       ));
 
@@ -96,9 +96,9 @@ namespace CommunityPatch {
           Options.Save();
           break;
         
-        case nameof(DisableMenuWhenEncouteringAnArmy):
-          DisableMenuWhenEncouteringAnArmy = !DisableMenuWhenEncouteringAnArmy;
-          ShowMessage($"Menu When Encountering an Army: {(DisableMenuWhenEncouteringAnArmy ? "Disabled" : "Enabled")}.");
+        case nameof(EnableMenuWhenEncouteringAnArmy):
+          EnableMenuWhenEncouteringAnArmy = !EnableMenuWhenEncouteringAnArmy;
+          ShowMessage($"Menu When Encountering an Army: {(EnableMenuWhenEncouteringAnArmy ? "Enabled" : "Disabled")}.");
           Options.Save();
           break;
 
