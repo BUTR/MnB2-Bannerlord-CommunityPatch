@@ -6,7 +6,6 @@
         <PlatformTarget>x64</PlatformTarget>
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64</Platforms>
-        <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
     </PropertyGroup>
 
     <ItemGroup>

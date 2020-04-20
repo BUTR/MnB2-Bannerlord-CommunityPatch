@@ -90,6 +90,8 @@ This repo should be placed under the Modules folder in your Bannerlord installat
 
 The default location for Bannerlord is `C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord`.
 
+If your Bannerlord or local repo are in a different place, you can change the property MnB2BannerlordBinDir in Directory.Build.props to the `bin/Win64_Shipping_Client` folder under your Bannerlord install. When editing the file be sure to use `&amp;` in place of an `&` if the path has one.
+
 ## Credits
 ##### Contributors
 * [🅠](https://www.nexusmods.com/users/958353) ([Discord](https://discordapp.com/users/475636674076868618))

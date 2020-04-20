@@ -14,8 +14,6 @@
         <OutputPath>../../bin/Win64_Shipping_Client</OutputPath>
         <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
         <LangVersion>8</LangVersion>
-        <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
-        <MnB2BannerlordLauncher>$(MnB2BannerlordBinDir)/TaleWorlds.MountAndBlade.Launcher.exe</MnB2BannerlordLauncher>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch</RepositoryUrl>

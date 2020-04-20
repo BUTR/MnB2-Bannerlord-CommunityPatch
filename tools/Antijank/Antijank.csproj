@@ -6,7 +6,6 @@
         <Platforms>x64</Platforms>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>8</LangVersion>
-        <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
     </PropertyGroup>
 
     <ItemGroup>
