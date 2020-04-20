@@ -67,7 +67,7 @@ namespace CommunityPatch.Patches {
     
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool Prefix(PlayerEncounter __instance) {
-      if (CommunityPatchSubModule.DisableMenuWhenEncouteringAnArmy) {
+      if (!CommunityPatchSubModule.EnableMenuWhenEncouteringAnArmy) {
         return true;
       }
       
