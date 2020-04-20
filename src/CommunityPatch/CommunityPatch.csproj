@@ -41,6 +41,10 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="..\..\..\..\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
         <Reference Include="$(PkgLib_Harmony)\lib\net472\0Harmony.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>True</Private>
@@ -65,6 +69,7 @@
         <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
         <PackageReference Include="Sigil" Version="5.0.0" />
+        <PackageReference Include="System.Numerics.Vectors" Version="4.4.0" />
         <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
         <PackageReference Include="Tomlyn" Version="0.1.2" />

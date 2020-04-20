@@ -34,7 +34,11 @@ namespace CommunityPatch {
         _configsDir = Utilities.GetConfigsPath();
       }
       catch (NullReferenceException) {
-        _configsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Mount and Blade II Bannerlord", "Configs");
+        _configsDir = Path.Combine(
+          Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+          "Mount and Blade II Bannerlord",
+          "Configs"
+        );
       }
 
       return _configsDir;
@@ -42,6 +46,10 @@ namespace CommunityPatch {
 
     public static bool IsOfficialAssembly(Assembly asm) {
       var path = new Uri(asm.CodeBase).LocalPath;
+      return IsOfficialPath(path);
+    }
+
+    private static bool IsOfficialPath(string path) {
       var dir = EnsureTrailingDirectorySeparator(Path.GetDirectoryName(path));
 
       var basePath = Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory));
@@ -52,27 +60,27 @@ namespace CommunityPatch {
         // ok...
       }
 
-      var gameBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "bin", Common.ConfigName));
+      var gameBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "bin", GetBinSubDir()));
       if (dir.Equals(gameBinDir, StringComparison.OrdinalIgnoreCase))
         return true;
 
-      var nativeBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "Native", "bin", Common.ConfigName));
+      var nativeBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "Native", "bin", GetBinSubDir()));
       if (dir.Equals(nativeBinDir, StringComparison.OrdinalIgnoreCase))
         return true;
 
-      var sbBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "SandBox", "bin", Common.ConfigName));
+      var sbBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "SandBox", "bin", GetBinSubDir()));
       if (dir.Equals(sbBinDir, StringComparison.OrdinalIgnoreCase))
         return true;
 
-      var sbcBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "SandBoxCore", "bin", Common.ConfigName));
+      var sbcBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "SandBoxCore", "bin", GetBinSubDir()));
       if (dir.Equals(sbcBinDir, StringComparison.OrdinalIgnoreCase))
         return true;
 
-      var smBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "StoryMode", "bin", Common.ConfigName));
+      var smBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "StoryMode", "bin", GetBinSubDir()));
       if (dir.Equals(smBinDir, StringComparison.OrdinalIgnoreCase))
         return true;
 
-      var cbBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "CustomBattle", "bin", Common.ConfigName));
+      var cbBinDir = EnsureTrailingDirectorySeparator(Path.Combine(basePath, "Modules", "CustomBattle", "bin", GetBinSubDir()));
       if (dir.Equals(cbBinDir, StringComparison.OrdinalIgnoreCase))
         return true;
 

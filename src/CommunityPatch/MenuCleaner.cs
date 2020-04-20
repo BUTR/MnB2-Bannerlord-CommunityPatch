@@ -32,6 +32,14 @@ namespace CommunityPatch {
 
       _alreadyCleanedUpMainMenu = true;
       var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
+      try {
+        Array.Sort(menu, Comparer<InitialStateOption>
+          .Create((a, b)
+            => a.OrderIndex.CompareTo(b.OrderIndex)));
+      }
+      catch {
+        // well whatever
+      }
 
       if (menu.Length <= MaxMenuLength)
         return;

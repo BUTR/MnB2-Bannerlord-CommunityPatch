@@ -12,24 +12,22 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class BallisticsPatch : PatchBase<BallisticsPatch> {
-
+  public sealed class HeavierSiegeEnginesPatch : PatchBase<HeavierSiegeEnginesPatch> {
     public override bool Applied { get; protected set; }
-
+    private static readonly MethodInfo TargetMethodInfo = typeof(SiegeEvent).GetMethod("BombardHitEngine", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
     private static readonly MethodInfo TooltipTargetMethodInfo = SiegeTooltipHelper.TargetMethodInfo;
-    private static readonly MethodInfo BombardTargetMethodInfo = typeof(SiegeEvent).GetMethod("BombardHitEngine", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    private static readonly MethodInfo TooltipPatchMethodInfo = typeof(BallisticsPatch).GetMethod(nameof(TooltipPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    private static readonly MethodInfo BombardPatchMethodInfo = typeof(BallisticsPatch).GetMethod(nameof(BombardPrefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TooltipPatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(TooltipPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
+      yield return TargetMethodInfo;
       yield return TooltipTargetMethodInfo;
-      yield return BombardTargetMethodInfo;
     }
 
     private PerkObject _perk;
-    
+
     private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
-    private static readonly byte[][] BombardHashes = {
+    private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x97, 0xF2, 0xEB, 0x6F, 0xD0, 0x02, 0x95, 0x39,
@@ -38,27 +36,26 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x53, 0x60, 0x27, 0xA9, 0x84, 0x1C, 0xC3, 0xF2
       }
     };
-
+    
     public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "LyVZYGkN");
+      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "qXkWSgwA");
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
       if (_perk == null) return false;
       if (_perk.PrimaryBonus != 0.3f) return false;
-      if (TooltipTargetMethodInfo == null) return false;
-      if (BombardTargetMethodInfo == null) return false;
-
+      if (TargetMethodInfo == null) return false;
+      
+      var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
+      if (AlreadyPatchedByOthers(patchInfo)) return false;
+      
       var tooltipPatchInfo = Harmony.GetPatchInfo(TooltipTargetMethodInfo);
       if (AlreadyPatchedByOthers(tooltipPatchInfo)) return false;
-      
-      var bombardPatchInfo = Harmony.GetPatchInfo(BombardTargetMethodInfo);
-      if (AlreadyPatchedByOthers(bombardPatchInfo)) return false;
 
+      var hash = TargetMethodInfo.MakeCilSignatureSha256();
       var tooltipHash = TooltipTargetMethodInfo.MakeCilSignatureSha256();
-      var bombardHash = BombardTargetMethodInfo.MakeCilSignatureSha256();
-      return tooltipHash.MatchesAnySha256(TooltipHashes) && bombardHash.MatchesAnySha256(BombardHashes);
+      return hash.MatchesAnySha256(Hashes) && tooltipHash.MatchesAnySha256(TooltipHashes);
     }
 
     public override void Apply(Game game) {
@@ -75,47 +72,40 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         _perk.Skill,
         (int) _perk.RequiredSkillValue,
         _perk.AlternativePerk,
-        SkillEffect.PerkRole.PartyLeader, 30f,
+        _perk.PrimaryRole, 20f,
         _perk.SecondaryRole, _perk.SecondaryBonus,
         _perk.IncrementType
       );
+      
       if (Applied) return;
 
+      CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, new HarmonyMethod(PatchMethodInfo));
       CommunityPatchSubModule.Harmony.Patch(TooltipTargetMethodInfo, postfix: new HarmonyMethod(TooltipPatchMethodInfo));
-      CommunityPatchSubModule.Harmony.Patch(BombardTargetMethodInfo, new HarmonyMethod(BombardPatchMethodInfo));
       Applied = true;
     }
 
-    // ReSharper disable once InconsistentNaming
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void Prefix(ISiegeEventSide siegeEventSide, SiegeEngineType attackerEngineType, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
+      CalculateBonusDamageAndRates(attackerEngineType, siegeEventSide, out _, out var bonusDamageOnly);
+      damagedEngine.SetHitpoints(damagedEngine.Hitpoints - bonusDamageOnly);
+    }
+    
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;
       
-      if (!IsCatapult(engineInProgress.SiegeEngine)) return;
-      
-      CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRate, out var bonusDamage);
-      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRate);
-      SiegeTooltipHelper.UpdateRangedDamageTooltip(__result, bonusDamage);
+      CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRateOnly, out var bonusDamageOnly);
+      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRateOnly);
+      SiegeTooltipHelper.UpdateRangedDamageTooltip(__result, bonusDamageOnly);
     }
-    
-    // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void BombardPrefix(ISiegeEventSide siegeEventSide, SiegeEngineType attackerEngineType, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
-      if (!IsCatapult(attackerEngineType)) return;
-      CalculateBonusDamageAndRates(attackerEngineType, siegeEventSide, out _, out var bonusDamage);
-      damagedEngine.SetHitpoints(damagedEngine.Hitpoints - bonusDamage);
-    }
-    
-    private static bool IsCatapult(SiegeEngineType engine)
-      => engine == DefaultSiegeEngineTypes.Catapult || engine == DefaultSiegeEngineTypes.FireCatapult;
-    
+
     private static void CalculateBonusDamageAndRates(
-      SiegeEngineType siegeEngine,
+      SiegeEngineType siegeEngineType,
       ISiegeEventSide siegeEventSide, out float bonusRateOnly, out float bonusDamageOnly) 
     {
       var perk = ActivePatch._perk;
-      var baseDamage = siegeEngine.Damage;
+      var baseDamage = siegeEngineType.Damage;
       var partyMemberDamage = new ExplainedNumber(baseDamage);
       var partyMemberRate = new ExplainedNumber(100f);
       var parties = siegeEventSide.SiegeParties.Where(x => x.MobileParty != null);
