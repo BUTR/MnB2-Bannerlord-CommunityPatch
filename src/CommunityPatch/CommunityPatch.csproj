@@ -39,7 +39,7 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="$(MnB2BannerlordBinDir)\..\..\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode*.dll">
+        <Reference Include="$(MnB2BannerlordDir)\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
