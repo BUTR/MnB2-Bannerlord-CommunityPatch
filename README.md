@@ -58,6 +58,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Good Materials
     * Everyday Engineer
     * Builder
+    * Armorcraft
   * Roguery
     * Party Raiding
     * Eye for Loot
