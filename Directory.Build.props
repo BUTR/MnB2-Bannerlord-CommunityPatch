@@ -1,7 +1,11 @@
 <Project>
 
     <PropertyGroup>
-        <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
+        <!-- user changes this -->
+        <MnB2BannerlordDir>../../../..</MnB2BannerlordDir>
+
+        <!-- and not these -->
+        <MnB2BannerlordBinDir>$(MnB2BannerlordDir)/bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
         <MnB2BannerlordLauncher>$(MnB2BannerlordBinDir)/TaleWorlds.MountAndBlade.Launcher.exe</MnB2BannerlordLauncher>
     </PropertyGroup>
 
