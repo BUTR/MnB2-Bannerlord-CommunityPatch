@@ -57,7 +57,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
     
     public static void AddPerkTooltip(List<TooltipProperty> tooltips, PerkObject perk, float bonusValue) {
-      if (Math.Abs(bonusValue) < 0.05) return;
+      if (bonusValue.IsZero()) return;
       var isRate = perk.IncrementType == SkillEffect.EffectIncrementType.AddFactor;
       var suffix = isRate ? "%" : "";
       var tooltip = new TooltipProperty(perk.Name.ToString(), value: $"{bonusValue:F1}{suffix}", 0);
