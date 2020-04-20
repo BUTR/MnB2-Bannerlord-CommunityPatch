@@ -60,6 +60,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Builder
     * Armorcraft
     * Imperial Fire
+    * Resolute
   * Roguery
     * Party Raiding
     * Eye for Loot
