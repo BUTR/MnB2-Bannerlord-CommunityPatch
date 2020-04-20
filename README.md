@@ -53,6 +53,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
   * Engineering
     * Ballistics
     * Construction Expert
+    * Improved Masonry
     * Good Materials
 * Policies
   * Land Grants For Veterans
