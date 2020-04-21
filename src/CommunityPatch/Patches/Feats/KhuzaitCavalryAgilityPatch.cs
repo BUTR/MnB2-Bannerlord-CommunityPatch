@@ -14,9 +14,7 @@ namespace CommunityPatch.Patches.Feats {
     public sealed class KhuzaitCavalryAgilityPatch : PatchBase<KhuzaitCavalryAgilityPatch> {
         public override bool Applied { get; protected set; }
         
-        // private static readonly MethodInfo PureSpeedMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculatePureSpeed", BindingFlags.Public | BindingFlags.Instance);
         private static readonly MethodInfo PureSpeedMethodInfo = AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), "CalculatePureSpeed");
-        // private static readonly MethodInfo PatchMethodInfo = typeof(KhuzaitCavalryAgilityPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
         private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(KhuzaitCavalryAgilityPatch), nameof(Postfix));
 
         public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -50,8 +48,6 @@ namespace CommunityPatch.Patches.Feats {
         public override void Reset() { }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-
-        // public override float CalculatePureSpeed(MobileParty mobileParty, StatExplainer explanation, int additionalTroopOnFootCount = 0, int additionalTroopOnHorseCount = 0)
         private static void Postfix(
             DefaultPartySpeedCalculatingModel __instance,
             ref MobileParty mobileParty,
