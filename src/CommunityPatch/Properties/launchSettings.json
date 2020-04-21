@@ -2,8 +2,8 @@
   "profiles": {
     "M&B II: BL": {
       "commandName": "Executable",
-      "executablePath": "$(MnB2BannerlordLauncher)",
-      "workingDirectory": "$(MnB2BannerlordDir)"
+      "executablePath": "./$(MnB2BannerlordLauncherName)",
+      "workingDirectory": "$(MnB2BannerlordBinDir)"
     }
   }
 }
