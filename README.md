@@ -6,8 +6,6 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 ### Current Fixes
 
 * Perks
-  * Two Handed
-    * Eviscerate
   * Athletics
     * Extra Arrows
     * Extra Throwing Weapon
@@ -62,6 +60,10 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Builder
   * Roguery
     * Party Raiding
+    * Eye for Loot
+  * Two Handed
+    * Quick Plunder
+    * Eviscerate
 * Policies
   * Land Grants For Veterans
 * Feats

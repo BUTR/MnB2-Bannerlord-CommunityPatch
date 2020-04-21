@@ -8,9 +8,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     private const float RaidMinHitDamage = 0.05f;
     private const float PredictionForHitMinDamage = 0.049f;
-    
+
     public static readonly FieldInfo IsFinishCalled = typeof(MapEvent).GetField("_isFinishCalled", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
     public static readonly FieldInfo NextSettlementDamage = typeof(MapEvent).GetField("_nextSettlementDamage", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    public static readonly PropertyInfo SettlementHitPoints = typeof(Settlement).GetProperty("SettlementHitPoints", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
     public static readonly MethodInfo TargetMethodInfo = typeof(MapEvent).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
     
     public static readonly byte[][] Hashes = {
@@ -44,6 +45,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public static void SetHitDamage(MapEvent mapEvent, float hitDamage)
       => NextSettlementDamage.SetValue(mapEvent, Math.Max(hitDamage, RaidingHelper.RaidMinHitDamage));
 
+    public static void IncreaseSettlementHitPoints(MapEvent mapEvent, float extraHitPoints) {
+      var currentHp = (float) SettlementHitPoints.GetValue(mapEvent.MapEventSettlement);
+      SettlementHitPoints.SetValue(mapEvent.MapEventSettlement, currentHp + extraHitPoints);
+    }
+    
     private static bool IsFinished(MapEvent mapEvent) 
       => (bool) IsFinishCalled.GetValue(mapEvent);
     
