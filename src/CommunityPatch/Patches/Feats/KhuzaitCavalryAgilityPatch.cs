@@ -48,12 +48,15 @@ namespace CommunityPatch.Patches.Feats {
                 mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.KhuzaitCavalryAgility)) {
 
                 // Get private methods needed for calculation
+                var calculateBaseSpeedForPartyMethod = AccessTools.Method(__instance.GetType(), "CalculateBaseSpeedForParty");
                 var getCavalryRatioModifierMethod = AccessTools.Method(__instance.GetType(), "GetCavalryRatioModifier");
                 var getMountedFootmenRatioModifierMethod = AccessTools.Method(__instance.GetType(), "GetMountedFootmenRatioModifier");
 
                 // Recalculate Cavalry and Footmen on horses speed modifiers based on 
                 int menCount = mobileParty.MemberRoster.TotalManCount + additionalTroopOnFootCount +
                                additionalTroopOnHorseCount;
+
+                float baseNumber = (float) calculateBaseSpeedForPartyMethod.Invoke(__instance, new object[] {menCount});
                 int horsemenCount = mobileParty.Party.NumberOfMenWithHorse + additionalTroopOnHorseCount;
                 int footmenCount = mobileParty.Party.NumberOfMenWithoutHorse + additionalTroopOnFootCount;
                 int numberOfAvailableMounts =
@@ -77,7 +80,7 @@ namespace CommunityPatch.Patches.Feats {
                 // calculate Khuzait bonus and apply
                 float khuzaitRatioModifier = DefaultFeats.Cultural.KhuzaitCavalryAgility.EffectBonus *
                                              (cavalryRatioModifier + mountedFootmenRatioModifier);
-                var explainedNumber = new ExplainedNumber(__result, explanation, null);
+                var explainedNumber = new ExplainedNumber(baseNumber, explanation, null);
 
                 explainedNumber.AddFactor(khuzaitRatioModifier, DefaultFeats.Cultural.KhuzaitCavalryAgility.Name);
                 __result = explainedNumber.ResultNumber;
