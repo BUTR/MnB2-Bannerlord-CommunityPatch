@@ -11,33 +11,22 @@ namespace CommunityPatch.Patches.Feats {
     public sealed class KhuzaitCavalryAgilityPatch : PatchBase<KhuzaitCavalryAgilityPatch> {
         public override bool Applied { get; protected set; }
         
-        private static readonly MethodInfo PureSpeedMethodInfo = AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), "CalculatePureSpeed");
         private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(KhuzaitCavalryAgilityPatch), nameof(Postfix));
 
         public override IEnumerable<MethodBase> GetMethodsChecked() {
-            yield return PureSpeedMethodInfo;
+            yield return AgilityPatchShared.CalculatePureSpeedMethodInfo;
         }
 
-        private static readonly byte[][] ValidHashes = {
-            new byte[] {
-                // e1.2.0.226271 and presumably previous versions
-                0x61, 0xD7, 0x4D, 0xF5, 0xB0, 0x0E, 0x84, 0x52,
-                0xDC, 0xCB, 0x2F, 0xE7, 0xE2, 0x20, 0x38, 0x10,
-                0x87, 0x01, 0xE3, 0x61, 0xF1, 0xAB, 0x89, 0x7D,
-                0x9C, 0xDC, 0x50, 0x6E, 0xA6, 0x7E, 0xEB, 0xEF
-            }
-        };
-        
         public override bool? IsApplicable(Game game) {
             // Currently ignores if method patched by others, expecting that there is a postfix already applied
-            var hash = PureSpeedMethodInfo.MakeCilSignatureSha256();
-            return hash.MatchesAnySha256(ValidHashes);
+            var hash = AgilityPatchShared.CalculatePureSpeedMethodInfo.MakeCilSignatureSha256();
+            return hash.MatchesAnySha256(AgilityPatchShared.CalculatePureSpeedHashes);
         }
 
         public override void Apply(Game game) {
             if (Applied) return;
 
-            CommunityPatchSubModule.Harmony.Patch(PureSpeedMethodInfo,
+            CommunityPatchSubModule.Harmony.Patch(AgilityPatchShared.CalculatePureSpeedMethodInfo,
                 postfix: new HarmonyMethod(PatchMethodInfo));
 
             Applied = true;
