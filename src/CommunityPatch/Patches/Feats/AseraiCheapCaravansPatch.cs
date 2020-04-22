@@ -6,7 +6,6 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
 
 namespace CommunityPatch.Patches.Feats {
     public sealed class AseraiCheapCaravansPatch : PatchBase<AseraiCheapCaravansPatch> {
