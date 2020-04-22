@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using Antijank.Debugging;
 using Microsoft.Diagnostics.Runtime;
@@ -88,6 +89,31 @@ namespace Antijank {
         );
 
         DebugProcess = (ICorDebugProcess) procObj;
+
+        var appDomCount = DebugProcess.EnumerateAppDomains().GetCount();
+
+        var sbName = new StringBuilder(4096);
+        foreach (var appDom in DebugHelpers.GetEnumerable<ICorDebugAppDomain>(DebugProcess.EnumerateAppDomains().Next)) {
+          var appDomId = appDom.GetID();
+          var sb = new StringBuilder(4096);
+
+          var appDomName = DebugHelpers.GetString(appDom.GetName);
+          Console.WriteLine($"AppDomain: {appDomId} {appDomName}");
+
+          foreach (var asm in DebugHelpers.GetEnumerable<ICorDebugAssembly>(appDom.EnumerateAssemblies().Next)) {
+            var asmName = DebugHelpers.GetString(asm.GetName);
+            Console.WriteLine($"Assembly: {asmName}");
+
+            foreach (var mod in DebugHelpers.GetEnumerable<ICorDebugModule>(asm.EnumerateModules().Next)) {
+              var modName = DebugHelpers.GetString(mod.GetName);
+              var isDyn = mod.IsDynamic() ? "yes" : "no";
+              Console.WriteLine($"Module: {modName} ({isDyn})");
+              
+              
+            }
+
+          }
+        }
       }
 
       DataTarget inProcDt;

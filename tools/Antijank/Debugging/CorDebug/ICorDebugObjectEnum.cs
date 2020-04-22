@@ -28,8 +28,8 @@ namespace Antijank.Debugging {
     uint GetCount();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void Next([In] uint celt, [MarshalAs(UnmanagedType.Interface)] [Out]
-      ICorDebugObjectEnum objects, out uint pceltFetched);
+    void Next([In] uint celt, [MarshalAs(UnmanagedType.LPArray)] [Out]
+      ulong[] objects, out uint pceltFetched);
 
   }
 

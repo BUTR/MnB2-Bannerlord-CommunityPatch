@@ -27,7 +27,7 @@ namespace Antijank.Debugging {
     [return: MarshalAs(UnmanagedType.Interface), Description("ppModules")]
     ICorDebugModuleEnum EnumerateModules();
 
-    [Obsolete("NOT IMPLEMENTED", true)]
+    //[Obsolete("NOT IMPLEMENTED", true)]
     [MethodImpl(MethodImplOptions.InternalCall)]
     void GetCodeBase([In] uint cchName, out uint pcchName,
       [MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 0)] [Out]

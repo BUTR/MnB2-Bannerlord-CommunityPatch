@@ -1,4 +1,5 @@
-﻿﻿using System;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -14,28 +15,46 @@ namespace Antijank.Debugging {
   [PublicAPI]
   public interface ICorDebugProcess : ICorDebugController {
 
-    /*
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void Stop([In] uint dwTimeoutIgnored);
+    new void Stop([In] uint dwTimeoutIgnored);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void Continue([In] int fIsOutOfBand);
+    new void Continue([In] int fIsOutOfBand);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void IsRunning(out int pbRunning);
+    new void IsRunning(out int pbRunning);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void HasQueuedCallbacks([MarshalAs(UnmanagedType.Interface)] [In] ICorDebugThread pThread, out int pbQueued);
+    new void HasQueuedCallbacks([MarshalAs(UnmanagedType.Interface)] [In]
+      ICorDebugThread pThread, out int pbQueued);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void EnumerateThreads([MarshalAs(UnmanagedType.Interface)] out ICorDebugThreadEnum ppThreads);
+    [return: MarshalAs(UnmanagedType.Interface)]
+    [return: Description("ppThreads")]
+    new ICorDebugThreadEnum EnumerateThreads();
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void SetAllThreadsDebugState([In] CorDebugThreadState state, [MarshalAs(UnmanagedType.Interface)] [In] ICorDebugThread pExceptThisThread);
+    new void SetAllThreadsDebugState([In] CorDebugThreadState state, [MarshalAs(UnmanagedType.Interface)] [In]
+      ICorDebugThread pExceptThisThread);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void Detach();
+    new void Detach();
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void Terminate([In] uint exitCode);
+    new void Terminate([In] uint exitCode);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void CanCommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In] ref ICorDebugEditAndContinueSnapshot pSnapshots, [MarshalAs(UnmanagedType.Interface)] out ICorDebugErrorInfoEnum pError);
+    [return: MarshalAs(UnmanagedType.Interface)]
+    [return: Description("pError")]
+    new ICorDebugErrorInfoEnum CanCommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In]
+      ref ICorDebugEditAndContinueSnapshot pSnapshots);
+
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void CommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In] ref ICorDebugEditAndContinueSnapshot pSnapshots, [MarshalAs(UnmanagedType.Interface)] out ICorDebugErrorInfoEnum pError);
-    */
+    [return: MarshalAs(UnmanagedType.Interface)]
+    [return: Description("pError")]
+    new ICorDebugErrorInfoEnum CommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In]
+      ref ICorDebugEditAndContinueSnapshot pSnapshots);
+    
     [MethodImpl(MethodImplOptions.InternalCall)]
     void GetID(out uint pdwProcessId);
 
@@ -79,7 +98,9 @@ namespace Antijank.Debugging {
     void ModifyLogSwitch([In] ref ushort pLogSwitchName, [In] int lLevel);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void EnumerateAppDomains([MarshalAs(UnmanagedType.Interface)] out ICorDebugAppDomainEnum ppAppDomains);
+    [return: MarshalAs(UnmanagedType.Interface)]
+    [return: Description("ppAppDomains")]
+    ICorDebugAppDomainEnum EnumerateAppDomains();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     void GetObject([MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppObject);

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
+using Module = TaleWorlds.MountAndBlade.Module;
 using Path = System.IO.Path;
 
 namespace Antijank {
@@ -125,7 +126,8 @@ namespace Antijank {
       }
 
       modsSubDir = modsSubDir.Substring(0, slashIndex);
-      mod = LoaderPatch.ModuleList.FirstOrDefault(m => m.Alias == modsSubDir);
+      var mods = LoaderPatch.ModuleList ?? ModuleInfo.GetModules();
+      mod = mods.FirstOrDefault(m => m.Alias == modsSubDir);
 
       return isMod;
     }
@@ -149,6 +151,7 @@ namespace Antijank {
 
       return _configsDir;
     }
+
   }
 
 }

@@ -17,6 +17,7 @@ namespace Antijank.Debugging {
       out uint pCchPathBuffer, ICorDebugMetaDataLocator wszPathBuffer) {
       Console.Error.WriteLine($"{nameof(InProcCorDebugDataTarget)}.{nameof(GetMetaData)}");
       Console.Error.Flush();
+      System.Diagnostics.Debugger.Break();
       throw new NotImplementedException();
     }
 
@@ -56,11 +57,6 @@ namespace Antijank.Debugging {
     }
 
     public unsafe void ReadVirtual(ulong address, byte* pBuffer, uint bytesRequested, out uint pBytesRead) {
-      if (address == 0) {
-        pBytesRead = 0;
-        return;
-      }
-
       Unsafe.CopyBlockUnaligned(pBuffer, (void*) address, bytesRequested);
       pBytesRead = bytesRequested;
     }
@@ -80,12 +76,14 @@ namespace Antijank.Debugging {
     public unsafe void SetThreadContext(uint dwThreadId, uint contextSize, byte* pContext) {
       Console.Error.WriteLine($"{nameof(InProcCorDebugDataTarget)}.{nameof(SetThreadContext)}");
       Console.Error.Flush();
+      System.Diagnostics.Debugger.Break();
       throw new NotImplementedException();
     }
 
     public void ContinueStatusChanged(uint dwThreadId, uint continueStatus) {
       Console.Error.WriteLine($"{nameof(InProcCorDebugDataTarget)}.{nameof(ContinueStatusChanged)}");
       Console.Error.Flush();
+      System.Diagnostics.Debugger.Break();
       throw new NotImplementedException();
     }
 
