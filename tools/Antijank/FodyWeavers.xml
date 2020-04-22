@@ -1,4 +1,12 @@
 ﻿<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
-  <InlineIL />
-  <Costura />
+    <InlineIL/>
+    <ModuleInit />
+    <Costura IncludeDebugSymbols="false" LoadAtModuleInit="false">
+        <ExcludeAssemblies>
+            Jetbrains.Annotations
+            InlineIL
+            0Harmony
+            System.Numerics.Vectors
+        </ExcludeAssemblies>
+    </Costura>
 </Weavers>

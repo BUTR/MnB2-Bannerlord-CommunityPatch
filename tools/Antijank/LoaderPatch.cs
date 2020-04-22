@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Linq;
 using HarmonyLib;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade.Launcher;
@@ -16,22 +17,17 @@ namespace Antijank {
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
     static LoaderPatch()
-      => PatchLoadSubModules();
+      => AssemblyResolver.Harmony.Patch(
+        typeof(LauncherModsVM).GetMethod("LoadSubModules", Declared),
+        new HarmonyMethod(typeof(LoaderPatch).GetMethod(nameof(LoadSubModulesPrefix), Declared)));
 
     public static void Init() {
       // static initializer
     }
 
-    private static void PatchLoadSubModules() {
-      var t = typeof(LauncherModsVM);
-      AssemblyResolver.Harmony.Patch(
-        t.GetMethod("LoadSubModules", Declared),
-        new HarmonyMethod(typeof(LoaderPatch).GetMethod(nameof(LoadSubModulesPrefix), Declared)));
-    }
-
     public static bool LoadSubModulesPrefix(LauncherModsVM __instance, UserData ____userData, bool isMultiplayer) {
       var list =
-        SortByDependencies(
+        ApplyUserSorting(SortByDependencies(
           ModuleInfo.GetModules()
             .Where(x => IsVisible(isMultiplayer, x))
             .Select(x => {
@@ -42,7 +38,7 @@ namespace Antijank {
             })
             .OrderBy(x => x.IsNative() ? 0 : x.IsOfficial ? 1 : x.IsSelected ? 2 : 3) // presort
             .ThenBy(x => Math.Min(x.DependedModuleIds.Count, 1)) // roots grouped
-        );
+        ));
 
       foreach (var moduleInfo in list) {
         UnblockModule(moduleInfo);
@@ -52,8 +48,12 @@ namespace Antijank {
         __instance.Modules.Add(launcherModuleVm);
       }
 
+      ModuleList = new MBReadOnlyList<ModuleInfo>(list.ToList());
+
       return false;
     }
+
+    public static IReadOnlyList<ModuleInfo> ModuleList { get; private set; }
 
     private static void UnblockModule(ModuleInfo moduleInfo) {
       var binDir = new Uri(Path.Combine(
@@ -74,10 +74,10 @@ namespace Antijank {
     }
 
     // this bit is based on @Fumblesneeze's loader
-    public static List<ModuleInfo> SortByDependencies(IEnumerable<ModuleInfo> mods) {
+    public static LinkedList<ModuleInfo> SortByDependencies(IEnumerable<ModuleInfo> mods) {
       var unresolvedMods = new Queue<ModuleInfo>(mods);
       var addedMods = new HashSet<string>();
-      var orderedModList = new List<ModuleInfo>();
+      var orderedModList = new LinkedList<ModuleInfo>();
       var failedCount = 0;
       while (failedCount < unresolvedMods.Count) {
         var moduleInfo = unresolvedMods.Dequeue();
@@ -96,14 +96,18 @@ namespace Antijank {
           continue;
 
         failedCount = 0;
-        orderedModList.Add(moduleInfo);
+        orderedModList.AddLast(moduleInfo);
         addedMods.Add(moduleInfo.Id);
       }
 
       foreach (var item in unresolvedMods)
-        orderedModList.Add(item);
+        orderedModList.AddLast(item);
 
       return orderedModList;
+    }
+
+    public static LinkedList<ModuleInfo> ApplyUserSorting(LinkedList<ModuleInfo> mods) {
+      return mods;
     }
 
     private static bool IsVisible(bool isMultiplayer, ModuleInfo moduleInfo) {

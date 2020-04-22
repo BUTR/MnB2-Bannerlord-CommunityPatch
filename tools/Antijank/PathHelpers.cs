@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using Path = System.IO.Path;
 
@@ -25,7 +26,7 @@ namespace Antijank {
       return _binSubDir;
     }
 
-    public static bool IsOfficialAssembly(Assembly asm) {
+    public static bool IsOfficialAssembly(this Assembly asm) {
       var path = new Uri(asm.CodeBase).LocalPath;
       return IsOfficialPath(path);
     }
@@ -112,11 +113,11 @@ namespace Antijank {
         return false;
       }
 
-      var asmPath = new Uri(typeof(AssemblyResolver).Assembly.CodeBase).LocalPath;
+      var asmPath = new Uri(asm.CodeBase).LocalPath;
       var modsDir = GetModulesDir();
       var isMod = asmPath.StartsWith(modsDir, StringComparison.OrdinalIgnoreCase);
 
-      var modsSubDir = asmPath.Substring(0, modsDir.Length);
+      var modsSubDir = asmPath.Substring(modsDir.Length);
       var slashIndex = modsSubDir.IndexOf(Path.DirectorySeparatorChar);
       if (slashIndex == -1) {
         mod = null; // wtf?
@@ -129,6 +130,25 @@ namespace Antijank {
       return isMod;
     }
 
+    private static string _configsDir;
+
+    public static string GetConfigsDir() {
+      if (_configsDir != null)
+        return _configsDir;
+
+      try {
+        _configsDir = Utilities.GetConfigsPath();
+      }
+      catch (NullReferenceException) {
+        _configsDir = Path.Combine(
+          Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+          "Mount and Blade II Bannerlord",
+          "Configs"
+        );
+      }
+
+      return _configsDir;
+    }
   }
 
 }

@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using HarmonyLib;
+using Microsoft.Win32.SafeHandles;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.TwoDimension.Standalone.Native.Windows;
 using Module = TaleWorlds.MountAndBlade.Module;
 using ModuleInfo = TaleWorlds.Library.ModuleInfo;
+using Path = System.IO.Path;
 
 namespace Antijank {
 
@@ -15,16 +21,181 @@ namespace Antijank {
 
     public static readonly Harmony Harmony = new Harmony(nameof(Antijank));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool HarmonyFileLogPatch(string str) {
+      Console.WriteLine(new string(FileLog.indentChar, FileLog.indentLevel) + str);
+      return false;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool HarmonyFileLogListPatch(List<string> strings) {
+      foreach (var line in strings)
+        Console.WriteLine(new string(FileLog.indentChar, FileLog.indentLevel) + line);
+      return false;
+    }
+
+    private static Dictionary<string, Assembly> SafeLoadedAssemblies
+      = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+
+    private static readonly Regex RxAnythingGoes = new Regex("", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool AssemblyLoaderLoadFromPatch(out Assembly __result, string assemblyFile) {
+      TryLoadAssembly(assemblyFile, out __result);
+
+      return false;
+    }
+
+    private static bool TryLoadAssembly(string filePath, out Assembly assembly) {
+      var ext = Path.GetExtension(filePath);
+
+      if (!ext.Equals(".dll", StringComparison.OrdinalIgnoreCase)
+        && !ext.Equals(".exe", StringComparison.OrdinalIgnoreCase))
+        filePath += ".dll";
+
+      if (filePath.StartsWith("../") || filePath.StartsWith("..\\") || filePath.StartsWith("./") || filePath.StartsWith(".\\"))
+        filePath = new Uri(Path.Combine(Environment.CurrentDirectory, filePath)).LocalPath;
+
+      if (!Path.IsPathRooted(filePath)) {
+        var gameBinDir = PathHelpers.GetGameBinDir();
+        var asmPath = Path.Combine(gameBinDir, filePath);
+        if (File.Exists(asmPath))
+          filePath = asmPath;
+        else {
+          asmPath = FindAnyModuleAssembly(filePath);
+          if (asmPath != null && File.Exists(asmPath))
+            filePath = asmPath;
+        }
+      }
+
+      var found =
+        SafeLoadedAssemblies.TryGetValue(filePath, out var safeAsm)
+          ? safeAsm
+          : AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(asm => !asm.IsDynamic
+              && new Uri(asm.CodeBase).LocalPath.Equals(filePath, StringComparison.OrdinalIgnoreCase));
+
+      if (found != null) {
+        // already loaded
+        assembly = found;
+        return false;
+      }
+
+      if (Path.IsPathRooted(filePath)) {
+        if (PathHelpers.IsOfficialPath(filePath)) {
+          assembly = Assembly.LoadFrom(filePath);
+          return true;
+        }
+
+        assembly = SafeLoadAssembly(filePath);
+        return true;
+      }
+
+      // help
+      assembly = null;
+      return false;
+    }
+
+    private static void RecursiveLoadReferencedAssemblies(Assembly asm) {
+      foreach (var asmName in asm.GetReferencedAssemblies())
+        if (TryLoadAssembly(asmName.Name, out var refdAsm))
+          RecursiveLoadReferencedAssemblies(refdAsm);
+    }
+
+    private static Assembly SafeLoadAssembly(string assemblyFile) {
+      try {
+        var asm = Assembly.LoadFile(assemblyFile);
+
+        try {
+          RecursiveLoadReferencedAssemblies(asm);
+        }
+        catch (Exception) {
+          Console.WriteLine("Missing some referenced assembly for " + assemblyFile);
+          // warning
+        }
+
+        return asm;
+      }
+      catch (Exception) {
+        // error
+        Console.WriteLine("Failed to load assembly " + assemblyFile);
+        return null;
+      }
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool DoNothing() {
+      return false;
+    }
+
+    private static bool _terminalExceptionLoopCheck = false;
+
     static AssemblyResolver() {
+      // here comes the magic
+      var twResolver = typeof(AssemblyLoader).GetMethod("OnAssemblyResolve", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      Harmony.Patch(typeof(AssemblyLoader).GetMethod(nameof(AssemblyLoader.LoadFrom)),
+        new HarmonyMethod(typeof(AssemblyResolver), nameof(AssemblyLoaderLoadFromPatch)));
+      AppDomain.CurrentDomain.AssemblyResolve -= (ResolveEventHandler) Delegate.CreateDelegate(typeof(ResolveEventHandler), twResolver);
+
+      if (AppDomain.CurrentDomain.DomainManager is AppDomainManager adm && Options.EnableDiagnosticConsole) {
+        Console.WriteLine("Attempting to direct Harmony logging output to console.");
+        try {
+          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.Log)),
+            new HarmonyMethod(typeof(AssemblyResolver), nameof(HarmonyFileLogPatch)));
+          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.LogBuffered), new[] {typeof(string)}),
+            new HarmonyMethod(typeof(AssemblyResolver), nameof(HarmonyFileLogPatch)));
+          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.LogBuffered), new[] {typeof(List<string>)}),
+            new HarmonyMethod(typeof(AssemblyResolver), nameof(HarmonyFileLogListPatch)));
+          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.FlushBuffer)),
+            new HarmonyMethod(typeof(AssemblyResolver), nameof(DoNothing)));
+          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.Reset)),
+            new HarmonyMethod(typeof(AssemblyResolver), nameof(DoNothing)));
+          FileLog.Log("Logging Harmony output to console success.");
+          FileLog.FlushBuffer();
+          if (Options.EnableHarmonyDebugLogging)
+            Harmony.DEBUG = true;
+        }
+        catch (Exception e) {
+          Console.WriteLine("Logging Harmony output to console failed.");
+          Log(e);
+        }
+      }
+
       var domain = AppDomain.CurrentDomain;
 
-      domain.AssemblyResolve += OnResolve;
+      domain.AssemblyResolve += OnAssemblyResolve;
 
       domain.UnhandledException += (sender, args) => {
+        if (args.IsTerminating) {
+          if (_terminalExceptionLoopCheck) {
+            _terminalExceptionLoopCheck = true;
+            try {
+              AppDomainManager.EnableDiagnosticsConsole();
+              MessageBox.Error(
+                "Check the diagnostic console for detailed output.",
+                "Terminal Unhandled Exception");
+            }
+            catch {
+              // well darn
+            }
+          }
+        }
+
         Console.WriteLine("Unhandled Exception:");
         var ex = args.ExceptionObject as Exception;
 
         Log(ex);
+
+        try {
+          var modAsm = new StackTrace(ex, false).FindModuleFromStackTrace(out var modInfo, out var stackFrame);
+          Console.WriteLine();
+          Console.WriteLine($"Possible Source Mod: {modInfo?.Name}");
+          Console.WriteLine($"Possible Source Assembly: {modAsm?.GetName().Name}");
+          Console.WriteLine($"Possible Source Call: {stackFrame?.GetMethod()?.FullDescription()}");
+        }
+        catch {
+          // ok
+        }
 
         if (!args.IsTerminating)
           return;
@@ -32,10 +203,14 @@ namespace Antijank {
         Console.WriteLine("Exception is terminal.");
         Console.WriteLine("Press any key to exit.");
         Console.ReadKey(true);
+        
+        var hWndConsole = Kernel32.GetConsoleWindow();
+        User32.SetActiveWindow(hWndConsole);
+        User32.SetForegroundWindow(hWndConsole);
       };
 
       domain.FirstChanceException += (sender, args) => {
-        if (DisableFirstChanceExceptionPrinting)
+        if (Options.DisableFirstChanceExceptionPrinting)
           return;
 
         Console.WriteLine("First Chance Exception:");
@@ -49,10 +224,7 @@ namespace Antijank {
       };
     }
 
-    public static bool DisableFirstChanceExceptionPrinting { get; set; }
-      = !Environment.GetCommandLineArgs().Any(arg => arg.Equals("/fce", StringComparison.OrdinalIgnoreCase));
-
-    private static void Log(Exception ex) {
+    public static void Log(Exception ex) {
       while (ex != null) {
         Console.WriteLine(ex.ToString());
 
@@ -74,34 +246,24 @@ namespace Antijank {
       // invoke static initializer
     }
 
-    private static Assembly OnResolve(object sender, ResolveEventArgs args) {
+    private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs args) {
       try {
         var name = new AssemblyName(args.Name);
 
+        if (name.Name == "ManagedStarter")
+          return null;
+
+        var reqAsm = args.RequestingAssembly
+          ?? new StackTrace(2, false).FindModuleFromStackTrace();
+
         // handle ambiguous resolve requests by checking all mod bin dirs
         // TODO: recursive scan module dirs
-        if (args.RequestingAssembly == null) {
-          foreach (var modInfo in ModuleInfo.GetModules()) {
-            if (!modInfo.IsSelected)
-              continue;
 
-            var modDir = Path.GetDirectoryName(ModuleInfo.GetPath(modInfo.Id));
-            if (modDir == null)
-              continue;
+        if (reqAsm == null) {
+          var absPath = FindAnyModuleAssembly(name.Name);
 
-            var modPath = Path.Combine(modDir, "bin", Common.ConfigName, name.Name + ".dll");
-            if (!File.Exists(modPath))
-              continue;
-
-            var absPath = new Uri(Path.Combine(Environment.CurrentDirectory, modPath)).LocalPath;
-
-            if (SecurityHelpers.UnblockFile(absPath))
-              Console.WriteLine("Unblocked: " + absPath);
-
-            Console.WriteLine("Resolved: " + absPath);
-
-            return Assembly.LoadFrom(absPath);
-          }
+          if (absPath != null)
+            return SafeLoadAssembly(absPath);
 
           return null;
         }
@@ -109,7 +271,7 @@ namespace Antijank {
         MBSubModuleBase reqSm = null;
         foreach (var sm in Module.CurrentModule.SubModules) {
           var smAsm = sm.GetType().Assembly;
-          if (smAsm == args.RequestingAssembly)
+          if (smAsm == reqAsm)
             reqSm = sm;
         }
 
@@ -119,7 +281,7 @@ namespace Antijank {
         var resolvable = new LinkedList<(ModuleInfo Mod, SubModuleInfo SubMod)>();
         ModuleInfo reqMi = null;
         SubModuleInfo reqSmi = null;
-        var modules = ModuleInfo.GetModules();
+        var modules = LoaderPatch.ModuleList;
         foreach (var mi in modules) {
           if (!mi.IsSelected)
             continue;
@@ -160,12 +322,50 @@ namespace Antijank {
 
             Console.WriteLine("Resolved: " + absPath);
 
-            return Assembly.LoadFrom(absPath);
+            return SafeLoadAssembly(absPath);
           }
         }
       }
       catch {
         // TODO: log?
+      }
+
+      return null;
+    }
+
+    private static string FindAnyModuleAssembly(string name) {
+      var modList = LoaderPatch.ModuleList;
+      if (modList == null)
+        return null;
+
+      foreach (var modInfo in modList) {
+        if (!modInfo.IsSelected)
+          continue;
+
+        var relModDir = Path.GetDirectoryName(ModuleInfo.GetPath(modInfo.Id));
+        if (relModDir == null)
+          continue;
+
+        var absModDir = new Uri(Path.Combine(PathHelpers.GetGameBinDir(), relModDir)).LocalPath;
+
+        var fileName = name;
+        var ext = Path.GetExtension(name);
+        if (!ext.Equals(".dll", StringComparison.OrdinalIgnoreCase)
+          && !ext.Equals(".dll", StringComparison.OrdinalIgnoreCase))
+          fileName += ".dll";
+
+        var modPath = Path.Combine(absModDir, "bin", PathHelpers.GetBinSubDir(), fileName);
+        if (!File.Exists(modPath))
+          continue;
+
+        var absPath = new Uri(Path.Combine(Environment.CurrentDirectory, modPath)).LocalPath;
+
+        if (SecurityHelpers.UnblockFile(absPath))
+          Console.WriteLine("Unblocked: " + absPath);
+
+        Console.WriteLine("Resolved: " + absPath);
+
+        return absPath;
       }
 
       return null;

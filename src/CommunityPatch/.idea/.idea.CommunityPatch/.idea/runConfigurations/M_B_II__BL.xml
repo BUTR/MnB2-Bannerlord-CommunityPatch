@@ -7,13 +7,13 @@
     <envs>
       <env name="ComPLUS_ReadyToRun" value="0" />
       <env name="ComPLUS_ZapDisable" value="1" />
+      <env name="ComPLUS_JitMinOpts" value="1" />
     </envs>
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="USE_MONO" value="0" />
     <option name="RUNTIME_ARGUMENTS" value="" />
     <method v="2">
       <option name="Build Solution" enabled="true" />
-      <option name="Build" default="false" projectName="Antijank" projectPath="D:\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\CommunityPatch\tools\Antijank\Antijank.csproj" />
     </method>
   </configuration>
 </component>
