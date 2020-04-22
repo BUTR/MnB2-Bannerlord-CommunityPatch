@@ -75,10 +75,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public static void Postfix(ref float __result, ref Agent __instance) {
       if (!__instance.IsHuman) return;
       if (!__instance.IsHero) return;
-      if (!(__instance.Character is CharacterObject)) return;
+      if (!(__instance.Character is CharacterObject character)) return;
 
-      var character = (CharacterObject)__instance.Character;
-      var hero = character?.HeroObject;
+      var hero = character.HeroObject;
       if (hero == null) return;
       
       var perk = ActivePatch._perk;
