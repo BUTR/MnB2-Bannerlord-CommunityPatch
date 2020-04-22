@@ -61,6 +61,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
   * Roguery
     * Party Raiding
     * Eye for Loot
+    * For the Thrill
   * Two Handed
     * Quick Plunder
     * Eviscerate
