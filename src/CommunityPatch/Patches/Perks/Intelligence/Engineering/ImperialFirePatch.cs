@@ -107,7 +107,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     private static bool AnyPartyMemberHasThePerkActive(MobileParty party) {
       var perk = ActivePatch._perk;
       var partyMemberValue = new ExplainedNumber(0f);
-      PerkHelper.AddPerkBonusForParty(perk, Hero.MainHero.PartyBelongedTo, ref partyMemberValue);
+      PerkHelper.AddPerkBonusForParty(perk, party, ref partyMemberValue);
+
+      if (party.Army?.Parties != null)
+        foreach (var armyParty in party.Army?.Parties)
+          PerkHelper.AddPerkBonusForParty(perk, armyParty, ref partyMemberValue);
+
       return partyMemberValue.ResultNumber.IsEqualOrBiggerThan(1f);
     }
     
