@@ -56,6 +56,11 @@ namespace Antijank.Debugging {
     }
 
     public unsafe void ReadVirtual(ulong address, byte* pBuffer, uint bytesRequested, out uint pBytesRead) {
+      if (address == 0) {
+        pBytesRead = 0;
+        return;
+      }
+
       Unsafe.CopyBlockUnaligned(pBuffer, (void*) address, bytesRequested);
       pBytesRead = bytesRequested;
     }

@@ -49,9 +49,14 @@ namespace Antijank {
     [ThreadStatic]
     private static CLRDebugging? Debugging;
 
+    [ThreadStatic]
+    private static ICorDebugProcess? DebugProcess;
+
     public static int ThreadId;
 
     private void DebuggerThreadAction() {
+      ThreadId = Thread.CurrentThread.ManagedThreadId;
+
       var pid = -1;
       using (var proc = Process.GetCurrentProcess())
         pid = proc.Id;
@@ -65,6 +70,24 @@ namespace Antijank {
         var clrRt = MetaHost.GetRuntime(version, typeof(ICLRRuntimeInfo).GUID);
         var dt = new InProcCorDebugDataTarget();
         //clrRt.GetInterface()
+        var lp = new InProcLibProvider();
+        var maxVersion = new CLR_DEBUGGING_VERSION {wMajor = 9999, wMinor = 9999, wBuild = 9999, wRevision = 9999};
+        CLR_DEBUGGING_VERSION gotVersion = default;
+
+        var clrAddr = lp.FindLoadedLibrary("clr.dll");
+
+        Debugging.OpenVirtualProcess(
+          unchecked((ulong) clrAddr.ToInt64()),
+          dt,
+          lp,
+          ref maxVersion,
+          typeof(ICorDebugProcess).GUID,
+          out object procObj,
+          ref gotVersion,
+          out var flags
+        );
+
+        DebugProcess = (ICorDebugProcess) procObj;
       }
 
       DataTarget inProcDt;
@@ -78,7 +101,6 @@ namespace Antijank {
         InProcDataTarget = inProcDt;
         InProcClrInfo = clrInfo;
         InProcClrRuntime = clrRt2;
-        ThreadId = Thread.CurrentThread.ManagedThreadId;
       }
       try {
         foreach (var (callback, state, waiter) in ExecutionQueue.GetConsumingEnumerable()) {

@@ -7,30 +7,32 @@ namespace Antijank.Debugging {
 
   public class InProcLibProvider : ICLRDebuggingLibraryProvider {
 
-    public void ProvideLibrary(string pWszFileName, uint dwTimestamp, uint dwSizeOfImage, out IntPtr phModule) {
-      phModule = default;
-
+    public IntPtr FindLoadedLibrary(string name) {
       using (var proc = Process.GetCurrentProcess()) {
         foreach (ProcessModule module in proc.Modules) {
-          if (module.FileName == pWszFileName) {
-            phModule = module.BaseAddress;
-            return;
+          if (module.FileName == name) {
+            return module.BaseAddress;
           }
 
           var modFileName = Path.GetFileName(module.FileName);
-          if (modFileName == pWszFileName) {
-            phModule = module.BaseAddress;
-            return;
+          if (modFileName == name) {
+            return module.BaseAddress;
           }
 
-          var fileName = Path.GetFileName(pWszFileName);
-          if (modFileName != fileName)
-            continue;
-
-          phModule = module.BaseAddress;
-          return;
+          var fileName = Path.GetFileName(name);
+          if (modFileName == fileName)
+            return module.BaseAddress;
         }
       }
+
+      return default;
+    }
+
+    public void ProvideLibrary(string pWszFileName, uint dwTimestamp, uint dwSizeOfImage, out IntPtr phModule) {
+      phModule = FindLoadedLibrary(pWszFileName);
+
+      if (phModule != default)
+        return;
 
       // module not already loaded, let's load it...
 
