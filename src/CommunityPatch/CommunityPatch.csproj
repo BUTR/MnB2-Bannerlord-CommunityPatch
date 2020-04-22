@@ -39,7 +39,6 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="$(PkgLib_Harmony)\lib\net48\0Harmony.dll">
         <Reference Include="$(MnB2BannerlordBinDir)\Mono.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>

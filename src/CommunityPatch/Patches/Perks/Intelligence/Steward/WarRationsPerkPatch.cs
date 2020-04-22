@@ -22,10 +22,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    internal static bool QuartermasterIsClanWide {
-      get => CommunityPatchSubModule.Options.Get<bool>(nameof(QuartermasterIsClanWide));
-      set => CommunityPatchSubModule.Options.Set(nameof(QuartermasterIsClanWide), value);
-    }
+    internal static readonly Option<bool> QuartermasterIsClanWide
+      = CommunityPatchSubModule.Options.GetOption<bool>(nameof(QuartermasterIsClanWide));
 
     private PerkObject _perk;
 

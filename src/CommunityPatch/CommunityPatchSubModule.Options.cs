@@ -8,22 +8,16 @@ namespace CommunityPatch {
 
   public partial class CommunityPatchSubModule {
 
-    internal static readonly OptionsFile Options = new OptionsFile(nameof(CommunityPatch) + ".txt");
+    internal static readonly OptionsFile Options = new CommunityPatchOptionsFile();
 
-    internal static bool DisableIntroVideo {
-      get => Options.Get<bool>(nameof(DisableIntroVideo));
-      set => Options.Set(nameof(DisableIntroVideo), value);
-    }
+    internal static readonly Option<bool> DisableIntroVideo
+      = Options.GetOption<bool>(nameof(DisableIntroVideo));
 
-    internal static bool RecordFirstChanceExceptions {
-      get => Options.Get<bool>(nameof(RecordFirstChanceExceptions));
-      set => Options.Set(nameof(RecordFirstChanceExceptions), value);
-    }
+    internal static readonly Option<bool> RecordFirstChanceExceptions
+      = Options.GetOption<bool>(nameof(RecordFirstChanceExceptions));
 
-    internal static bool DontGroupThirdPartyMenuOptions {
-      get => Options.Get<bool>(nameof(DontGroupThirdPartyMenuOptions));
-      set => Options.Set(nameof(DontGroupThirdPartyMenuOptions), value);
-    }
+    internal static readonly Option<bool> DontGroupThirdPartyMenuOptions
+      = Options.GetOption<bool>(nameof(DontGroupThirdPartyMenuOptions));
 
     internal void ShowOptions() {
       // ReSharper disable once UseObjectOrCollectionInitializer
@@ -80,13 +74,13 @@ namespace CommunityPatch {
       var selected = (string) list[0].Identifier;
       switch (selected) {
         case nameof(DisableIntroVideo):
-          DisableIntroVideo = !DisableIntroVideo;
+          DisableIntroVideo.Set(!DisableIntroVideo);
           ShowMessage($"Intro Videos: {(DisableIntroVideo ? "Disabled" : "Enabled")}.");
           Options.Save();
           break;
 
         case nameof(RecordFirstChanceExceptions):
-          RecordFirstChanceExceptions = !RecordFirstChanceExceptions;
+          RecordFirstChanceExceptions.Set(!RecordFirstChanceExceptions);
           ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
           Options.Save();
           break;
@@ -96,7 +90,7 @@ namespace CommunityPatch {
           break;
 
         case nameof(DontGroupThirdPartyMenuOptions):
-          DontGroupThirdPartyMenuOptions = !DontGroupThirdPartyMenuOptions;
+          DontGroupThirdPartyMenuOptions.Set(!DontGroupThirdPartyMenuOptions);
           ShowMessage($"3rd Party Menu Options: {(DontGroupThirdPartyMenuOptions ? "Loose" : "Grouped")}.");
           Options.Save();
           break;

@@ -6,7 +6,7 @@ namespace CommunityPatch {
 
     public override string Name => "CommunityPatch";
 
-    public CommunityPatchOptionsFile(string fileName) : base(fileName) {
+    public CommunityPatchOptionsFile() : base(nameof(CommunityPatch) + ".txt") {
     }
 
     // essentially this is the option file's schema

@@ -21,11 +21,12 @@ namespace CommunityPatch {
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
 
-    internal static readonly Option<bool> DisableIntroVideo
-      = Options.GetOption<bool>(nameof(DisableIntroVideo));
+    protected override void OnSubModuleLoad() {
+      var module = Module.CurrentModule;
 
-    internal static readonly Option<bool> RecordFirstChanceExceptions
-      = Options.GetOption<bool>(nameof(RecordFirstChanceExceptions));
+      try {
+        Harmony.PatchAll(typeof(CommunityPatchSubModule).Assembly);
+      }
       catch (Exception ex) {
         Error(ex, "Could not apply all generic attribute-based harmony patches.");
       }
@@ -92,12 +93,12 @@ namespace CommunityPatch {
     }
 
     protected override void OnGameStart(Game game, IGameStarter gameStarterObject) {
-      if (game.GameType is Campaign)
-      {
-        var cgs = (CampaignGameStarter)gameStarterObject;
+      if (game.GameType is Campaign) {
+        var cgs = (CampaignGameStarter) gameStarterObject;
         cgs.AddBehavior(new CommunityPatchCampaignBehavior());
-        }
-        }
-            }
+      }
+    }
+
+  }
 
 }
