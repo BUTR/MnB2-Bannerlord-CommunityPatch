@@ -86,11 +86,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
         var baseSpeed = (float)BaseSpeedMethodInfo.Invoke(__instance, new object[] {totalTroops});
         
-        var explainedNumber = new ExplainedNumber(baseSpeed, explanation);
-        explainedNumber.AddFactor(perkCavalryRatio, ActivePatch._perk.Name);
-        explainedNumber.AddFactor(perkMountedFootmanRatio, ActivePatch._perk.Name);
-        var perkBonus = explainedNumber.ResultNumber - baseSpeed;
-        __result += perkBonus;
+        var explainedNumber = new ExplainedNumber(__result, explanation);
+        explainedNumber.Add(baseSpeed * perkCavalryRatio, ActivePatch._perk.Name);
+        explainedNumber.Add(baseSpeed * perkMountedFootmanRatio, ActivePatch._perk.Name);
+        __result = explainedNumber.ResultNumber;
       }
     }
   }
