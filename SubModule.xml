@@ -7,7 +7,9 @@
     <SingleplayerModule value="true" />
     <MultiplayerModule value="true" />
     <Official value="false" />
-    <DependedModules />
+    <DependedModules>
+        <DependedModule Id="StoryMode" />
+    </DependedModules>
     <SubModules>
         <SubModule>
             <Name value="CommunityPatch" />
