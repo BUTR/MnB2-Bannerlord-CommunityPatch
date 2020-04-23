@@ -7,6 +7,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches {
 
@@ -32,7 +33,7 @@ namespace CommunityPatch.Patches {
 
     private static readonly int FirstPhaseTimeLimitInYears = ExtractFirstPhaseTimeLimitInYears();
 
-    private static readonly FieldInfo FirstPhaseTimeLimitInYearsConst = FirstPhaseCampaignBehaviorType.GetField("FirstPhaseTimeLimitInYears", BindingFlags.NonPublic | BindingFlags.Static);
+    private static readonly FieldInfo FirstPhaseTimeLimitInYearsField = AccessTools.Field(FirstPhaseCampaignBehaviorType, "FirstPhaseTimeLimitInYears");
 
     public bool Applied { get; private set; }
 
@@ -46,15 +47,21 @@ namespace CommunityPatch.Patches {
 
     // if they remove the const, they probably got rid of the time limit
     public bool? IsApplicable(Game game)
-      => FirstPhaseTimeLimitInYearsConst != null
+      => FirstPhaseTimeLimitInYearsField != null
         && game.GameType.GetType().FullName == "StoryMode.CampaignStoryMode";
 
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield break;
     }
 
-    private static int ExtractFirstPhaseTimeLimitInYears()
-      => (int) FirstPhaseTimeLimitInYearsConst!.GetRawConstantValue();
+    private static int ExtractFirstPhaseTimeLimitInYears() {
+      try {
+        return (int) FirstPhaseTimeLimitInYearsField!.GetRawConstantValue();
+      }
+      catch {
+        return (int) FirstPhaseTimeLimitInYearsField!.GetValue(null);
+      }
+    }
 
     public void Apply(Game game) {
       CampaignEvents.OnQuestStartedEvent.AddNonSerializedListener(this, OnQuestStarted);
