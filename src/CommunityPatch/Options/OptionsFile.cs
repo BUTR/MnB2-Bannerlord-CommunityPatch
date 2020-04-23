@@ -4,16 +4,17 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using JetBrains.Annotations;
+using TaleWorlds.Engine;
 using Tomlyn;
 using Tomlyn.Syntax;
 using Path = System.IO.Path;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public abstract partial class OptionsFile : OptionsStore, IEquatable<OptionsFile>, IComparable<OptionsFile> {
 
     public bool Equals(OptionsFile other)
-      => _path == other._path;
+      => _path == other?._path;
 
     public override bool Equals(OptionsStore other)
       => other is OptionsFile file && Equals(file);
@@ -44,9 +45,14 @@ namespace CommunityPatch {
 
     private readonly DocumentSyntax _toml;
 
+    private readonly string _name;
+
+    public override string Name => _name;
+
     [PublicAPI]
-    public OptionsFile(string fileName) {
-      _path = Path.Combine(PathHelpers.GetConfigsDir(), fileName);
+    protected OptionsFile(string fileName, bool initDeclaredOptionMembers = true) : base(initDeclaredOptionMembers) {
+      _name = Path.GetFileNameWithoutExtension(fileName);
+      _path = Path.Combine(Utilities.GetConfigsPath(), fileName);
       if (!File.Exists(_path)) {
         _toml = new DocumentSyntax();
         return;
@@ -54,6 +60,39 @@ namespace CommunityPatch {
 
       var bytes = File.ReadAllBytes(_path);
       _toml = Toml.Parse(bytes, _path);
+    }
+
+    public override bool IsEmpty => _toml.ChildrenCount == 0;
+
+    [PublicAPI]
+    public void Import(string path) {
+      if (!File.Exists(path))
+        throw new FileNotFoundException("Can't import missing file.", path);
+
+      var bytes = File.ReadAllBytes(path);
+      var imported = Toml.Parse(bytes, path);
+      foreach (var kv in imported.KeyValues) {
+        var targetKv = _toml.KeyValues.FirstOrDefault(x => x.Key == kv.Key);
+        if (targetKv == null)
+          _toml.KeyValues.Add(kv);
+        else
+          targetKv.Value = kv.Value;
+      }
+
+      foreach (var t in imported.Tables) {
+        var targetT = _toml.Tables.FirstOrDefault(x => x.Name == t.Name);
+        if (targetT != null)
+          _toml.Tables.Add(t);
+        else {
+          foreach (var kv in t.Items) {
+            var targetKv = _toml.KeyValues.FirstOrDefault(x => x.Key != kv.Key);
+            if (targetKv == null)
+              _toml.KeyValues.Add(kv);
+            else
+              targetKv.Value = kv.Value;
+          }
+        }
+      }
     }
 
     [PublicAPI]

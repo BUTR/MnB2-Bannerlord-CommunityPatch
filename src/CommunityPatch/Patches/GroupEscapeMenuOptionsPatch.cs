@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using CommunityPatch.Options;
 using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.Core;
@@ -28,7 +29,7 @@ namespace CommunityPatch.Patches {
     private static readonly object _groupEscMenuOptsKey = new object();
 
     public static void Postfix(EscapeMenuVM __instance, ref MBBindingList<EscapeMenuItemVM> ____menuItems, IEnumerable<EscapeMenuItemVM> items, TextObject title = null) {
-      if (CommunityPatchSubModule.DontGroupThirdPartyMenuOptions) {
+      if (CommunityPatchSubModule.Options.DontGroupThirdPartyMenuOptions) {
         ____menuItems.Add(new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
           _ => CommunityPatchSubModule.Current.ShowOptions(), _groupEscMenuOptsKey, false));
         return;

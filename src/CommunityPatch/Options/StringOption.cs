@@ -1,9 +1,9 @@
 using System;
 using JetBrains.Annotations;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
-  public sealed partial class StringOption : Option, IComparable<StringOption>, IEquatable<StringOption>, IEquatable<string> {
+  public sealed partial class StringOption : Option, IOption<string>, IComparable<StringOption>, IEquatable<StringOption>, IEquatable<string> {
 
     public StringOption([NotNull] OptionsStore store, [CanBeNull] string ns, [NotNull] string name) : base(store, ns, name) {
     }
@@ -25,6 +25,9 @@ namespace CommunityPatch {
     public void Set(string value)
       => Value = value;
 
+    public override void Set(object value)
+      => Set(value is null ? null : value as string ?? value.ToString());
+
     public bool Equals(StringOption other)
       => other != null
         && Store.Equals(other.Store)
@@ -33,6 +36,9 @@ namespace CommunityPatch {
 
     public bool Equals(string other)
       => Value.Equals(other);
+
+    public bool Equals(IOption<string> other)
+      => other is StringOption o && Equals(o);
 
     public override bool Equals(object obj)
       => !ReferenceEquals(null, obj)
@@ -45,6 +51,7 @@ namespace CommunityPatch {
 
     public override string ToString()
       => $"{Namespace}:{Name} = {Value}";
+
     public override int GetHashCode() {
       unchecked {
         var hashCode = Store.GetHashCode();

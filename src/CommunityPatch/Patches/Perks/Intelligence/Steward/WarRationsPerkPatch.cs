@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CommunityPatch.Options;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
@@ -22,8 +23,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    internal static readonly Option<bool> QuartermasterIsClanWide
-      = CommunityPatchSubModule.Options.GetOption<bool>(nameof(QuartermasterIsClanWide));
+    internal static Option<bool> QuartermasterIsClanWide
+      => CommunityPatchSubModule.Options.QuartermasterIsClanWide;
 
     private PerkObject _perk;
 

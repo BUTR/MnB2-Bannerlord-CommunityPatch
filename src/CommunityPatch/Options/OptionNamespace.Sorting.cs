@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public partial class OptionNamespace {
 
@@ -23,7 +23,7 @@ namespace CommunityPatch {
       if (ReferenceEquals(null, other))
         return 1;
 
-      var optionsComparison = _options.CompareTo(other._options);
+      var optionsComparison = _store.CompareTo(other._store);
       if (optionsComparison != 0)
         return optionsComparison;
 

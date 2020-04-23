@@ -1,9 +1,8 @@
 using TaleWorlds.Engine.Options;
-using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   // NOTE: precision lost, maybe use StringOptionViewModel instead?
   public class IntOptionViewModel : NumericOptionViewModel {

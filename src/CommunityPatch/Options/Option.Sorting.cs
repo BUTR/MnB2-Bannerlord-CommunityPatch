@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public partial class Option<TOption> {
 
@@ -64,6 +64,13 @@ namespace CommunityPatch {
 
     public static bool operator >=(Option<TOption> left, Option<TOption> right)
       => left.CompareTo(right) >= 0;
+
+    public int CompareTo(IOption<TOption> other) {
+      if (other is Option<TOption> o)
+        return CompareTo(o);
+
+      return GetHashCode() - other.GetHashCode();
+    }
 
   }
 

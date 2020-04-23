@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using CommunityPatch.Options;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
@@ -8,36 +9,30 @@ namespace CommunityPatch {
 
   public partial class CommunityPatchSubModule {
 
-    internal static readonly OptionsFile Options = new CommunityPatchOptionsFile();
-
-    internal static readonly Option<bool> DisableIntroVideo
-      = Options.GetOption<bool>(nameof(DisableIntroVideo));
-
-    internal static readonly Option<bool> RecordFirstChanceExceptions
-      = Options.GetOption<bool>(nameof(RecordFirstChanceExceptions));
-
-    internal static readonly Option<bool> DontGroupThirdPartyMenuOptions
-      = Options.GetOption<bool>(nameof(DontGroupThirdPartyMenuOptions));
+    internal static readonly CommunityPatchOptionsFile Options = new CommunityPatchOptionsFile();
 
     internal void ShowOptions() {
       // ReSharper disable once UseObjectOrCollectionInitializer
       var elements = new List<InquiryElement>();
 
+      var disableIntroVideo = Options.DisableIntroVideo;
       elements.Add(new InquiryElement(
-        nameof(DisableIntroVideo),
-        DisableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
+        nameof(disableIntroVideo),
+        disableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
         null
       ));
 
+      var recordFirstChanceExceptions = Options.RecordFirstChanceExceptions;
       elements.Add(new InquiryElement(
-        nameof(RecordFirstChanceExceptions),
-        RecordFirstChanceExceptions ? "Ignore First Chance Exceptions" : "Record First Chance Exceptions",
+        nameof(recordFirstChanceExceptions),
+        recordFirstChanceExceptions ? "Ignore First Chance Exceptions" : "Record First Chance Exceptions",
         null
       ));
 
+      var dontGroupThirdPartyMenuOptions = Options.DontGroupThirdPartyMenuOptions;
       elements.Add(new InquiryElement(
-        nameof(DontGroupThirdPartyMenuOptions),
-        DontGroupThirdPartyMenuOptions ? "Group 3rd Party Menu Options" : "Don't Group 3rd Party Menu Options",
+        nameof(dontGroupThirdPartyMenuOptions),
+        dontGroupThirdPartyMenuOptions ? "Group 3rd Party Menu Options" : "Don't Group 3rd Party Menu Options",
         null));
 
       elements.Add(new InquiryElement(
@@ -72,16 +67,19 @@ namespace CommunityPatch {
 
     private void HandleOptionChoice(List<InquiryElement> list) {
       var selected = (string) list[0].Identifier;
+      var disableIntroVideo = Options.DisableIntroVideo;
+      var recordFirstChanceExceptions = Options.RecordFirstChanceExceptions;
+      var dontGroupThirdPartyMenuOptions = Options.DontGroupThirdPartyMenuOptions;
       switch (selected) {
-        case nameof(DisableIntroVideo):
-          DisableIntroVideo.Set(!DisableIntroVideo);
-          ShowMessage($"Intro Videos: {(DisableIntroVideo ? "Disabled" : "Enabled")}.");
+        case nameof(disableIntroVideo):
+          disableIntroVideo.Set(!disableIntroVideo);
+          ShowMessage($"Intro Videos: {(disableIntroVideo ? "Disabled" : "Enabled")}.");
           Options.Save();
           break;
 
-        case nameof(RecordFirstChanceExceptions):
-          RecordFirstChanceExceptions.Set(!RecordFirstChanceExceptions);
-          ShowMessage($"Record FCEs: {(RecordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
+        case nameof(recordFirstChanceExceptions):
+          recordFirstChanceExceptions.Set(!recordFirstChanceExceptions);
+          ShowMessage($"Record FCEs: {(recordFirstChanceExceptions ? "Enabled" : "Disabled")}.");
           Options.Save();
           break;
 
@@ -89,9 +87,9 @@ namespace CommunityPatch {
           Diagnostics.GenerateReport();
           break;
 
-        case nameof(DontGroupThirdPartyMenuOptions):
-          DontGroupThirdPartyMenuOptions.Set(!DontGroupThirdPartyMenuOptions);
-          ShowMessage($"3rd Party Menu Options: {(DontGroupThirdPartyMenuOptions ? "Loose" : "Grouped")}.");
+        case nameof(dontGroupThirdPartyMenuOptions):
+          dontGroupThirdPartyMenuOptions.Set(!dontGroupThirdPartyMenuOptions);
+          ShowMessage($"3rd Party Menu Options: {(dontGroupThirdPartyMenuOptions ? "Loose" : "Grouped")}.");
           Options.Save();
           break;
 

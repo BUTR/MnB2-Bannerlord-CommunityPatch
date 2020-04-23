@@ -1,11 +1,10 @@
 using System;
 using TaleWorlds.Core;
-using TaleWorlds.Engine.Options;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public class StringOptionViewModel {
 

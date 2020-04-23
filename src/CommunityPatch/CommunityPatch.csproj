@@ -21,7 +21,7 @@
         <Version>0.1.0</Version>
         <Platforms>x64</Platforms>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <Reference Include="$(MnB2BannerlordBinDir)\System.*.dll">
             <HintPath>%(Identity)</HintPath>
@@ -62,16 +62,18 @@
         <None Remove="*.DotSettings" />
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="Fody" Version="6.1.1" />
         <PackageReference Include="HardwareProviders.CPU.Standard" Version="2.0.1" />
         <PackageReference Include="HardwareProviders.Standard" Version="2.0.1" />
+        <PackageReference Include="InlineIL.Fody" Version="1.4.0" PrivateAssets="All" />
         <PackageReference Include="Lib.Harmony" Version="2.0.0.9" PrivateAssets="All">
             <GeneratePathProperty>True</GeneratePathProperty>
             <NoWarn>NU1701</NoWarn>
         </PackageReference>
-        <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+        <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
         <PackageReference Include="Sigil" Version="5.0.0" />
-        <PackageReference Include="System.Numerics.Vectors" Version="4.4.0" />
+        <PackageReference Include="System.Numerics.Vectors" />
         <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
         <PackageReference Include="Tomlyn" Version="0.1.2" />
@@ -83,7 +85,7 @@
             <DependentUpon Condition="'%(DependentUpon)' == '' And '%(WouldDependOn)' != '%(Filename)'">%(WouldDependOn)</DependentUpon>
         </Compile>
     </ItemGroup>
-    
+
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
         <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
         <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />

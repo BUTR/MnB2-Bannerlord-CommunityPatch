@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using CommunityPatch.Options;
+using JetBrains.Annotations;
 
 namespace CommunityPatch {
 
+  [PublicAPI]
   public sealed class CommunityPatchOptionsFile : OptionsFile {
 
     public override string Name => "CommunityPatch";
@@ -19,11 +22,13 @@ namespace CommunityPatch {
     public override object GetOptionMetadata(string ns, string key, string metadataType)
       => Metadata.TryGetValue(ns == null ? $"{key}.{metadataType}" : $"{ns}:{key}.{metadataType}", out var result) ? result : null;
 
-    public override IEnumerable<Option> GetKnownOptions() {
-      yield return new Option<bool>(this, null, "DisableIntroVideo");
-      yield return new Option<float>(this, "SomeNamespace", "SomeFloatOption");
-      yield return new StringOption(this, "SomeNamespace", "SomeStringOption");
-    }
+    public Option<bool> DisableIntroVideo { get; set; }
+
+    public Option<bool> RecordFirstChanceExceptions { get; set; }
+
+    public Option<bool> DontGroupThirdPartyMenuOptions { get; set; }
+
+    public Option<bool> QuartermasterIsClanWide { get; set; }
 
   }
 

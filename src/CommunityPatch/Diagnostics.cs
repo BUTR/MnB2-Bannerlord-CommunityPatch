@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using CommunityPatch.Options;
 using HardwareProviders.CPU;
 using HarmonyLib;
 using TaleWorlds.Core;
@@ -105,7 +106,7 @@ namespace CommunityPatch {
           }
         }
 
-        if (RecordFirstChanceExceptions) {
+        if (CommunityPatchSubModule.Options.RecordFirstChanceExceptions) {
           if (i == 0)
             sb.AppendLine("  None recorded.");
         }

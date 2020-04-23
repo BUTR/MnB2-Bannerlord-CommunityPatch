@@ -1,6 +1,6 @@
 using System;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public partial class OptionsFile {
 

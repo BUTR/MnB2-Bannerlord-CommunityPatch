@@ -1,7 +1,7 @@
 using TaleWorlds.Engine.Options;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public abstract class NumericOptionViewModel : NumericOptionDataVM {
 

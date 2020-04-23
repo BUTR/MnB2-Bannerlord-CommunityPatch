@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public sealed partial class StringOption {
 
@@ -64,6 +64,13 @@ namespace CommunityPatch {
 
     public static bool operator >=(StringOption left, StringOption right)
       => left.CompareTo(right) >= 0;
+
+    public int CompareTo(IOption<string> other) {
+      if (other is StringOption o)
+        return CompareTo(o);
+
+      return GetHashCode() - other.GetHashCode();
+    }
 
   }
 

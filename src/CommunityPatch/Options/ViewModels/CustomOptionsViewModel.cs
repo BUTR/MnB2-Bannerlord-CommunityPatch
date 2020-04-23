@@ -5,7 +5,7 @@ using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions.GamepadOptions;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public class CustomOptionsViewModel : ViewModel {
 

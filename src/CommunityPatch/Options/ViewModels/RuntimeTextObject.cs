@@ -1,7 +1,7 @@
 using System;
 using TaleWorlds.Localization;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public sealed class RuntimeTextObject : TextObject {
 

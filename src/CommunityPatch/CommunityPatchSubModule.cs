@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using CommunityPatch.Behaviors;
+using CommunityPatch.Options;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -57,10 +58,10 @@ namespace CommunityPatch {
         }
       }
 
-      if (!DontGroupThirdPartyMenuOptions)
+      if (!Options.DontGroupThirdPartyMenuOptions)
         MenuCleaner.CleanUpMainMenu();
 
-      if (DisableIntroVideo) {
+      if (Options.DisableIntroVideo) {
         try {
           typeof(Module)
             .GetField("_splashScreenPlayed", BindingFlags.NonPublic | BindingFlags.Instance)

@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Engine.Screens;
 using TaleWorlds.GauntletUI.Data;
 using TaleWorlds.InputSystem;
-using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade.GauntletUI;
 using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.MountAndBlade.View.Screen;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
-using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions.GameKeys;
 using TaleWorlds.TwoDimension;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   [OverrideView(typeof(OptionsScreen))]
   public class CustomOptionsGauntletScreen : ScreenBase {
@@ -73,12 +70,14 @@ namespace CommunityPatch {
 
     protected override void OnInitialize() {
       base.OnInitialize();
+
       _spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_options"];
       _spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.UIResourceDepot);
       _optionsVm = new OptionsVM(true, false, OnKeyBindRequest);
       _dataSource = new CustomOptionsViewModel(_optionsVm) {
         ModOptions = new CustomOptionCategoryViewModel(_optionsVm, "ModOptions".Localized(),
-          GenerateOptionDataViewModels(CommunityPatchSubModule.Options.GetKnownOptions()))
+          OptionsStore.GetRegisteredForGui()
+            .SelectMany(store => GenerateOptionDataViewModels(store.GetKnownOptions())))
       };
       _gauntletLayer = new GauntletLayer(4000);
       _gauntletMovie = _gauntletLayer.LoadMovie("CustomOptions", _dataSource);

@@ -5,7 +5,7 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
   public class CustomOptionCategoryViewModel : OptionCategoryVM {
 

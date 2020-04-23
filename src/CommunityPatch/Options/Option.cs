@@ -2,18 +2,18 @@ using System;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
-namespace CommunityPatch {
+namespace CommunityPatch.Options {
 
-  public abstract class Option : IComparable, IComparable<Option> {
+  public abstract class Option : IOption {
 
     [NotNull]
-    public readonly OptionsStore Store;
+    public OptionsStore Store { get; }
 
     [CanBeNull]
-    public readonly string Namespace;
+    public string Namespace { get; }
 
     [NotNull]
-    public readonly string Name;
+    public string Name { get; }
 
     public abstract int CompareTo(object obj);
 
@@ -25,7 +25,9 @@ namespace CommunityPatch {
       Name = name;
     }
 
-    protected internal virtual bool IsEnum => false;
+    public virtual bool IsEnum => false;
+
+    public virtual Type EnumType => null;
 
     public object GetMetadata(string metadataType)
       => Store.GetMetadata(this, metadataType);
@@ -39,10 +41,13 @@ namespace CommunityPatch {
       }
     }
 
+    public virtual void Set(object value)
+      => throw new NotImplementedException();
+
   }
 
   [PublicAPI]
-  public partial class Option<TOption> : Option, IComparable<Option<TOption>>, IEquatable<Option<TOption>>, IEquatable<TOption> where TOption : unmanaged {
+  public partial class Option<TOption> : Option, IOption<TOption>, IComparable<Option<TOption>>, IEquatable<Option<TOption>> where TOption : unmanaged {
 
     public Option([NotNull] OptionsStore store, [CanBeNull] string ns, [NotNull] string name)
       : base(store, ns, name) {
@@ -65,6 +70,9 @@ namespace CommunityPatch {
     public void Set(TOption value)
       => Value = value;
 
+    public override void Set(object value)
+      => Set((TOption) value);
+
     public bool Equals(Option<TOption> other)
       => other != null
         && Store.Equals(other.Store)
@@ -73,6 +81,9 @@ namespace CommunityPatch {
 
     public bool Equals(TOption other)
       => Value.Equals(other);
+
+    public bool Equals(IOption<TOption> other)
+      => other is Option<TOption> o && Equals(o);
 
     public override bool Equals(object obj)
       => !ReferenceEquals(null, obj)
@@ -85,7 +96,7 @@ namespace CommunityPatch {
 
     public override string ToString()
       => $"{Namespace}:{Name} = {Value}";
-    
+
     public override int GetHashCode() {
       unchecked {
         var hashCode = Store.GetHashCode();
@@ -123,11 +134,13 @@ namespace CommunityPatch {
       }
     }
 
+    public virtual Type EnumType => typeof(TEnum);
+
     public void Set(TEnum value)
       => Value = value;
 
     public static bool operator ==(Option<TOption, TEnum> option, TEnum value)
-      => option?.Value.Equals(value) ?? value.Equals(null);
+      => option?.Value.Equals(value) ?? value == null;
 
     public static bool operator !=(Option<TOption, TEnum> option, TEnum value)
       => !(option == value);
@@ -156,7 +169,7 @@ namespace CommunityPatch {
       }
     }
 
-    protected internal override bool IsEnum => true;
+    public override bool IsEnum => true;
 
   }
 

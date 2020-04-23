@@ -1,0 +1,164 @@
+<Prefab>
+  <Constants>
+    <Constant Name="ButtonBrush.Width" BrushLayer="Default" BrushName="ButtonBrush4" BrushValueType="Width"/>
+    <Constant Name="ButtonBrush.Height" BrushLayer="Default" BrushName="ButtonBrush4" BrushValueType="Height"/>
+
+
+    <Constant Name="SPOptions.GameKeysgroup.ExpandIndicator.Width" BrushLayer="Default" BrushName="SPOptions.GameKeysgroup.ExpandIndicator" BrushValueType="Width"/>
+    <Constant Name="SPOptions.GameKeysgroup.ExpandIndicator.Height" BrushLayer="Default" BrushName="SPOptions.GameKeysgroup.ExpandIndicator" BrushValueType="Height"/>
+  </Constants>
+  <Window>
+    <Widget Id="OptionsInnerPanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="10" MarginBottom="10" LayoutImp.LayoutMethod="VerticalBottomToTop">
+      <Children>
+        <Widget Id="sss" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Top">
+          <Children>
+            <ListPanel DataSource="{ModOptionLists}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="50" MarginBottom="200"
+                       LayoutImp.LayoutMethod="VerticalBottomToTop">
+              <ItemTemplate>
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginBottom="80" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                  <Children>
+
+                    <PartyHeaderToggleWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Top" MarginLeft="80"
+                                             MarginRight="10" CollapseIndicator="Description\CollapseParent\GroupTitle\CollapseIndicator" ListPanel="..\GameKeysList" RenderLate="true" UpdateChildrenStates="true"
+                                             WidgetToClose="..\GameKeysList">
+                      <Children>
+
+                        <ListPanel Id="Description" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   LayoutImp.LayoutMethod="HorizontalLeftToRight" UpdateChildrenStates="true">
+                          <Children>
+
+                            <Widget Id="CollapseParent" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="450" HorizontalAlignment="Center" UpdateChildrenStates="true">
+                              <Children>
+                                <TextWidget Id="GroupTitle" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" Brush="SPOptions.GameKeysGroup.Title.Text"
+                                            Text="@ModName" ClipContents="false">
+                                  <Children>
+                                    <ImageWidget Id="CollapseIndicator" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="19" SuggestedWidth="19" VerticalAlignment="Center"
+                                                 PositionXOffset="-26" PositionYOffset="-3" Brush="SPOptions.GameKeysgroup.ExpandIndicator" OverrideDefaultStateSwitchingEnabled="true"/>
+                                  </Children>
+                                </TextWidget>
+                              </Children>
+                            </Widget>
+
+                            <ImageWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" VerticalAlignment="Center" MarginLeft="15" Brush="SPOptions.CollapserLine"/>
+                          </Children>
+                        </ListPanel>
+
+                      </Children>
+                    </PartyHeaderToggleWidget>
+
+
+                    <ListPanel DataSource="{Options}" MarginLeft="40" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Top"
+                               LayoutImp.LayoutMethod="VerticalBottomToTop">
+                      <ItemTemplate>
+
+                        <OptionsItemWidget Id="OptionItem"
+                                           WidthSizePolicy="StretchToParent"
+                                           HeightSizePolicy="Fixed"
+                                           SuggestedHeight="50"
+                                           ActionOption="ListPanel\Option\ActionOption"
+                                           BooleanOption="ListPanel\Option\BooleanOption"
+                                           GameKeyOption="ListPanel\Option\GameKeyOption"
+                                           ImageIDs="@ImageIDs"
+                                           InputOption="ListPanel\Option\InputOption"
+                                           NumericOption="ListPanel\Option\NumericOption"
+                                           OptionDescription="@Description"
+                                           OptionTitle="@Name"
+                                           OptionTypeID="@OptionTypeID"
+                                           StringOption="ListPanel\Option\StringOption"
+                        >
+                          <Children>
+
+                            <ListPanel Id="ListPanel" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" LayoutImp.LayoutMethod="HorizontalLeftToRight">
+                              <Children>
+
+                                <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="500" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                Brush="SPOptions.OptionName.Text" Text="@Name"/>
+
+                                <Widget Id="Option" DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="40">
+                                  <Children>
+
+                                    <Widget Id="BooleanOption" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" IsVisible="false"
+                                            UpdateChildrenStates="true">
+                                      <Children>
+                                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40" SuggestedHeight="40" MarginLeft="175"
+                                                      Brush="SPOptions.Checkbox.Empty.Button" ButtonType="Toggle" IsSelected="@OptionValueAsBoolean" ToggleIndicator="ToggleIndicator"
+                                                      UpdateChildrenStates="true">
+                                          <Children>
+                                            <ImageWidget Id="ToggleIndicator" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="SPOptions.Checkbox.Full.Button"/>
+                                          </Children>
+                                        </ButtonWidget>
+                                      </Children>
+                                    </Widget>
+
+                                    <ListPanel Id="NumericOption" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="20"
+                                               IsVisible="false">
+                                      <Children>
+
+                                        <SliderWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="338" SuggestedHeight="42" VerticalAlignment="Center" DoNotUpdateHandleSize="true"
+                                                      Filler="Filler" Handle="SliderHandle" IsDiscrete="@IsDiscrete" MaxValueFloat="@Max" MinValueFloat="@Min" ValueFloat="@OptionValue">
+                                          <Children>
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="362" SuggestedHeight="38" HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" Sprite="SPOptions\standart_slider_canvas" IsEnabled="false"/>
+                                            <Widget Id="Filler" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="345" SuggestedHeight="35" VerticalAlignment="Center"
+                                                    Sprite="SPOptions\standart_slider_fill" ClipContents="true">
+                                              <Children>
+                                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="345" SuggestedHeight="35" HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center" Sprite="SPOptions\standart_slider_fill"/>
+                                              </Children>
+                                            </Widget>
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="400" SuggestedHeight="65" HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" Sprite="SPOptions\standart_slider_frame" IsEnabled="false"/>
+                                            <Widget Id="SliderHandle" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="38"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Center" Brush="SPOptions.Slider.Handle"/>
+                                          </Children>
+                                        </SliderWidget>
+
+                                        <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginLeft="60" Brush="SPOptions.Slider.Value.Text" IsEnabled="false"
+                                                        Text="@OptionValueAsString"/>
+                                      </Children>
+                                    </ListPanel>
+
+                                    <Widget Id="ActionOption" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" MarginLeft="25" IsVisible="false">
+                                      <Children>
+                                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="338" SuggestedHeight="42"
+                                                      HorizontalAlignment="Left" VerticalAlignment="Center" Command.Click="ExecuteAction" UpdateChildrenStates="true">
+                                          <Children>
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="362" SuggestedHeight="38" HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" Brush="SPOptions.GameKey.Button.Canvas" IsEnabled="false"/>
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="400" SuggestedHeight="65" HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" Brush="SPOptions.GameKey.Button.Frame" IsEnabled="false"/>
+                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="SPOptions.Dropdown.Center.Text" Text="@ActionName"/>
+                                          </Children>
+                                        </ButtonWidget>
+                                      </Children>
+                                    </Widget>
+
+                                    <Standard.DropdownWithHorizontalControl Id="StringOption" VerticalAlignment="Center" IsVisible="false" Parameter.SelectorDataSource="{Selector}"/>
+
+                                    <Widget Id="InputOption" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" IsVisible="false"/>
+
+                                    <Widget Id="GameKeyOption" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" IsVisible="false"/>
+
+                                  </Children>
+                                </Widget>
+
+                              </Children>
+                            </ListPanel>
+
+                          </Children>
+                        </OptionsItemWidget>
+
+                      </ItemTemplate>
+                    </ListPanel>
+
+                  </Children>
+                </ListPanel>
+              </ItemTemplate>
+            </ListPanel>
+          </Children>
+        </Widget>
+      </Children>
+    </Widget>
+
+  </Window>
+</Prefab>

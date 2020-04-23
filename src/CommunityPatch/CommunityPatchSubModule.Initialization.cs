@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using CommunityPatch.Options;
 using HarmonyLib;
 using Sigil;
 using Sigil.NonGeneric;
@@ -22,7 +23,7 @@ namespace CommunityPatch {
       CallStackHelpers.Init();
       // catch and record exceptions
       AppDomain.CurrentDomain.FirstChanceException += (sender, args) => {
-        if (RecordFirstChanceExceptions)
+        if (Options.RecordFirstChanceExceptions)
           RecordedFirstChanceExceptions.AddLast(args.Exception);
       };
       AppDomain.CurrentDomain.UnhandledException += (sender, args) => {
