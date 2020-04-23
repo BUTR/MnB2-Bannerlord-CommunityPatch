@@ -55,11 +55,16 @@ namespace CommunityPatch.Patches {
     }
 
     private static int ExtractFirstPhaseTimeLimitInYears() {
+      if (FirstPhaseTimeLimitInYearsField == null)
+        return 0;
+
       try {
-        return (int) FirstPhaseTimeLimitInYearsField!.GetRawConstantValue();
+        return (int) FirstPhaseTimeLimitInYearsField
+          .GetRawConstantValue();
       }
       catch {
-        return (int) FirstPhaseTimeLimitInYearsField!.GetValue(null);
+        return (int) FirstPhaseTimeLimitInYearsField
+          .GetValue(FirstPhaseTimeLimitInYearsField.IsStatic ? null : FirstPhaseInstance);
       }
     }
 
