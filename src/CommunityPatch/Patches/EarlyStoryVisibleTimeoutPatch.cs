@@ -56,15 +56,17 @@ namespace CommunityPatch.Patches {
 
     private static int ExtractFirstPhaseTimeLimitInYears() {
       if (FirstPhaseTimeLimitInYearsField == null)
-        return 0;
+        throw new InvalidOperationException("FirstPhaseTimeLimitInYearsField was not available");
 
       try {
         return (int) FirstPhaseTimeLimitInYearsField
           .GetRawConstantValue();
       }
       catch {
-        return (int) FirstPhaseTimeLimitInYearsField
-          .GetValue(FirstPhaseTimeLimitInYearsField.IsStatic ? null : FirstPhaseInstance);
+        if (!FirstPhaseTimeLimitInYearsField.IsStatic) {
+          throw new InvalidOperationException("FirstPhaseTimeLimitInYears was not static and we do not have an instance");
+        }
+        return (int) FirstPhaseTimeLimitInYearsField.GetValue(null);
       }
     }
 
