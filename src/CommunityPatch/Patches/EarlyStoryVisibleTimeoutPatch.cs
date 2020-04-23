@@ -113,7 +113,7 @@ namespace CommunityPatch.Patches {
       // updated after all OnQuestStarted handlers have fired.
       onHourlyTickBoxed.Value = () => {
         SetStoryVisibleTimeoutIfNeeded(quest);
-        CampaignEvents.HourlyTickEvent.ClearListeners(onHourlyTickBoxed.Value);
+        CampaignEvents.HourlyTickEvent.ClearListeners(this);
       };
 
       CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, onHourlyTickBoxed.Value);
