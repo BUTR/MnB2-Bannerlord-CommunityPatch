@@ -6,6 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
+using TaleWorlds.Localization;
 
 namespace CommunityPatch.Patches.Feats {
     public sealed class AseraiCheapCaravansPatch : PatchBase<AseraiCheapCaravansPatch> {
@@ -57,26 +58,26 @@ namespace CommunityPatch.Patches.Feats {
             __state = Hero.MainHero.Gold;
         }
 
+        private static readonly TextObject AseraiCheapCaravansFlavorText = new TextObject(
+            "{=AseraiCheapCaravansFlavorText}An Aserai clerk nods to you and slips a coin purse into your hands.");
+        private static readonly float AseraiCheapCaravansEffectBonusFallback = 0.30f;  // fallback to 30%, per character creation screen
+
         static void Postfix(int __state) {
             // presume the player successfully purchased a caravan if their gold is less than it was at the beginning
             // of the target function call
             if (Hero.MainHero.Gold < __state &&
                 Hero.MainHero.IsHumanPlayerCharacter &&
                 Hero.MainHero.CharacterObject.GetFeatValue(DefaultFeats.Cultural.AseraiCheapCaravans)) {
-                
-                int creditAmount = 0;
-                if (DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus == 0f) {
-                    // As of e1.2.0.226271, Aserai bonus is not set
-                    // Assume 30% caravan discount per character creation screen text
-                    creditAmount = (int) (0.30f * (__state - Hero.MainHero.Gold));
-                }
-                else {
-                    // If bonus is set, use it
-                    creditAmount = (int) ((1.0f - DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus) * (__state - Hero.MainHero.Gold));
-                }
 
-                var flavorText = "An Aserai clerk nods to you and slips a coin purse into your hands.";
-                InformationManager.DisplayMessage(new InformationMessage(flavorText));
+                // As of e1.2.0.226271, Aserai bonus is set as 0f
+                float effectBonus =
+                    FloatHelper.IsZero(DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus)
+                        ? AseraiCheapCaravansEffectBonusFallback
+                        : DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus;
+
+                int creditAmount = (int) (effectBonus * (__state - Hero.MainHero.Gold));
+
+                InformationManager.DisplayMessage(new InformationMessage(AseraiCheapCaravansFlavorText.ToString()));
 
                 // Apply credit
                 GiveGoldAction.ApplyForSettlementToCharacter(
