@@ -27,6 +27,9 @@ namespace CommunityPatch.Patches.Feats {
                 0x22, 0x1B, 0x88, 0xED, 0x36, 0xFB, 0xAA, 0x7A
             }
         };
+        
+        private static readonly TextObject AseraiCheapCaravansFlavorText = new TextObject(
+            "{=AseraiCheapCaravansFlavorText}An Aserai clerk nods to you and slips a coin purse into your hands.");
 
         public override IEnumerable<MethodBase> GetMethodsChecked() {
             yield return AseraiCheapCaravansPatch.TargetMethodInfo;
@@ -58,10 +61,6 @@ namespace CommunityPatch.Patches.Feats {
             __state = Hero.MainHero.Gold;
         }
 
-        private static readonly TextObject AseraiCheapCaravansFlavorText = new TextObject(
-            "{=AseraiCheapCaravansFlavorText}An Aserai clerk nods to you and slips a coin purse into your hands.");
-        private static readonly float AseraiCheapCaravansEffectBonusFallback = 0.30f;  // fallback to 30%, per character creation screen
-
         static void Postfix(int __state) {
             // presume the player successfully purchased a caravan if their gold is less than it was at the beginning
             // of the target function call
@@ -69,19 +68,14 @@ namespace CommunityPatch.Patches.Feats {
                 Hero.MainHero.IsHumanPlayerCharacter &&
                 Hero.MainHero.CharacterObject.GetFeatValue(DefaultFeats.Cultural.AseraiCheapCaravans)) {
 
-                // As of e1.2.0.226271, Aserai bonus is set as 0f
-                float effectBonus =
-                    FloatHelper.IsZero(DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus)
-                        ? AseraiCheapCaravansEffectBonusFallback
-                        : DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus;
+                int creditAmount = (int) (DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus * (__state - Hero.MainHero.Gold));
 
-                int creditAmount = (int) (effectBonus * (__state - Hero.MainHero.Gold));
+                if (creditAmount > 0) {
+                    InformationManager.DisplayMessage(new InformationMessage(AseraiCheapCaravansFlavorText.ToString()));
 
-                InformationManager.DisplayMessage(new InformationMessage(AseraiCheapCaravansFlavorText.ToString()));
-
-                // Apply credit
-                GiveGoldAction.ApplyForSettlementToCharacter(
-                    Settlement.CurrentSettlement, Hero.MainHero, creditAmount, false);
+                    // Apply credit
+                    GiveGoldAction.ApplyForSettlementToCharacter(Settlement.CurrentSettlement, Hero.MainHero, creditAmount, false);
+                }
             }
         }
     }
