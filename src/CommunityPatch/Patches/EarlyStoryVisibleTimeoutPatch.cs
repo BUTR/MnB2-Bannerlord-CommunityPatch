@@ -62,13 +62,14 @@ namespace CommunityPatch.Patches {
         return (int) FirstPhaseTimeLimitInYearsField
           .GetRawConstantValue();
       }
-      catch {}
+      catch { }
+
       try {
         if (FirstPhaseTimeLimitInYearsField.IsStatic) {
           return (int) FirstPhaseTimeLimitInYearsField.GetValue(null);
         }
       }
-      catch {}
+      catch { }
 
       return null;
     }
@@ -94,12 +95,16 @@ namespace CommunityPatch.Patches {
       // out the quest,  minus a day to make very sure the quest doesn't 
       // somehow trigger vanilla's silent timeout too early.
       var newDueTime = GetFirstPhaseFirstPhaseStartTime(FirstPhaseInstance)
-        + CampaignTime.Years((int)FirstPhaseTimeLimitInYears)
+        + CampaignTime.Years((int) FirstPhaseTimeLimitInYears)
         - CampaignTime.Days(1);
       if (quest.QuestDueTime == newDueTime)
         return;
 
       quest.ChangeQuestDueTime(newDueTime);
+
+      if (quest.IsRemainingTimeHidden && !quest.IsOngoing)
+        return; // nothing we should show here
+
       ShowNotification(
         new TextObject("{=QuestTimeRemainingUpdated}Quest time remaining was updated."),
         "event:/ui/notification/quest_update"
