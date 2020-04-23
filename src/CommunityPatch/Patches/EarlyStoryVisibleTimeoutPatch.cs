@@ -22,8 +22,8 @@ namespace CommunityPatch.Patches {
 
     private static readonly List<MethodInfo> FirstPhaseQuestRemainingTimeHiddenGetters =
       Assembly.Load("StoryMode, Version=1.0.0.0, Culture=neutral").GetTypes()
-              .Where(type => type.Namespace == "StoryMode.Behaviors.Quests.FirstPhase" && IsAQuest(type))
-              .Select(type => AccessTools.PropertyGetter(type, "IsRemainingTimeHidden")).ToList();
+        .Where(type => type.Namespace == "StoryMode.Behaviors.Quests.FirstPhase" && IsAQuest(type))
+        .Select(type => AccessTools.PropertyGetter(type, "IsRemainingTimeHidden")).ToList();
 
     private static readonly MethodInfo RemainingTimeHiddenGetterPostfixHandle = AccessTools.Method(typeof(EarlyStoryVisibleTimeoutPatch), "RemainingTimeHiddenGetterPostfix");
 
@@ -56,7 +56,7 @@ namespace CommunityPatch.Patches {
         return;
 
       CampaignEvents.OnQuestStartedEvent.ClearListeners(this);
-      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters) { 
+      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters) {
         CommunityPatchSubModule.Harmony.Unpatch(method, RemainingTimeHiddenGetterPostfixHandle);
       }
 
@@ -76,7 +76,6 @@ namespace CommunityPatch.Patches {
         // may have changed considerably so don't apply
         if (!method.GetMethodBody().GetILAsByteArray().SequenceEqual(IsRemainingTimeHiddenGetterBodyIL))
           return false;
-
       }
 
       return true;
@@ -96,6 +95,7 @@ namespace CommunityPatch.Patches {
         if (!FirstPhaseTimeLimitInYearsField.IsStatic) {
           throw new InvalidOperationException("FirstPhaseTimeLimitInYears was not static and we do not have an instance");
         }
+
         return (int) FirstPhaseTimeLimitInYearsField.GetValue(null);
       }
     }
@@ -106,7 +106,7 @@ namespace CommunityPatch.Patches {
       foreach (var quest in Campaign.Current.QuestManager.Quests.ToList())
         SetStoryVisibleTimeoutIfNeeded(quest);
 
-      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters) { 
+      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters) {
         CommunityPatchSubModule.Harmony.Patch(method, postfix: new HarmonyMethod(RemainingTimeHiddenGetterPostfixHandle));
       }
 
@@ -132,7 +132,7 @@ namespace CommunityPatch.Patches {
 
       quest.ChangeQuestDueTime(newDueTime);
 
-      if (quest.IsRemainingTimeHidden && !quest.IsOngoing)
+      if (quest.IsRemainingTimeHidden)
         return; // nothing we should show here
 
       ShowNotification(
