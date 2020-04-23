@@ -46,14 +46,14 @@ namespace Antijank.Debugging {
     [MethodImpl(MethodImplOptions.InternalCall)]
     [return: MarshalAs(UnmanagedType.Interface)]
     [return: Description("pError")]
-    new ICorDebugErrorInfoEnum CanCommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In]
-      ref ICorDebugEditAndContinueSnapshot pSnapshots);
+    new ICorDebugErrorInfoEnum CanCommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Interface)] [In]
+      ICorDebugEditAndContinueSnapshot[] pSnapshots);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     [return: MarshalAs(UnmanagedType.Interface)]
     [return: Description("pError")]
-    new ICorDebugErrorInfoEnum CommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In]
-      ref ICorDebugEditAndContinueSnapshot pSnapshots);
+    new ICorDebugErrorInfoEnum CommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Interface)] [In]
+      ICorDebugEditAndContinueSnapshot[] pSnapshots);
     
     [MethodImpl(MethodImplOptions.InternalCall)]
     void GetID(out uint pdwProcessId);

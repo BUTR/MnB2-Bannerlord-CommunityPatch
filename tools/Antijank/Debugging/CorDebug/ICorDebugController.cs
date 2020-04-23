@@ -44,14 +44,14 @@ namespace Antijank.Debugging {
     [MethodImpl(MethodImplOptions.InternalCall)]
     [return: MarshalAs(UnmanagedType.Interface)]
     [return: Description("pError")]
-    ICorDebugErrorInfoEnum CanCommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In]
-      ref ICorDebugEditAndContinueSnapshot pSnapshots);
+    ICorDebugErrorInfoEnum CanCommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Interface)] [In]
+      ICorDebugEditAndContinueSnapshot[] pSnapshots);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     [return: MarshalAs(UnmanagedType.Interface)]
     [return: Description("pError")]
-    ICorDebugErrorInfoEnum CommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.Interface)] [In]
-      ref ICorDebugEditAndContinueSnapshot pSnapshots);
+    ICorDebugErrorInfoEnum CommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Interface)] [In]
+      ICorDebugEditAndContinueSnapshot[] pSnapshots);
 
   }
 

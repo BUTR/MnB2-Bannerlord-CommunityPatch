@@ -12,7 +12,7 @@ namespace Antijank.Debugging {
   [Guid("90F1A06E-7712-4762-86B5-7A5EBA6BDB02")]
   [ComImport]
   [PublicAPI]
-  public class CLRRuntimeHostClass : ICLRRuntimeHost, CLRRuntimeHost, ICLRValidator {
+  public class CLRRuntimeHostClass : CLRRuntimeHost, ICLRValidator {
 
     //[MethodImpl(MethodImplOptions.InternalCall)]
     //public extern CLRRuntimeHostClass();

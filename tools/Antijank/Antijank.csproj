@@ -65,10 +65,6 @@
       </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Debugging\Metadata" />
-    </ItemGroup>
-
     <Target Name="FixDuplicateJetBrainsAnnotationsReferenceBefore" BeforeTargets="CoreCompile">
         <Message Importance="high" Text="FixDuplicateJetBrainsAnnotationsReferenceBefore" />
         <ItemGroup>

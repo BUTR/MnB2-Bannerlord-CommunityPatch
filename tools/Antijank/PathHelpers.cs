@@ -114,22 +114,28 @@ namespace Antijank {
         return false;
       }
 
-      var asmPath = new Uri(asm.CodeBase).LocalPath;
-      var modsDir = GetModulesDir();
-      var isMod = asmPath.StartsWith(modsDir, StringComparison.OrdinalIgnoreCase);
+      try {
+        var asmPath = new Uri(asm.CodeBase).LocalPath;
+        var modsDir = GetModulesDir();
+        var isMod = asmPath.StartsWith(modsDir, StringComparison.OrdinalIgnoreCase);
 
-      var modsSubDir = asmPath.Substring(modsDir.Length);
-      var slashIndex = modsSubDir.IndexOf(Path.DirectorySeparatorChar);
-      if (slashIndex == -1) {
-        mod = null; // wtf?
-        return true;
+        var modsSubDir = asmPath.Substring(modsDir.Length);
+        var slashIndex = modsSubDir.IndexOf(Path.DirectorySeparatorChar);
+        if (slashIndex == -1) {
+          mod = null; // wtf?
+          return true;
+        }
+
+        modsSubDir = modsSubDir.Substring(0, slashIndex);
+        var mods = LoaderPatch.ModuleList ?? ModuleInfo.GetModules();
+        mod = mods.FirstOrDefault(m => m.Alias == modsSubDir);
+
+        return isMod;
       }
-
-      modsSubDir = modsSubDir.Substring(0, slashIndex);
-      var mods = LoaderPatch.ModuleList ?? ModuleInfo.GetModules();
-      mod = mods.FirstOrDefault(m => m.Alias == modsSubDir);
-
-      return isMod;
+      catch {
+        mod = null;
+        return false;
+      }
     }
 
     private static string _configsDir;

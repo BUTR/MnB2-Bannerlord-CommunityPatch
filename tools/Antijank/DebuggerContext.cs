@@ -69,6 +69,7 @@ namespace Antijank {
 
         var version = RuntimeEnvironment.GetSystemVersion();
         var clrRt = MetaHost.GetRuntime(version, typeof(ICLRRuntimeInfo).GUID);
+        //var mddx = clrRt.GetInterface(typeof(IMetaDataDispenserEx), )
         var dt = new InProcCorDebugDataTarget();
         //clrRt.GetInterface()
         var lp = new InProcLibProvider();
@@ -106,12 +107,9 @@ namespace Antijank {
 
             foreach (var mod in DebugHelpers.GetEnumerable<ICorDebugModule>(asm.EnumerateModules().Next)) {
               var modName = DebugHelpers.GetString(mod.GetName);
-              var isDyn = mod.IsDynamic() ? "yes" : "no";
-              Console.WriteLine($"Module: {modName} ({isDyn})");
-              
-              
+              var modType = mod.IsDynamic() ? "Dynamic" : "Static";
+              Console.WriteLine($"{modType} Module: {modName}");
             }
-
           }
         }
       }
