@@ -97,7 +97,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         var troop = casualtiesInBattle.GetCharacterAtIndex(i);
         var emptyTroop = new TroopRosterElement(troop);
         
-        for (var num4 = 0; num4 < troopSize; num4++) {
+        for (var trooper = 0; trooper < troopSize; trooper++) {
           if (!(MBRandom.RandomFloat < lootAmount)) continue;
           casualtiesShare.Add(emptyTroop);
         }
