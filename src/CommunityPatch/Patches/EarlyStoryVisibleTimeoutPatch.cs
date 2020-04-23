@@ -109,20 +109,14 @@ namespace CommunityPatch.Patches {
     private static void ShowNotification(TextObject message, string soundEventPath = "")
       => InformationManager.AddQuickInformation(message, 0, null, soundEventPath);
 
-    private void OnQuestStarted(QuestBase quest) {
-      // give OnHourlyTick's closure a late bound self-ref
-      var onHourlyTickBoxed = new StrongBox<Action>();
-
+    private void OnQuestStarted(QuestBase quest)
       // defer our updates until some time has passed, because they depend on whether 
       // FirstPhase or SecondPhase is active, and story Phase information is only 
       // updated after all OnQuestStarted handlers have fired.
-      onHourlyTickBoxed.Value = () => {
+      => CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, () => {
         SetStoryVisibleTimeoutIfNeeded(quest);
         CampaignEvents.HourlyTickEvent.ClearListeners(this);
-      };
-
-      CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, onHourlyTickBoxed.Value);
-    }
+      });
 
   }
 
