@@ -9,12 +9,12 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class SlipIntoShadows : PatchBase<SlipIntoShadows> {
+  public sealed class SlipIntoShadowsPatch : PatchBase<SlipIntoShadowsPatch> {
     
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultDisguiseDetectionModel).GetMethod(nameof(DefaultDisguiseDetectionModel.CalculateDisguiseDetectionProbability), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    private static readonly MethodInfo PatchMethodInfo = typeof(SlipIntoShadows).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(SlipIntoShadowsPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
