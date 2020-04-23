@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -27,32 +26,40 @@ namespace CommunityPatch.Patches.Feats {
         }
         
         public override bool? IsApplicable(Game game) {
-            if (TargetMethodInfo == null) {
+            if (Applied ||
+                TargetMethodInfo == null ||
+                !DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus.IsDifferentFrom(PatchedEffectBonusValue)) {
+                
                 return false;
             }
 
             var hash = TargetMethodInfo.MakeCilSignatureSha256();
             return hash.MatchesAnySha256(TargetHashes);
         }
-        
+
         public override void Apply(Game game) {
             if (Applied) return;
-            
-            var field = AccessTools.Field(typeof(DefaultFeats), "_cultureAseraiCheapCaravans");
 
-            if (field != null) {
-                var value = (FeatObject) field.GetValue(Campaign.Current.DefaultFeats);
+            FeatObject featObject =
+                (FeatObject) AccessTools.Field(
+                    typeof(DefaultFeats), "_cultureAseraiCheapCaravans")?.GetValue(Campaign.Current.DefaultFeats);
 
-                value?.Initialize(
-                    value.Name.ToString(),
-                    value.Description.ToString(),
-                    PatchedEffectBonusValue,
-                    value.IncrementType);
+            if (featObject == null) {
+                Applied = false;
             }
+            else {
+                featObject.Initialize(
+                    featObject.Name.ToString(),
+                    featObject.Description.ToString(),
+                    PatchedEffectBonusValue,
+                    featObject.IncrementType);
 
-            Applied = true;
+                Applied = !featObject.EffectBonus.IsDifferentFrom(PatchedEffectBonusValue);
+            }
         }
 
-        public override void Reset() { }
+        public override void Reset() {
+            Applied = false;
+        }
     }
 }
