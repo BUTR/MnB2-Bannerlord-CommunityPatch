@@ -65,6 +65,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * For the Thrill
     * Slip into Shadows
     * Negotiator
+    * Bribe Master
   * Two Handed
     * Quick Plunder
     * Eviscerate
