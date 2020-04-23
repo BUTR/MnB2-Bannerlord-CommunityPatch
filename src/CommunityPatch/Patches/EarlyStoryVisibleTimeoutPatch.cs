@@ -33,7 +33,7 @@ namespace CommunityPatch.Patches {
 
     private static readonly FieldInfo FirstPhaseTimeLimitInYearsField = AccessTools.Field(FirstPhaseCampaignBehaviorType, "FirstPhaseTimeLimitInYears");
 
-    private static readonly int? FirstPhaseTimeLimitInYears = ExtractFirstPhaseTimeLimitInYears();
+    private static readonly int FirstPhaseTimeLimitInYears = ExtractFirstPhaseTimeLimitInYears();
 
     public bool Applied { get; private set; }
 
@@ -54,24 +54,18 @@ namespace CommunityPatch.Patches {
       yield break;
     }
 
-    private static int? ExtractFirstPhaseTimeLimitInYears() {
+    private static int ExtractFirstPhaseTimeLimitInYears() {
       if (FirstPhaseTimeLimitInYearsField == null)
-        return null;
+        return 0;
 
       try {
         return (int) FirstPhaseTimeLimitInYearsField
           .GetRawConstantValue();
       }
-      catch { }
-
-      try {
-        if (FirstPhaseTimeLimitInYearsField.IsStatic) {
-          return (int) FirstPhaseTimeLimitInYearsField.GetValue(null);
-        }
+      catch {
+        return (int) FirstPhaseTimeLimitInYearsField
+          .GetValue(FirstPhaseTimeLimitInYearsField.IsStatic ? null : FirstPhaseInstance);
       }
-      catch { }
-
-      return null;
     }
 
     public void Apply(Game game) {
@@ -88,14 +82,14 @@ namespace CommunityPatch.Patches {
         && SecondPhaseInstance == null;
 
     private static void SetStoryVisibleTimeoutIfNeeded(QuestBase quest) {
-      if (FirstPhaseTimeLimitInYears == null || !IsFirstStoryPhase() || !quest.IsSpecialQuest || !quest.IsOngoing)
+      if (!IsFirstStoryPhase() || !quest.IsSpecialQuest || !quest.IsOngoing)
         return;
 
       // set visible timeout to be when vanilla would have (silently) timed 
       // out the quest,  minus a day to make very sure the quest doesn't 
       // somehow trigger vanilla's silent timeout too early.
       var newDueTime = GetFirstPhaseFirstPhaseStartTime(FirstPhaseInstance)
-        + CampaignTime.Years((int) FirstPhaseTimeLimitInYears)
+        + CampaignTime.Years(FirstPhaseTimeLimitInYears)
         - CampaignTime.Days(1);
       if (quest.QuestDueTime == newDueTime)
         return;
