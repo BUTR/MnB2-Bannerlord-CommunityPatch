@@ -55,6 +55,10 @@ namespace CommunityPatch.Patches.Feats {
                     featObject.IncrementType);
 
                 Applied = !featObject.EffectBonus.IsDifferentFrom(PatchedEffectBonusValue);
+
+                if (!Applied) {
+                    CommunityPatchSubModule.Error("AseraiCheapCaravansEffectBonusPatch:  Feat not initialized with new EffectBonus value");
+                }
             }
         }
 
