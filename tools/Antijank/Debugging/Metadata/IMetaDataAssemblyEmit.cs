@@ -10,9 +10,11 @@ IMetaDataInfo
 
 using System;
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
+  [PublicAPI]
   [ComImport, Guid("211EF15B-5317-4438-B196-DEC87B887693"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   public interface IMetaDataAssemblyEmit {
 

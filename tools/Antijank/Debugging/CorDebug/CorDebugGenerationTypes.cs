@@ -12,7 +12,7 @@ namespace Antijank.Debugging {
     Gen2 = 2,
 
     LOH = 3,
-    
+
     Invalid = -1
 
   }

@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
+
   [PublicAPI]
   public struct CorDebugBlockingObject {
 

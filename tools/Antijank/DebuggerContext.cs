@@ -69,7 +69,30 @@ namespace Antijank {
 
         var version = RuntimeEnvironment.GetSystemVersion();
         var clrRt = MetaHost.GetRuntime(version, typeof(ICLRRuntimeInfo).GUID);
-        //var mddx = clrRt.GetInterface(typeof(IMetaDataDispenserEx), )
+
+        IMetaDataDispenserEx mddx;
+        try {
+          mddx = (IMetaDataDispenserEx) clrRt.GetInterface(
+            typeof(CorMetaDataDispenserClass).GUID,
+            typeof(IMetaDataDispenserEx).GUID
+          );
+        }
+        catch {
+          var mdd = (IMetaDataDispenser) clrRt.GetInterface(
+            typeof(CorMetaDataDispenserClass).GUID,
+            typeof(IMetaDataDispenser).GUID
+          );
+
+          mddx = mdd as IMetaDataDispenserEx ?? throw new PlatformNotSupportedException();
+        }
+
+        var encMode = (CorSetEnC) (uint) mddx.GetOption(MetaDataDispenserOptions.MetaDataSetENC);
+
+        if (encMode != CorSetEnC.MDUpdateFull)
+          throw new NotImplementedException(encMode.ToString());
+
+        //Console.WriteLine("MetaDataSetEnC: " + metaDataSetEnC);
+
         var dt = new InProcCorDebugDataTarget();
         //clrRt.GetInterface()
         var lp = new InProcLibProvider();

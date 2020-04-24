@@ -187,7 +187,8 @@ namespace Antijank {
         Log(ex);
 
         try {
-          var modAsm = new StackTrace(ex, false).FindModuleFromStackTrace(out var modInfo, out var stackFrame);
+          var modAsm = new StackTrace(ex, false)
+            .FindModuleFromStackTrace(out var modInfo, out var stackFrame);
           Console.WriteLine();
           Console.WriteLine($"Possible Source Mod: {modInfo?.Name}");
           Console.WriteLine($"Possible Source Assembly: {modAsm?.GetName().Name}");

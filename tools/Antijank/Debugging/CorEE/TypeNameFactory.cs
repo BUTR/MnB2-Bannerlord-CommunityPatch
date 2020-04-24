@@ -7,6 +7,8 @@ namespace Antijank.Debugging {
   [CoClass(typeof(TypeNameFactoryClass))]
   [ComImport]
   [PublicAPI]
-  public interface TypeNameFactory : ITypeNameFactory { }
+  public interface TypeNameFactory : ITypeNameFactory {
+
+  }
 
 }

@@ -7,6 +7,8 @@ namespace Antijank.Debugging {
   [CoClass(typeof(CLRMetaHostPolicyClass))]
   [ComImport]
   [PublicAPI]
-  public interface CLRMetaHostPolicy : ICLRMetaHostPolicy {}
+  public interface CLRMetaHostPolicy : ICLRMetaHostPolicy {
+
+  }
 
 }

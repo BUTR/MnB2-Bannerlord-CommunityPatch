@@ -4,10 +4,10 @@ using JetBrains.Annotations;
 namespace Antijank.Debugging {
 
   [CoClass(typeof(CorMetaDataDispenserClass))]
-  [Guid("31BCFCE2-DAFB-11D2-9F81-00C04F79A0A3")]
+  [Guid("809C652E-7396-11D2-9771-00A0C9B4D50C")]
   [ComImport]
   [PublicAPI]
-  public interface CorMetaDataDispenser : IMetaDataDispenserEx {
+  public interface CorMetaDataDispenser : IMetaDataDispenser {
 
   }
 

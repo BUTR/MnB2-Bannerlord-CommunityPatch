@@ -68,10 +68,12 @@ namespace Antijank.Debugging {
     public readonly int MetadataToken;
 
     public FastTypeHandle(Type type)
-      : this(type.Assembly, type.MetadataToken) { }
+      : this(type.Assembly, type.MetadataToken) {
+    }
 
     public FastTypeHandle(Assembly asm, int mdToken)
-      : this(GetBaseAddress(asm), mdToken) { }
+      : this(GetBaseAddress(asm), mdToken) {
+    }
 
     public FastTypeHandle(IntPtr moduleAddress, int mdToken)
       : this() {

@@ -54,7 +54,7 @@ namespace Antijank.Debugging {
     [return: Description("pError")]
     new ICorDebugErrorInfoEnum CommitChanges([In] uint cSnapshots, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Interface)] [In]
       ICorDebugEditAndContinueSnapshot[] pSnapshots);
-    
+
     [MethodImpl(MethodImplOptions.InternalCall)]
     void GetID(out uint pdwProcessId);
 

@@ -11,15 +11,21 @@ namespace Antijank.Debugging {
   public struct CLRDATA_FOLLOW_STUB_BUFFER {
 
     public ulong Data0;
+
     public ulong Data1;
+
     public ulong Data2;
+
     public ulong Data3;
+
     public ulong Data4;
+
     public ulong Data5;
+
     public ulong Data6;
+
     public ulong Data7;
 
-    
     public unsafe ref ulong Data(int i) {
       switch (i) {
         case 0: return ref Unsafe.AsRef<ulong>(Unsafe.AsPointer(ref Data0));
@@ -34,7 +40,6 @@ namespace Antijank.Debugging {
       }
     }
 
-    
   }
 
 }

@@ -7,6 +7,8 @@ namespace Antijank.Debugging {
   [CoClass(typeof(CorDebugClass))]
   [ComImport]
   [PublicAPI]
-  public interface CorDebug : ICorDebug { }
+  public interface CorDebug : ICorDebug {
+
+  }
 
 }

@@ -3,16 +3,17 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security;
+using Antijank.Interop;
 using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
   [ClassInterface(ClassInterfaceType.None)]
   [SuppressUnmanagedCodeSecurity]
-  [Guid("1EC2DE53-75CC-11d2-9775-00A0C9B4D50C")]
+  [Guid("E5CB7A31-7512-11D2-89CE-0080C792E5D8")]
   [ComImport]
   [PublicAPI]
-  public class CorMetaDataDispenserRuntimeClass : CorMetaDataDispenserRuntime {
+  public class CorMetaDataDispenserExClass : CorMetaDataDispenserEx {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public virtual extern uint DefineScope(ref Guid rclsid, uint dwCreateFlags, ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out object ppIUnk);
@@ -24,10 +25,11 @@ namespace Antijank.Debugging {
     public virtual extern uint OpenScopeOnMemory(IntPtr pData, uint cbData, uint dwOpenFlags, ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out object ppIUnk);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public virtual extern uint SetOption(ref Guid optionid, [MarshalAs(UnmanagedType.Struct)] object value);
+    public virtual extern void SetOption([In] in Guid optionId, [In, MarshalAs(UnmanagedType.Struct)] in object pValue);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public virtual extern uint GetOption(ref Guid optionid, [MarshalAs(UnmanagedType.Struct)] out object pvalue);
+    [return: MarshalAs(UnmanagedType.Struct)]
+    public virtual extern object GetOption([In] in Guid optionId);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public virtual extern uint OpenScopeOnITypeInfo([MarshalAs(UnmanagedType.Interface)] ITypeInfo pITI, uint dwOpenFlags, ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out object ppIUnk);

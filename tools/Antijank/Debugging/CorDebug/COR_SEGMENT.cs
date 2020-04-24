@@ -16,10 +16,8 @@ namespace Antijank.Debugging {
 
     public uint heap; // The heap the segment resides in.
 
-
     public static readonly COR_SEGMENT Invalid
-      = new COR_SEGMENT
-      {
+      = new COR_SEGMENT {
         start = ulong.MaxValue,
         end = ulong.MaxValue,
         type = CorDebugGenerationTypes.Invalid,

@@ -25,7 +25,8 @@ namespace Antijank.Debugging {
       StringBuilder pwzImageVersion,
       ref uint pcchImageVersion,
       out uint pdwConfigFlags,
-      [In] [MarshalAs(UnmanagedType.LPStruct)] Guid riid
+      [In] [MarshalAs(UnmanagedType.LPStruct)]
+      Guid riid
     );
 
   }

@@ -119,6 +119,11 @@ namespace Antijank {
         var modsDir = GetModulesDir();
         var isMod = asmPath.StartsWith(modsDir, StringComparison.OrdinalIgnoreCase);
 
+        if (asmPath.Length <= modsDir.Length) {
+          mod = null;
+          return false;
+        }
+
         var modsSubDir = asmPath.Substring(modsDir.Length);
         var slashIndex = modsSubDir.IndexOf(Path.DirectorySeparatorChar);
         if (slashIndex == -1) {

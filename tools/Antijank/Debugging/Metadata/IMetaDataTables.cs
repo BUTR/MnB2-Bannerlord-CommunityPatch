@@ -1,8 +1,10 @@
 using System;
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
+  [PublicAPI]
   [ComImport, Guid("D8F579AB-402D-4b8e-82D9-5D63B1065C68"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   public interface IMetaDataTables {
 

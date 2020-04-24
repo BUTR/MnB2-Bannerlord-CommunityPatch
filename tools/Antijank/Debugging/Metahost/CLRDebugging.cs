@@ -7,6 +7,8 @@ namespace Antijank.Debugging {
   [CoClass(typeof(CLRDebuggingClass))]
   [ComImport]
   [PublicAPI]
-  public interface CLRDebugging : ICLRDebugging { }
+  public interface CLRDebugging : ICLRDebugging {
+
+  }
 
 }

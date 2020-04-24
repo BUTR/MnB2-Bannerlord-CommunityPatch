@@ -7,6 +7,8 @@ namespace Antijank.Debugging {
   [CoClass(typeof(CorDebugClass))]
   [ComImport]
   [PublicAPI]
-  public interface CLRProfiling : ICLRProfiling { }
+  public interface CLRProfiling : ICLRProfiling {
+
+  }
 
 }
