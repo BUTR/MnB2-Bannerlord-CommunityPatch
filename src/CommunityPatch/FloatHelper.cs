@@ -16,6 +16,14 @@ namespace CommunityPatch {
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEqualOrBiggerThan(this float value, float target)
-      => value >= target - Tolerance;
+      => value.IsEqualTo(target) || value > target;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsEqualOrLesserThan(this float value, float target)
+      => value.IsEqualTo(target) || value < target;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsEqualTo(this float value, float target)
+      => Math.Abs(value - target) < Tolerance;
   }
 }

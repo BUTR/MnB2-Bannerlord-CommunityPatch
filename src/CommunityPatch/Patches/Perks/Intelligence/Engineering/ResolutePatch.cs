@@ -14,7 +14,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
   public class ResolutePatch : PatchBase<ResolutePatch> {
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultPartyMoraleModel).GetMethod(nameof(DefaultPartyMoraleModel.GetEffectivePartyMorale), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly Type DefaultPartyMoraleModelType = typeof(DefaultPartyMoraleModel);
+    private static readonly MethodInfo TargetMethodInfo = DefaultPartyMoraleModelType.GetMethod(nameof(DefaultPartyMoraleModel.GetEffectivePartyMorale), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
     private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ResolutePatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -35,11 +36,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
     
-    // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game)
     {
       if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
       
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -73,18 +72,18 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
     
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void Postfix(ref float __result, MobileParty mobileParty, StatExplainer explanation = null) {
+    public static void Postfix(ref float __result, ref DefaultPartyMoraleModel __instance, MobileParty mobileParty, StatExplainer explanation = null) {
       var perk = ActivePatch._perk;
       
       if (mobileParty.SiegeEvent == null) return;
       var partyMemberBonus = GetPartyMemberBonus(mobileParty, perk);
-      if (partyMemberBonus < .01) return;
+      if (partyMemberBonus.IsEqualOrLesserThan(0f)) return;
 
       var partyMembersCount = (int) (partyMemberBonus / perk.PrimaryBonus);
       var multiplicativeBonus = CalculateMultiplicativeBonus(perk.PrimaryBonus / 100, partyMembersCount);
       var moraleLossReductionRate = multiplicativeBonus * -1;
       
-      var totalMoraleLossReduction = CalculateTotalMoraleLossReduction(mobileParty, moraleLossReductionRate);
+      var totalMoraleLossReduction = CalculateTotalMoraleLossReduction(__instance, mobileParty, moraleLossReductionRate);
       explanation?.AddLine(perk.Name.ToString(), totalMoraleLossReduction);
       __result += totalMoraleLossReduction;
     }
@@ -110,33 +109,57 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       return finalRate;
     }
 
-    private static int CalculateTotalMoraleLossReduction(MobileParty mobileParty, float moraleLossReductionRate)
+    private static int CalculateTotalMoraleLossReduction(DefaultPartyMoraleModel model, MobileParty party, float reductionRate)
     {
-      var recentEventsMoraleLossReduction = Math.Min(mobileParty.RecentEventsMorale, 0) * moraleLossReductionRate;
-      var starvationMoraleLossReduction = mobileParty.Party.IsStarving ? -30 * moraleLossReductionRate : 0;
-      var unpaidWageMoraleLossReduction = mobileParty.HasUnpaidWages > 0f ? -20 * moraleLossReductionRate : 0;
-      var partySizeMoraleLossReduction = CalculatePartySizeMoralePenalty(mobileParty) * moraleLossReductionRate;
-      var foodVarietyMoraleLossReduction = CalculateFoodVarietyPenalty(mobileParty) * moraleLossReductionRate;
+      var recentEventsMoraleLossReduction = Math.Min(party.RecentEventsMorale, 0);
+      var starvationMoraleLossReduction = CalculateStarvationMoralePenalty(model, party);
+      var unpaidWageMoraleLossReduction = CalculateUnpaidWageMoralePenalty(model, party);
+      var partySizeMoraleLossReduction = CalculatePartySizeMoralePenalty(model, party);
+      var foodVarietyMoraleLossReduction = CalculateFoodVarietyPenalty(model, party);
 
-      var totalMoraleLossReduction = (int) (recentEventsMoraleLossReduction +
+      var totalMoraleLossReduction = recentEventsMoraleLossReduction +
         starvationMoraleLossReduction +
         unpaidWageMoraleLossReduction +
         partySizeMoraleLossReduction +
-        foodVarietyMoraleLossReduction);
+        foodVarietyMoraleLossReduction;
       
-      return totalMoraleLossReduction;
-    }
-    private static float CalculatePartySizeMoralePenalty(MobileParty party) {
-      var oversize = party.Party.NumberOfAllMembers - party.Party.PartySizeLimit;
-      if (oversize > 0) return -1f * (float) Math.Sqrt(oversize);
-      return 0f;
+      return (int) (totalMoraleLossReduction * reductionRate);
     }
 
-    private static float CalculateFoodVarietyPenalty(MobileParty party) {
-      var variety = party.ItemRoster.FoodVariety;
-      if (variety <= 1) return -2;
-      if (variety <= 2) return -1;
-      return 0;
+    private static float CalculateUnpaidWageMoralePenalty(DefaultPartyMoraleModel model, MobileParty mobileParty)
+      => GetMoralePenaltyFromMethod(model, "GetNoWageMoralePenalty", mobileParty) * mobileParty.HasUnpaidWages;
+
+    private static float CalculateStarvationMoralePenalty(DefaultPartyMoraleModel model, MobileParty mobileParty)
+      => mobileParty.Party.IsStarving ? GetMoralePenaltyFromMethod(model, "GetStarvationMoralePenalty", mobileParty) : 0f;
+
+    private static float CalculatePartySizeMoralePenalty(DefaultPartyMoraleModel model, MobileParty party)
+      => GetMoralePenaltyFromMethodWithExplainedNumber(model, "GetPartySizeMoraleEffect", party);
+
+    private static float CalculateFoodVarietyPenalty(DefaultPartyMoraleModel model, MobileParty party)
+      => GetMoralePenaltyFromMethodWithExplainedNumber(model, "CalculateFoodVarietyMoraleBonus", party);
+
+    private static float GetMoralePenaltyFromMethod(DefaultPartyMoraleModel model, string methodName, MobileParty party) {
+      var method = DefaultPartyMoraleModelType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.NonPublic);
+      if (method == null) return 0f;
+      
+      var moraleBonus = (int) method.Invoke(model, new object[] {party});
+      return GetMoralePenalty(moraleBonus);
     }
+    
+    private static float GetMoralePenaltyFromMethodWithExplainedNumber(DefaultPartyMoraleModel model, string methodName, MobileParty party) {
+      var method = DefaultPartyMoraleModelType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+      if (method == null) return 0f;
+      
+      var args = new object[] { party, new ExplainedNumber(0f) };
+      method.Invoke(model, args);
+      var moraleBonus = (ExplainedNumber) args[1];
+      return GetMoralePenalty(moraleBonus.ResultNumber);
+    }
+    
+    private static int GetMoralePenalty(int moraleBonus)
+      => moraleBonus >= 0 ? 0 : moraleBonus;
+    private static float GetMoralePenalty(float moraleBonus)
+      => moraleBonus >= 0f ? 0f : moraleBonus;
+    
   }
 }
