@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -59,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       var perk = ActivePatch._perk;
       if (!scout.GetPerkValue(perk)) return;
 
-      __result = (int) (__result * -perk.PrimaryBonus);
+      __result = (int) (__result * Math.Abs(perk.PrimaryBonus));
     }
   }
 }
