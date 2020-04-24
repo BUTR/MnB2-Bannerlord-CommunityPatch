@@ -55,7 +55,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public static void Postfix(ref int __result) {
       var perk = ActivePatch._perk;
       if (!Hero.MainHero.GetPerkValue(perk)) return;
-      __result = (int) (__result * perk.PrimaryBonus);
+      __result = (int) (__result * Math.Abs(perk.PrimaryBonus));
     }
   }
 }
