@@ -63,6 +63,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Eye for Loot
     * For the Thrill
     * Slip into Shadows
+    * Briber
   * Two Handed
     * Quick Plunder
     * Eviscerate
