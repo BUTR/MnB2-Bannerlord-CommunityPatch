@@ -64,6 +64,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       intimidated = PartyBaseHelper.DoesSurrenderIsLogicalForParty(
         MobileParty.ConversationParty, 
         MobileParty.MainParty, 
+        // requires that the bandits be merely less than 100% of our strength to surrender.
         1f);
 
       return false;
