@@ -67,7 +67,6 @@
         <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
         <PackageReference Include="Tomlyn" Version="0.1.2" />
-        <PackageReference Remove="Fody" />
     </ItemGroup>
 
     <ItemGroup>
