@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using CommunityPatch.Behaviors;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -92,6 +93,13 @@ namespace CommunityPatch {
       base.OnGameInitializationFinished(game);
     }
 
+    protected override void OnGameStart(Game game, IGameStarter gameStarterObject) {
+      if (game.GameType is Campaign)
+      {
+        var cgs = (CampaignGameStarter)gameStarterObject;
+        cgs.AddBehavior(new CommunityPatchCampaignBehavior());
+      }
+    }
   }
 
 }

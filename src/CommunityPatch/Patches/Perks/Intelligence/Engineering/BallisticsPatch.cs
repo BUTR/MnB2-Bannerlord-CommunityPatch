@@ -96,7 +96,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       
       CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRate, out var bonusDamage);
       SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRate);
-      SiegeTooltipHelper.UpdateRangedDamageTooltip(__result, bonusDamage);
+      SiegeTooltipHelper.UpdateRangedDamageToWallsTooltip(__result, bonusDamage);
+      SiegeTooltipHelper.UpdateRangedEngineDamageTooltip(__result, bonusDamage);
     }
     
     // ReSharper disable once InconsistentNaming

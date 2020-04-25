@@ -26,7 +26,10 @@ namespace CommunityPatch {
 
     internal static List<InitialStateOption> _groupedOptionsMenus;
 
-    public static void CleanUpMainMenu() {
+    public static void CleanUpMainMenu()
+      => SynchronizationContext.Current.Post(_ => CleanUpMainMenuInternal(), null);
+
+    private static void CleanUpMainMenuInternal() {
       if (_alreadyCleanedUpMainMenu)
         return;
 
@@ -64,10 +67,22 @@ namespace CommunityPatch {
         --menuLength;
       }
 
+      _groupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
+        var order = a.OrderIndex.CompareTo(b.OrderIndex);
+        if (order == 0)
+          order = string.Compare((a.Id ?? ""), b.Id ?? "", StringComparison.OrdinalIgnoreCase);
+        if (order == 0)
+          order = string.Compare((a.Name.ToString() ?? ""), b.Name.ToString() ?? "", StringComparison.OrdinalIgnoreCase);
+        if (order == 0)
+          order = a.GetHashCode().CompareTo(b.GetHashCode());
+        return order;
+      }));
+
       Module.CurrentModule.ClearStateOptions();
-      foreach (var opt in menu)
+      foreach (var opt in menu) {
         if (opt != null)
           Module.CurrentModule.AddInitialStateOption(opt);
+      }
 
       Module.CurrentModule.AddInitialStateOption(new InitialStateOption(
         "MoreOptions",
