@@ -78,11 +78,14 @@ namespace CommunityPatch.Patches.Feats {
                 float mountedFootmenRatioModifier = (float) getMountedFootmenRatioModifierMethod.Invoke(__instance, new object[] {menCount, minFootmenCountNumberOfAvailableMounts});
 
                 // calculate Khuzait bonus and apply
-                float khuzaitRatioModifier = DefaultFeats.Cultural.KhuzaitCavalryAgility.EffectBonus *
-                                             (cavalryRatioModifier + mountedFootmenRatioModifier);
-                var explainedNumber = new ExplainedNumber(baseNumber, explanation, null);
+                float khuzaitBonus =
+                    AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.KhuzaitCavalryAgility)
+                    * (cavalryRatioModifier + mountedFootmenRatioModifier)
+                    * baseNumber;
 
-                explainedNumber.AddFactor(khuzaitRatioModifier, DefaultFeats.Cultural.KhuzaitCavalryAgility.Name);
+                var explainedNumber = new ExplainedNumber(__result, explanation, null);
+
+                explainedNumber.Add(khuzaitBonus, DefaultFeats.Cultural.KhuzaitCavalryAgility.Name);
                 __result = explainedNumber.ResultNumber;
             }
         }
