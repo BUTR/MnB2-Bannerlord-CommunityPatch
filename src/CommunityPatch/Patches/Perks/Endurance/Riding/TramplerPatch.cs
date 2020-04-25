@@ -92,7 +92,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
 
       if (characterLocalVariableInfos.Count != 2) {
-        CommunityPatchSubModule.Error($"{typeof(TramplerPatch).Name}: Expected two BasicCharacterObject  local variable instances in the original method."
+        CommunityPatchSubModule.Error($"{nameof(TramplerPatch)}: Expected two BasicCharacterObject  local variable instances in the original method."
           + $" The original code has been changed requiring an update of this patch." + Environment.NewLine);
         return instructions;
       }
@@ -113,7 +113,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         }
       }
       
-      CommunityPatchSubModule.Error($"{typeof(TramplerPatch).Name}: Could not find the starting point to add new instructions in {TargetMethodInfo}." + Environment.NewLine);
+      CommunityPatchSubModule.Error($"{nameof(TramplerPatch)}: Could not find the starting point to add new instructions in {TargetMethodInfo}." + Environment.NewLine);
       return codes.AsEnumerable();
     }
     
