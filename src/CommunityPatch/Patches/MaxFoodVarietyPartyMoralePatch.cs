@@ -59,7 +59,7 @@ namespace CommunityPatch.Patches {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(MobileParty party, ref ExplainedNumber result) {
       if (party.ItemRoster.FoodVariety > 10)
-        result.Add(party.ItemRoster.FoodVariety - 4f, GameTexts.FindText("str_food_bonus_morale", (string) null));
+        result.Add(party.ItemRoster.FoodVariety - 4f, GameTexts.FindText("str_food_bonus_morale"));
     }
 
   }

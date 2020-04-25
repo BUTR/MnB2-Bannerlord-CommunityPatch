@@ -87,7 +87,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (village.VillageType.PrimaryProduction.IsFood)
         return;
 
-      var explainedNumber = new ExplainedNumber(__result, null);
+      var explainedNumber = new ExplainedNumber(__result);
       explainedNumber.AddFactor(perk.PrimaryBonus, perk.Description);
       __result = (int) explainedNumber.ResultNumber;
     }

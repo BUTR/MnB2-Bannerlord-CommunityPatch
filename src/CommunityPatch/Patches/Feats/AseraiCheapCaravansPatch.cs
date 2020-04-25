@@ -73,7 +73,7 @@ namespace CommunityPatch.Patches.Feats {
                     InformationManager.DisplayMessage(new InformationMessage(AseraiCheapCaravansFlavorText.ToString()));
 
                     // Apply credit
-                    GiveGoldAction.ApplyForSettlementToCharacter(Settlement.CurrentSettlement, Hero.MainHero, creditAmount, false);
+                    GiveGoldAction.ApplyForSettlementToCharacter(Settlement.CurrentSettlement, Hero.MainHero, creditAmount);
                 }
             }
         }

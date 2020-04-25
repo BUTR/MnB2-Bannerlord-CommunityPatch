@@ -52,7 +52,7 @@ namespace CommunityPatch.Patches.Feats {
 
       // SnowInfo.Density is between 0.0f and 1.0f
       if (atmosphereModel.SnowInfo.Density > 0f) {
-        var explainedNumber = new ExplainedNumber(__result, explanation, null);
+        var explainedNumber = new ExplainedNumber(__result, explanation);
 
         var movingOnSnowEffectField =
           AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingOnSnowEffect");

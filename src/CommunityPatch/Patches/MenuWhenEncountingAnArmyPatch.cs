@@ -97,8 +97,8 @@ namespace CommunityPatch.Patches {
         GameMenu.SwitchToMenu("army_encounter");
       else {
         MeetingDoneField.SetValue(__instance, true);
-        CampaignMission.OpenConversationMission(new ConversationCharacterData(CharacterObject.PlayerCharacter, PartyBase.MainParty, false, false, false, false),
-          new ConversationCharacterData(attacker.Leader, attacker, false, false, false, false), "", "");
+        CampaignMission.OpenConversationMission(new ConversationCharacterData(CharacterObject.PlayerCharacter, PartyBase.MainParty),
+          new ConversationCharacterData(attacker.Leader, attacker));
       }
 
       return false;

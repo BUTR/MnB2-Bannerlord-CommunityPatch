@@ -95,7 +95,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
     public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
       var result = __result;
 
-      var explainedNumber = new ExplainedNumber(result, explanation, null);
+      var explainedNumber = new ExplainedNumber(result, explanation);
 
       var perk = ActivePatch._perk;
 

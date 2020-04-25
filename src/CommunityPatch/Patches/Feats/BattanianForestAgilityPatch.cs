@@ -49,7 +49,7 @@ namespace CommunityPatch.Patches.Feats {
       if (faceTerrainType == TerrainType.Forest &&
         mobileParty.Leader != null &&
         mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.BattanianForestAgility)) {
-        var explainedNumber = new ExplainedNumber(__result, explanation, null);
+        var explainedNumber = new ExplainedNumber(__result, explanation);
 
         var movingAtForestEffectField = AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingAtForestEffect");
         var movingAtForestEffect = (float) movingAtForestEffectField.GetValue(__instance);

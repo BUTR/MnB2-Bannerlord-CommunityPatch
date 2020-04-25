@@ -83,7 +83,7 @@ namespace CommunityPatch.Patches.Feats {
           * (cavalryRatioModifier + mountedFootmenRatioModifier)
           * baseNumber;
 
-        var explainedNumber = new ExplainedNumber(__result, explanation, null);
+        var explainedNumber = new ExplainedNumber(__result, explanation);
 
         explainedNumber.Add(khuzaitBonus, DefaultFeats.Cultural.KhuzaitCavalryAgility.Name);
         __result = explainedNumber.ResultNumber;
