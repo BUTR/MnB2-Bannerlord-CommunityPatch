@@ -21,7 +21,6 @@ namespace CommunityPatch {
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
 
-
     protected override void OnSubModuleLoad() {
       var module = Module.CurrentModule;
 
@@ -42,7 +41,7 @@ namespace CommunityPatch {
 
       base.OnSubModuleLoad();
     }
-    
+
     protected override void OnBeforeInitialModuleScreenSetAsRoot() {
       var module = Module.CurrentModule;
 
@@ -82,7 +81,6 @@ namespace CommunityPatch {
     public override void OnCampaignStart(Game game, object starterObject) {
       if (starterObject is CampaignGameStarter cgs)
         CampaignGameStarter = cgs;
-      
 
       base.OnCampaignStart(game, starterObject);
     }
@@ -94,12 +92,12 @@ namespace CommunityPatch {
     }
 
     protected override void OnGameStart(Game game, IGameStarter gameStarterObject) {
-      if (game.GameType is Campaign)
-      {
-        var cgs = (CampaignGameStarter)gameStarterObject;
+      if (game.GameType is Campaign) {
+        var cgs = (CampaignGameStarter) gameStarterObject;
         cgs.AddBehavior(new CommunityPatchCampaignBehavior());
       }
     }
+
   }
 
 }

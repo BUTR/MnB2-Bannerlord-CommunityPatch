@@ -9,18 +9,16 @@ namespace CommunityPatch.Behaviors {
     private static readonly FieldInfo PartyPureSpeedLastCheckVersionField = typeof(MobileParty).GetField("_partyPureSpeedLastCheckVersion", BindingFlags.Instance | BindingFlags.NonPublic);
 
     public override void RegisterEvents()
-    {
-      CampaignEvents.PerkOpenedEvent.AddNonSerializedListener(this, OnPerkOpened);
-    }
+      => CampaignEvents.PerkOpenedEvent.AddNonSerializedListener(this, OnPerkOpened);
 
-    private void OnPerkOpened(Hero hero, PerkObject openedPerk)
-    {
+    private void OnPerkOpened(Hero hero, PerkObject openedPerk) {
       if (hero != null && openedPerk == DefaultPerks.Riding.NomadicTraditions)
         PartyPureSpeedLastCheckVersionField.SetValue(hero.PartyBelongedTo, -1);
     }
 
-    public override void SyncData(IDataStore dataStore)
-    {
+    public override void SyncData(IDataStore dataStore) {
     }
+
   }
+
 }

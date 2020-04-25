@@ -75,7 +75,7 @@
             <DependentUpon Condition="'%(DependentUpon)' == '' And '%(WouldDependOn)' != '%(Filename)'">%(WouldDependOn)</DependentUpon>
         </Compile>
     </ItemGroup>
-    
+
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
         <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
         <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />

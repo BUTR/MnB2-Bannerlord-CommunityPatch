@@ -43,7 +43,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var rangedDamageProperty = FindRangedDamageTooltipProperty(tooltips);
       if (rangedDamageProperty == null) return;
 
-      Double.TryParse(rangedDamageProperty.ValueLabel, out var currentRangedDamage);
+      double.TryParse(rangedDamageProperty.ValueLabel, out var currentRangedDamage);
       var amplifiedRangedDamage = (int) (currentRangedDamage + bonusDamageOnly);
       rangedDamageProperty.ValueLabel = amplifiedRangedDamage.ToString();
     }
@@ -52,7 +52,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var property = FindMaxHpTooltipProperty(tooltips);
       if (property == null) return;
 
-      Double.TryParse(property.ValueLabel, out var currentHp);
+      double.TryParse(property.ValueLabel, out var currentHp);
       var buffedHp = (int) (currentHp + bonusHp);
       property.ValueLabel = buffedHp.ToString();
     }
@@ -87,7 +87,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         tooltips.Insert(tooltips.IndexOf(rangedDamageTooltip) + 1, wallDamageProperty);
       }
 
-      Double.TryParse(wallDamageProperty.ValueLabel, out var currentWallDamage);
+      double.TryParse(wallDamageProperty.ValueLabel, out var currentWallDamage);
       var amplifiedWallDamage = (int) (currentWallDamage + bonusDamage);
       wallDamageProperty.ValueLabel = amplifiedWallDamage.ToString();
     }

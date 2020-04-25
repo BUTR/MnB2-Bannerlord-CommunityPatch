@@ -127,7 +127,7 @@ namespace CommunityPatch {
             sb.Append(" *Selected*");
           sb.AppendLine();
           sb.Append("    ").Append(mi.Name);
-          if (!String.IsNullOrWhiteSpace(mi.Alias))
+          if (!string.IsNullOrWhiteSpace(mi.Alias))
             sb.Append(" (").Append(mi.Alias).Append(")");
           if (mi.IsOfficial)
             sb.Append(" *Official*");

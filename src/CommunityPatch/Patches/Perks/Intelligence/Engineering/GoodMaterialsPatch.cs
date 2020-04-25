@@ -160,20 +160,25 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     // ReSharper disable once RedundantAssignment
-    public static void PlayerPrefix(ref Object __instance, ref Tuple<int, int> __state) {
+    public static void PlayerPrefix(ref Object __instance, out (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
+      if (siegeEvent == null) {
+        __state = (0, 0);
+        return;
+      }
+
       var playerSideSiegeEvent = siegeEvent.GetSiegeEventSide(GetPlayerSideFromVm(__instance));
       var deployedSiegeEngineCount = playerSideSiegeEvent.SiegeEngines.DeployedSiegeEngines.Count;
       var reservedSiegeEngineCount = playerSideSiegeEvent.SiegeEngines.ReservedSiegeEngines.Count;
-      __state = new Tuple<int, int>(deployedSiegeEngineCount, reservedSiegeEngineCount);
+      __state = (deployedSiegeEngineCount, reservedSiegeEngineCount);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void PlayerPostfix(ref Object __instance, ref Tuple<int, int> __state) {
+    public static void PlayerPostfix(ref Object __instance, ref (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
       var playerSideSiegeEvent = siegeEvent.GetSiegeEventSide(GetPlayerSideFromVm(__instance));
 
-      if (!HasSiegeEngineJustBeenConstructed(playerSideSiegeEvent, __state.Item1, __state.Item2)) return;
+      if (!HasSiegeEngineJustBeenConstructed(playerSideSiegeEvent, __state.DeployedCount, __state.ReservedCount)) return;
 
       var justDeployedEngine = playerSideSiegeEvent.SiegeEngines.DeployedSiegeEngines.Last();
       ApplyPerkToSiegeEngine(justDeployedEngine, playerSideSiegeEvent);
@@ -203,12 +208,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       SiegeEngineConstructionExtraDataManager.SetMaxHitPoints(justDeployedEngine, justDeployedEngine.Hitpoints);
     }
 
-    private static SiegeEvent GetSiegeEventFromVm(object vm)
-      => (SiegeEvent) MapSiegeProductionVmSiegeProperty?.GetValue(vm);
+    private static SiegeEvent? GetSiegeEventFromVm(object vm)
+      => MapSiegeProductionVmSiegeProperty?.GetValue(vm) as SiegeEvent;
 
-    private static BattleSideEnum GetPlayerSideFromVm(object vm) {
-      return (BattleSideEnum) (MapSiegeProductionVmPlayerSideProperty != null ? MapSiegeProductionVmPlayerSideProperty.GetValue(vm) : BattleSideEnum.None);
-    }
+    private static BattleSideEnum GetPlayerSideFromVm(object vm)
+      => (BattleSideEnum) (MapSiegeProductionVmPlayerSideProperty != null ? MapSiegeProductionVmPlayerSideProperty.GetValue(vm) : BattleSideEnum.None);
 
     private static bool HasSiegeEngineJustBeenConstructed(ISiegeEventSide playerSiegeEvent, int deployedSiegeEngineCount, int reservedSiegeEngineCount) {
       if (playerSiegeEvent.SiegeEngines.DeployedSiegeEngines.Count <= deployedSiegeEngineCount) return false;

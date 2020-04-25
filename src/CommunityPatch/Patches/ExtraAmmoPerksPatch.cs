@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  public abstract class ExtraAmmoPerksPatch<TPatch> : PatchBase<TPatch> where  TPatch : ExtraAmmoPerksPatch<TPatch> {
+  public abstract class ExtraAmmoPerksPatch<TPatch> : PatchBase<TPatch> where TPatch : ExtraAmmoPerksPatch<TPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -34,12 +34,13 @@ namespace CommunityPatch.Patches {
     private static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
       .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
 
-    public override void Reset(){}
+    public override void Reset() {
+    }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
-    
+
     public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
@@ -76,5 +77,7 @@ namespace CommunityPatch.Patches {
         missionWeapons[i] = (MissionWeapon) boxed;
       }
     }
+
   }
+
 }
