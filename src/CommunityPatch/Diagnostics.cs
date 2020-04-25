@@ -200,15 +200,21 @@ namespace CommunityPatch {
         foreach (var patch in CommunityPatchSubModule.Patches) {
           var type = patch.GetType();
           sb.Append("  ").Append(++i).Append(". ").Append(type.Name);
-          if (ActivePatches.ContainsKey(type))
-            sb.Append(" *Active*");
-          var applicability = patch.IsApplicable(Game.Current);
-          if (applicability ?? false)
-            sb.Append(" *Applicable*");
-          if (applicability == null)
-            sb.Append(" *Maybe Applicable*");
-          if (patch.Applied)
-            sb.Append(" *Applied*");
+          try {
+            if (ActivePatches.ContainsKey(type))
+              sb.Append(" *Active*");
+            var applicability = patch.IsApplicable(Game.Current);
+            if (applicability ?? false)
+              sb.Append(" *Applicable*");
+            if (applicability == null)
+              sb.Append(" *Maybe Applicable*");
+            if (patch.Applied)
+              sb.Append(" *Applied*");
+          }
+          catch (Exception ex2) {
+            sb.Append("  *** ERROR: ").Append(ex2.GetType().Name).Append(": ").AppendLine(ex2.Message);
+          }
+
           sb.AppendLine();
         }
       }
