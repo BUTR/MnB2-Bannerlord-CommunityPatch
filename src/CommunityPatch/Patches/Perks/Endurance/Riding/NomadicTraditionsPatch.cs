@@ -64,7 +64,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         //have to recalculate cavalry and mounted footman bonuses, so repeat the code
         var party = mobileParty.Party;
         float availableHorses = mobileParty.ItemRoster.NumberOfMounts;
-        int totalTroops = mobileParty.MemberRoster.TotalManCount + additionalTroopOnFootCount + additionalTroopOnHorseCount;
+        var totalTroops = mobileParty.MemberRoster.TotalManCount + additionalTroopOnFootCount + additionalTroopOnHorseCount;
         float mountedTroops = party.NumberOfMenWithHorse + additionalTroopOnHorseCount;
         float troopsOnFoot = party.NumberOfMenWithoutHorse + additionalTroopOnFootCount;
         if (mobileParty.AttachedParties.Count != 0) {
@@ -75,7 +75,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
             availableHorses += mobileParty2.ItemRoster.NumberOfMounts;
           }
         }
-        float mountedFootman = Math.Min(availableHorses, troopsOnFoot);
+        var mountedFootman = Math.Min(availableHorses, troopsOnFoot);
         var mountedFootmanRatio = totalTroops == 0 ? 0 : mountedFootman / totalTroops;
         var mountedFootmanMagicNumber = (float)MountedFootmenRatioModifierMethodInfo.Invoke(__instance, new object[] {1, 1});
         var perkMountedFootmanRatio = GetPerkBaseRatio(mountedFootmanMagicNumber) * mountedFootmanRatio;

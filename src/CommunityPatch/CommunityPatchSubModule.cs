@@ -83,6 +83,7 @@ namespace CommunityPatch {
     public override void OnCampaignStart(Game game, object starterObject) {
       if (starterObject is CampaignGameStarter cgs)
         CampaignGameStarter = cgs;
+      
 
       base.OnCampaignStart(game, starterObject);
     }

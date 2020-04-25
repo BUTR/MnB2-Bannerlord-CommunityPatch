@@ -25,7 +25,7 @@ namespace Antijank {
 
     static TickExceptionHandler() {
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ScreenManager_PreTick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -35,7 +35,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ScreenManager_Tick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -45,7 +45,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(SceneScripting
+        Context.Harmony.Patch(SceneScripting
             .GetMethod("Tick", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalSceneTickExceptionPatch), AnyDeclared))
         );
@@ -55,7 +55,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ScriptComponentBehaviour_OnTick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -65,7 +65,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ManagedScriptHolder_TickComponents", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -75,7 +75,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(LibraryCallbacksType
+        Context.Harmony.Patch(LibraryCallbacksType
             .GetMethod("Managed_ApplicationTick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -96,14 +96,20 @@ namespace Antijank {
 
       // TODO: option to remember ignore
 
+      var ex = CallStackHelpers.UnnestCommonExceptions(__exception);
+
+      var modAsm = new StackTrace(ex, false).FindModuleFromStackTrace(out var modInfo);
+
       void ShowDetails()
-        => MessageBox.Info(__exception.ToString(), "Exception Details");
+        => MessageBox.Info(ex.ToString(), "Exception Details");
 
       return MessageBox.Error("Exception processing tick event.\n" +
         "Do you wish to ignore this exception and continue?\n" +
         "The game may not continue running as expected if ignored.\n" +
+        $"Possible Source Mod: {modInfo?.Name}\n" +
+        $"Possible Source Assembly: {modAsm?.GetName().Name}\n" +
         $"Ticker: {__originalMethod.FullDescription()}\n" +
-        $"Exception: {__exception.GetType().Name}: {__exception.Message}",
+        $"Exception: {ex.GetType().Name}: {ex.Message}",
         type: MessageBoxType.YesNo,
         help: ShowDetails) != MessageBoxResult.Yes
         ? __exception
@@ -121,27 +127,29 @@ namespace Antijank {
     private static Exception TerminalSceneTickExceptionPatch(Exception __exception, MethodBase __originalMethod, UIntPtr scenePointer, float deltaTime) {
       if (__exception == null)
         return null;
-
-      var modAsm = new StackTrace(__exception, false).FindModuleFromStackTrace(out var modInfo);
       // TODO: option to remember ignore
 
+      var ex = CallStackHelpers.UnnestCommonExceptions(__exception);
+
+      var modAsm = new StackTrace(ex, false).FindModuleFromStackTrace(out var modInfo);
+
       void ShowDetails()
-        => MessageBox.Info(__exception.ToString(), "Exception Details");
+        => MessageBox.Info(ex.ToString(), "Exception Details");
 
       if (DotNetObjectGetManagedObjectWithIdMethod
         .Invoke(null, new object[] {scenePointer}) is ScriptComponentBehaviour behavior) {
         return MessageBox.Error("Exception processing tick event.\n" +
           "Do you wish to ignore this exception and continue?\n" +
           "The game may not continue running as expected if ignored.\n" +
-          $"Possible Source Mod: {modInfo.Name}\n" +
-          $"Possible Source Assembly: {modAsm.GetName().Name}\n" +
+          $"Possible Source Mod: {modInfo?.Name}\n" +
+          $"Possible Source Assembly: {modAsm?.GetName().Name}\n" +
           "Managed Behavior:\n" +
           $" • Pointer: 0x{scenePointer.ToUInt64():X16}\n" +
-          $" • Entity: {behavior.GameEntity.Name}\n" +
-          $" • Scene: {behavior.Scene.GetName()}\n" +
-          $" • Component: {((UIntPtr) NativeObjectGetPointerMethod.Invoke(behavior.ScriptComponent, null)).ToUInt64():X16})\n" +
+          $" • Entity: {behavior?.GameEntity?.Name}\n" +
+          $" • Scene: {behavior?.Scene?.GetName()}\n" +
+          $" • Component: {(behavior.ScriptComponent != null ? ((UIntPtr) NativeObjectGetPointerMethod.Invoke(behavior.ScriptComponent, null)).ToUInt64() : 0):X16})\n" +
           $"Ticker: {__originalMethod.FullDescription()}\n" +
-          $"Exception: {__exception.GetType().Name}: {__exception.Message}",
+          $"Exception: {ex.GetType().Name}: {ex.Message}",
           type: MessageBoxType.YesNo,
           help: ShowDetails
         ) != MessageBoxResult.Yes
@@ -152,11 +160,11 @@ namespace Antijank {
       return MessageBox.Error("Exception processing tick event.\n" +
         "Do you wish to ignore this exception and continue?\n" +
         "The game may not continue running as expected if ignored.\n" +
-        $"Possible Source Mod: {modInfo.Name}\n" +
-        $"Possible Source Assembly: {modAsm.GetName().Name}\n" +
+        $"Possible Source Mod: {modInfo?.Name}\n" +
+        $"Possible Source Assembly: {modAsm?.GetName().Name}\n" +
         $"Managed Behavior Pointer: 0x{scenePointer.ToUInt64():X16}\n" +
         $"Ticker: {__originalMethod.FullDescription()}\n" +
-        $"Exception: {__exception.GetType().Name}: {__exception.Message}",
+        $"Exception: {ex?.GetType().Name}: {ex?.Message}",
         type: MessageBoxType.YesNo,
         help: ShowDetails) != MessageBoxResult.Yes
         ? __exception

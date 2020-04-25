@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 
@@ -14,8 +15,17 @@ namespace Antijank {
     private readonly LinkedList<WarpContext> _web
       = new LinkedList<WarpContext>();
 
+    [PublicAPI]
+    public WarpContext FindContext(int id) {
+      lock (_web)
+        return _web.FirstOrDefault(ctx => ctx?.Thread?.ManagedThreadId == id);
+    }
+
     private WarpManager() {
       _root = Thread.CurrentThread;
+      var ctx = new WarpContext();
+      _web.AddFirst(ctx);
+      ctx.SetManager(this);
     }
 
     public override HostExecutionContext Capture() {
@@ -40,6 +50,14 @@ namespace Antijank {
       }
 
       base.Revert(previousState);
+    }
+
+    internal void Remove(WarpContext warpContext) {
+      lock (_web) {
+        var link = _web.FindLast(warpContext);
+        if (link != null)
+          _web.Remove(link);
+      }
     }
 
   }

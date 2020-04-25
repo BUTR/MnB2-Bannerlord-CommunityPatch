@@ -42,6 +42,9 @@ namespace Antijank {
     public override void Dispose(bool disposing) {
       _disposed = true;
       _current = null;
+
+      _manager?.Remove(this);
+      _manager = null;
     }
 
     public bool Disposed => _disposed;

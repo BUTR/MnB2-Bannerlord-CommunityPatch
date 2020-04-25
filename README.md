@@ -59,12 +59,27 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Everyday Engineer
     * Builder
   * Roguery
+    * Scavenger
+    * Armorcraft
+    * Wall Breaker
+    * Imperial Fire
+  * Roguery
     * Party Raiding
     * Eye for Loot
     * For the Thrill
+    * Slip into Shadows
+    * Briber
+    * Negotiator
+    * Bribe Master
+    * Escape Artist
+    * Slave Trader
+    * Merry men
   * Two Handed
     * Quick Plunder
     * Eviscerate
+  * Tactics
+    * Companion Cavalry
+    * Tactical Superiority
 * Policies
   * Land Grants For Veterans
 * Feats
@@ -81,6 +96,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 
 ### Current Features
 * Enable and Disable the Intro Video
+* Enable and Disable Menu when encountering a neutral or enemy army.
 * Copy Diagnostic Info to the Clipboard
 * Toggle recording First Chance Exception info (don't use unless troubleshooting bugs)
 * Automatically capture Diagnostic Info to the Clipboard when an Unhandled Exception crash occurs
@@ -114,6 +130,7 @@ If your Bannerlord or local repo are in a different place, you can change the pr
 * [Zarganoth](https://www.nexusmods.com/users/6940484) ([Discord](https://discordapp.com/users/298985985843396618))
 * [Tynakuh](https://www.nexusmods.com/users/51824126) ([Discord](https://discordapp.com/users/178209384852094976))
 * [wonkotron](https://www.nexusmods.com/users/87193583) ([Discord](https://discordapp.com/users/171467525660344320))
+* [iPherian](https://www.nexusmods.com/users/86335488)
 
 ##### Others
 * Xaphedo for providing the banner art

@@ -42,21 +42,23 @@ namespace CommunityPatch.Patches.Feats {
             ref StatExplainer explanation,
             ref float __result) {
             
-            TerrainType faceTerrainType = Campaign.Current.MapSceneWrapper.GetFaceTerrainType(mobileParty.CurrentNavigationFace);
+            var faceTerrainType = Campaign.Current.MapSceneWrapper.GetFaceTerrainType(mobileParty.CurrentNavigationFace);
 
             if (faceTerrainType == TerrainType.Forest &&
                 mobileParty.Leader != null &&
                 mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.BattanianForestAgility)) {
 
-                var explainedNumber = new ExplainedNumber(baseSpeed, explanation, null);
+                var explainedNumber = new ExplainedNumber(__result, explanation, null);
 
                 var movingAtForestEffectField = AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingAtForestEffect");
                 var movingAtForestEffect = (float) movingAtForestEffectField.GetValue(__instance);
 
                 var battanianAgilityBonus =
-                    DefaultFeats.Cultural.BattanianForestAgility.EffectBonus * Math.Abs(movingAtForestEffect);
+                    AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.BattanianForestAgility)
+                    * Math.Abs(movingAtForestEffect)
+                    * baseSpeed;
 
-                explainedNumber.AddFactor(battanianAgilityBonus, DefaultFeats.Cultural.BattanianForestAgility.Name);
+                explainedNumber.Add(battanianAgilityBonus, DefaultFeats.Cultural.BattanianForestAgility.Name);
 
                 __result = explainedNumber.ResultNumber;
             }
