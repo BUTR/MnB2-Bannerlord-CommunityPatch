@@ -10,6 +10,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using static CommunityPatch.HarmonyHelpers;
+using OpCodes = System.Reflection.Emit.OpCodes;
 
 namespace CommunityPatch.Patches {
 
@@ -17,8 +18,8 @@ namespace CommunityPatch.Patches {
 
     private static readonly byte[] IsRemainingTimeHiddenGetterBodyIl = {
       // e1.1.2.226306
-      OpCodes.Ldc_I4_1.Op1, // 0x17
-      OpCodes.Ret.Op1, // 0x2a
+      (byte) OpCodes.Ldc_I4_1.Value, // 0x17
+      (byte) OpCodes.Ret.Value, // 0x2a
     };
 
     private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase, StoryMode, Version=1.0.0.0, Culture=neutral");
