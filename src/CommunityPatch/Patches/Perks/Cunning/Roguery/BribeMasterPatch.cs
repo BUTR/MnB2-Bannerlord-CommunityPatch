@@ -5,6 +5,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
@@ -55,7 +56,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public static void Postfix(ref int __result) {
       var perk = ActivePatch._perk;
       if (!Hero.MainHero.GetPerkValue(perk)) return;
-      __result = (int) (__result * Math.Abs(perk.PrimaryBonus));
+      __result = (int) (__result * System.Math.Abs(perk.PrimaryBonus));
     }
   }
 }
