@@ -64,15 +64,20 @@ namespace CommunityPatch.Patches.Feats {
             ref FeatObject feat,
             ref CharacterObject character,
             ref ExplainedNumber bonuses) {
-            
-            // If the given feat is *Agility, skip normal functionality by returning false and allow *AgilityPatch to
-            // apply the correct value later
-            var result = !(
-                feat == DefaultFeats.Cultural.BattanianForestAgility ||
-                feat == DefaultFeats.Cultural.KhuzaitCavalryAgility ||
-                feat == DefaultFeats.Cultural.SturgianSnowAgility);
 
-            return result;
+             if (character == null ||
+                !character.GetFeatValue(feat)) {
+                return true;
+            }
+
+            if (feat == DefaultFeats.Cultural.BattanianForestAgility ||
+                feat == DefaultFeats.Cultural.KhuzaitCavalryAgility ||
+                feat == DefaultFeats.Cultural.SturgianSnowAgility) {
+                
+                return false;
+            }
+
+            return true;
         }
     }
 }
