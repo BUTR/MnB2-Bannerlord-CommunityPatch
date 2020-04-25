@@ -1,54 +1,43 @@
+using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Microsoft.Diagnostics.Runtime;
 using TaleWorlds.Library;
+using static System.Reflection.BindingFlags;
+using static Antijank.DebuggerContext;
 
 namespace Antijank {
 
   public class CustomDebugManager : IDebugManager {
 
-    private static readonly CustomDebugManager Instance = new CustomDebugManager();
+    public static readonly CustomDebugManager Instance = new CustomDebugManager();
 
-    private static DataTarget _attachedDt;
+    private static SynchronizationContext _syncCtx;
 
-    private static DataTarget _inProcDt;
-
-    private static ClrRuntime _debugRt;
-
-    private static ClrInfo _clrInfo;
-
+    private bool TestGenericMethod<T>() => typeof(T).IsPrimitive;
+    
     static CustomDebugManager() {
       TaleWorlds.Library.Debug.DebugManager = Instance;
-      
-      
-      
-      var pid = -1;
-      using (var proc = Process.GetCurrentProcess())
-        pid = proc.Id;
 
-      _attachedDt = DataTarget.PassiveAttachToProcess(pid);
-      _inProcDt = new DataTarget(new InProcDataReader(_attachedDt.DataReader));
+      var syncCtx = new DebuggerContext();
+      _syncCtx = syncCtx;
+      syncCtx.Start();
+      SynchronizationContext.SetSynchronizationContext(syncCtx);
 
-      _clrInfo = _inProcDt.ClrVersions.Single();
-      _debugRt = _clrInfo.CreateRuntime();
-      
-      /*
-      foreach (var thread in _debugRt.Threads) {
-        if (thread.IsUnstarted)
-          continue;
+      _syncCtx?.Send(_ => {
+        var thisType = typeof(CustomDebugManager);
+        var testMethod = thisType.GetMethod(nameof(TestGenericMethod), Public | NonPublic | Static | BindingFlags.Instance);
+        if (testMethod == null)
+          throw new NotImplementedException();
 
-        var i = 0;
-        foreach (var frame in thread.EnumerateStackTrace()) {
-          if (i++ < 100)
-            continue;
-
-          Debugger.Break();
-          break;
-        }
-      }
-      */
-
+        var mh =InProcClrRuntime!.GetMethodByHandle((ulong) testMethod.MethodHandle.Value.ToInt64());
+        
+        
+      }, null);
     }
 
     public static void Init() {
@@ -129,6 +118,9 @@ namespace Antijank {
 
     public void SetCrashReportCustomStack(string customStack)
       => Trace.TraceInformation($"Crash Report Stack Trace: {customStack}");
+
+    public void Error(Exception exception, string message)
+      => PrintError(message, exception.ToString());
 
   }
 

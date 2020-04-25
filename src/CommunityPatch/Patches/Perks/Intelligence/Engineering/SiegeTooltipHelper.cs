@@ -9,6 +9,9 @@ using TaleWorlds.Core.ViewModelCollection;
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
   public static class SiegeTooltipHelper {
+
+    private const string WallDamageLabel = "Projectile Wall Damage";
+    
     public static readonly MethodInfo TargetMethodInfo =
       Type.GetType("SandBox.ViewModelCollection.SandBoxUIHelper, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
         .GetMethod("GetSiegeEngineInProgressTooltip", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
@@ -36,7 +39,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       return defenderSide;
     }
     
-    public static void UpdateRangedDamageTooltip(List<TooltipProperty> tooltips, float bonusDamageOnly)
+    public static void UpdateRangedEngineDamageTooltip(List<TooltipProperty> tooltips, float bonusDamageOnly)
     {
       var rangedDamageProperty = FindRangedDamageTooltipProperty(tooltips);
       if (rangedDamageProperty == null) return;
@@ -60,7 +63,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       if (bonusValue.IsZero()) return;
       var isRate = perk.IncrementType == SkillEffect.EffectIncrementType.AddFactor;
       var suffix = isRate ? "%" : "";
-      var tooltip = new TooltipProperty(perk.Name.ToString(), value: $"{bonusValue:F1}{suffix}", 0);
+      var tooltip = new TooltipProperty(perk.Name.ToString(), $"{bonusValue:F1}{suffix}", 0);
       tooltips.Add(tooltip);
     }
     
@@ -73,10 +76,29 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         heroParty.CurrentSettlement.SiegeEvent;
     }
     
+    public static void UpdateRangedDamageToWallsTooltip(List<TooltipProperty> tooltips, float bonusDamage)
+    {
+      var wallDamageProperty = FindProjectileWallDamageTooltipProperty(tooltips);
+
+      if (wallDamageProperty == null) {
+        var rangedDamageTooltip = FindRangedDamageTooltipProperty(tooltips);
+        if (rangedDamageTooltip == null) return;
+        wallDamageProperty = new TooltipProperty(WallDamageLabel, rangedDamageTooltip.ValueLabel, 0);
+        tooltips.Insert(tooltips.IndexOf(rangedDamageTooltip) + 1, wallDamageProperty);
+      }
+      
+      Double.TryParse(wallDamageProperty.ValueLabel, out var currentWallDamage);
+      var amplifiedWallDamage = (int) (currentWallDamage + bonusDamage);
+      wallDamageProperty.ValueLabel = amplifiedWallDamage.ToString();
+    }
+    
     private static TooltipProperty FindRangedDamageTooltipProperty(List<TooltipProperty> tooltips) 
       =>  tooltips.FirstOrDefault(x => 
         x.DefinitionLabel == GameTexts.FindText("str_projectile_damage").ToString());
-
+    
+    private static TooltipProperty FindProjectileWallDamageTooltipProperty(List<TooltipProperty> tooltips) 
+      =>  tooltips.FirstOrDefault(x => x.DefinitionLabel == WallDamageLabel);
+    
     private static TooltipProperty FindMaxHpTooltipProperty(List<TooltipProperty> tooltips)
       => tooltips[3];
   }

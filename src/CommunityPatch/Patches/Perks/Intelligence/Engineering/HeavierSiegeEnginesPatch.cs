@@ -97,7 +97,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       
       CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRateOnly, out var bonusDamageOnly);
       SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRateOnly);
-      SiegeTooltipHelper.UpdateRangedDamageTooltip(__result, bonusDamageOnly);
+      SiegeTooltipHelper.UpdateRangedDamageToWallsTooltip(__result, 0);
+      SiegeTooltipHelper.UpdateRangedEngineDamageTooltip(__result, bonusDamageOnly);
     }
 
     private static void CalculateBonusDamageAndRates(

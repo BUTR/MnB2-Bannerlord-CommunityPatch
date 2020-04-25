@@ -53,13 +53,13 @@ namespace CommunityPatch.Patches.Feats {
                 var getMountedFootmenRatioModifierMethod = AccessTools.Method(__instance.GetType(), "GetMountedFootmenRatioModifier");
 
                 // Recalculate Cavalry and Footmen on horses speed modifiers based on 
-                int menCount = mobileParty.MemberRoster.TotalManCount + additionalTroopOnFootCount +
+                var menCount = mobileParty.MemberRoster.TotalManCount + additionalTroopOnFootCount +
                                additionalTroopOnHorseCount;
 
-                float baseNumber = (float) calculateBaseSpeedForPartyMethod.Invoke(__instance, new object[] {menCount});
-                int horsemenCount = mobileParty.Party.NumberOfMenWithHorse + additionalTroopOnHorseCount;
-                int footmenCount = mobileParty.Party.NumberOfMenWithoutHorse + additionalTroopOnFootCount;
-                int numberOfAvailableMounts =
+                var baseNumber = (float) calculateBaseSpeedForPartyMethod.Invoke(__instance, new object[] {menCount});
+                var horsemenCount = mobileParty.Party.NumberOfMenWithHorse + additionalTroopOnHorseCount;
+                var footmenCount = mobileParty.Party.NumberOfMenWithoutHorse + additionalTroopOnFootCount;
+                var numberOfAvailableMounts =
                     mobileParty.ItemRoster.NumberOfMounts; // Do this instead of calling AddCargoStats()
 
                 if (mobileParty.AttachedParties.Count != 0) {
@@ -72,17 +72,20 @@ namespace CommunityPatch.Patches.Feats {
                     }
                 }
 
-                int minFootmenCountNumberOfAvailableMounts = Math.Min(footmenCount, numberOfAvailableMounts);
+                var minFootmenCountNumberOfAvailableMounts = Math.Min(footmenCount, numberOfAvailableMounts);
 
-                float cavalryRatioModifier = (float) getCavalryRatioModifierMethod.Invoke(__instance, new object[] {menCount, horsemenCount});
-                float mountedFootmenRatioModifier = (float) getMountedFootmenRatioModifierMethod.Invoke(__instance, new object[] {menCount, minFootmenCountNumberOfAvailableMounts});
+                var cavalryRatioModifier = (float) getCavalryRatioModifierMethod.Invoke(__instance, new object[] {menCount, horsemenCount});
+                var mountedFootmenRatioModifier = (float) getMountedFootmenRatioModifierMethod.Invoke(__instance, new object[] {menCount, minFootmenCountNumberOfAvailableMounts});
 
                 // calculate Khuzait bonus and apply
-                float khuzaitRatioModifier = DefaultFeats.Cultural.KhuzaitCavalryAgility.EffectBonus *
-                                             (cavalryRatioModifier + mountedFootmenRatioModifier);
-                var explainedNumber = new ExplainedNumber(baseNumber, explanation, null);
+                var khuzaitBonus =
+                    AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.KhuzaitCavalryAgility)
+                    * (cavalryRatioModifier + mountedFootmenRatioModifier)
+                    * baseNumber;
 
-                explainedNumber.AddFactor(khuzaitRatioModifier, DefaultFeats.Cultural.KhuzaitCavalryAgility.Name);
+                var explainedNumber = new ExplainedNumber(__result, explanation, null);
+
+                explainedNumber.Add(khuzaitBonus, DefaultFeats.Cultural.KhuzaitCavalryAgility.Name);
                 __result = explainedNumber.ResultNumber;
             }
         }
