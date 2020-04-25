@@ -53,7 +53,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "EJCrymMr");
 
-    private PerkObject _perk;
+    private PerkObject _perk = null!;
 
     private static readonly byte[][] AiHashes = {
       new byte[] {

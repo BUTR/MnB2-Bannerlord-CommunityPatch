@@ -103,7 +103,7 @@ namespace Antijank {
       if (asm.IsDynamic)
         return false;
 
-      var asmPath = new Uri(typeof(AssemblyResolver).Assembly.CodeBase).LocalPath;
+      var asmPath = new Uri(asm.CodeBase).LocalPath;
       var modsDir = GetModulesDir();
       return asmPath.StartsWith(modsDir, StringComparison.OrdinalIgnoreCase);
     }
