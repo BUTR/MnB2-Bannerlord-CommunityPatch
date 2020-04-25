@@ -60,7 +60,7 @@ namespace CommunityPatch.Patches.Feats {
                 var snowDescription = (TextObject) snowDescriptionField.GetValue(__instance);
                 
                 // if there is snow on the ground, apply the movement debuff as a factor of the density
-                float snowDensityDebuff =
+                var snowDensityDebuff =
                     movingOnSnowEffect
                     * atmosphereModel.SnowInfo.Density
                     * baseSpeed;
@@ -70,7 +70,7 @@ namespace CommunityPatch.Patches.Feats {
                 if (mobileParty.Leader != null &&
                     mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.SturgianSnowAgility)) {
 
-                    float sturgianBonus =
+                    var sturgianBonus =
                         AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.SturgianSnowAgility)
                         * Math.Abs(snowDensityDebuff);
 

@@ -37,7 +37,7 @@ namespace CommunityPatch.Patches {
 
     private static int ExtractFirstPhaseTimeLimitInYears() {
       try {
-        FieldInfo field = typeof(FirstPhaseCampaignBehavior).GetField("FirstPhaseTimeLimitInYears", BindingFlags.NonPublic | BindingFlags.Static);
+        var field = typeof(FirstPhaseCampaignBehavior).GetField("FirstPhaseTimeLimitInYears", BindingFlags.NonPublic | BindingFlags.Static);
         return (int)field.GetRawConstantValue();
       }
       catch (NullReferenceException ex) {
@@ -52,7 +52,7 @@ namespace CommunityPatch.Patches {
         this,
         new Action<QuestBase>(OnQuestStarted)
       );
-      foreach (QuestBase quest
+      foreach (var quest
                in Campaign.Current.QuestManager.Quests.ToList<QuestBase>()) {
         SetStoryVisibleTimeoutIfNeeded(quest);
       }
@@ -72,7 +72,7 @@ namespace CommunityPatch.Patches {
       // set visible timeout to be when vanilla would have (silently) timed 
       // out the quest,  minus a day to make very sure the quest doesn't 
       // somehow trigger vanilla's silent timeout too early.
-      CampaignTime newDueTime = FirstPhase.Instance.FirstPhaseStartTime
+      var newDueTime = FirstPhase.Instance.FirstPhaseStartTime
                                   + CampaignTime.Years(FirstPhaseTimeLimitInYears)
                                   - CampaignTime.Days(1);
       if (quest.QuestDueTime != newDueTime) {

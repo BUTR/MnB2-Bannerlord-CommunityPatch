@@ -76,10 +76,10 @@ namespace CommunityPatch.Patches {
         return true;
       }
       
-      PartyBase attacker = (PartyBase) EncounteredPartyField.GetValue(__instance);
+      var attacker = (PartyBase) EncounteredPartyField.GetValue(__instance);
       if (attacker.IsSettlement)
       {
-        foreach (PartyBase defender in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties)
+        foreach (var defender in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties)
         {
           if (!defender.IsSettlement)
           {

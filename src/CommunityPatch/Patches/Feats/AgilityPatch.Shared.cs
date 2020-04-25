@@ -32,7 +32,7 @@ namespace CommunityPatch.Patches.Feats {
         };
 
         public static float GetEffectBonus(FeatObject feat) {
-            float result = 0f;
+            var result = 0f;
 
             if (feat == null) {
                 CommunityPatchSubModule.Error("AgilityPatchShared.GetEffectBonus():  given feat is null");
