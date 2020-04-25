@@ -5,6 +5,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using HarmonyLib;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
@@ -15,9 +16,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     private static readonly MethodInfo TargetMethodInfo =
       Type.GetType("TaleWorlds.CampaignSystem.SandBox.GameComponents.DefaultSettlementTaxModel, TaleWorlds.CampaignSystem")?
-        .GetMethod("CalculateVillageTaxFromIncome", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+        .GetMethod("CalculateVillageTaxFromIncome", Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(EnhancedMinesPatch).GetMethod("Postfix", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(EnhancedMinesPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -80,14 +81,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     // ReSharper disable once t
     public static void Postfix(ref int __result, Village village, int marketIncome) {
       var perk = ActivePatch._perk;
-      if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false)) {
+      if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))
         return;
-      }
 
       if (village.VillageType.PrimaryProduction.IsFood)
         return;
 
-      var explainedNumber = new ExplainedNumber(__result, null);
+      var explainedNumber = new ExplainedNumber(__result);
       explainedNumber.AddFactor(perk.PrimaryBonus, perk.Description);
       __result = (int) explainedNumber.ResultNumber;
     }

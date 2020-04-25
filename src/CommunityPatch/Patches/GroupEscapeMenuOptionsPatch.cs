@@ -9,6 +9,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade.ViewModelCollection;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches {
 
@@ -16,18 +17,19 @@ namespace CommunityPatch.Patches {
   [HarmonyPatch(typeof(EscapeMenuVM), MethodType.Constructor, typeof(IEnumerable<EscapeMenuItemVM>), typeof(TextObject))]
   public static class GroupEscapeMenuOptionsPatch {
 
-    public static FieldInfo EscapeMenuItemVmOnExecute = typeof(EscapeMenuItemVM)
-      .GetField("_onExecute", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    public static readonly FieldInfo EscapeMenuItemVmOnExecute = typeof(EscapeMenuItemVM)
+      .GetField("_onExecute", NonPublic | Instance | DeclaredOnly);
 
     public static FieldInfo EscapeMenuItemVmIdentifier = typeof(EscapeMenuItemVM)
-      .GetField("_identifier", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      .GetField("_identifier", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly object _groupEscMenuOptsKey = new object();
+    private static readonly object GroupEscMenuOptsKey = new object();
 
+    [UsedImplicitly]
     public static void Postfix(EscapeMenuVM __instance, ref MBBindingList<EscapeMenuItemVM> ____menuItems, IEnumerable<EscapeMenuItemVM> items, TextObject title = null) {
       if (CommunityPatchSubModule.DontGroupThirdPartyMenuOptions) {
         ____menuItems.Add(new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
-          _ => CommunityPatchSubModule.Current.ShowOptions(), _groupEscMenuOptsKey, false));
+          _ => CommunityPatchSubModule.Current.ShowOptions(), GroupEscMenuOptsKey, false));
         return;
       }
 
@@ -47,7 +49,8 @@ namespace CommunityPatch.Patches {
             || optAsmName.StartsWith("SandBox.")
             || optAsmName.StartsWith("SandBoxCore.")
             || optAsmName.StartsWith("StoryMode."))
-            continue;
+            if (PathHelpers.IsOfficialAssembly(actAsm))
+              continue;
         }
         catch {
           // yeah, it's 3rd party.
@@ -66,7 +69,7 @@ namespace CommunityPatch.Patches {
 
       if (customOptions.Count <= 0) {
         newList.Insert(newList.Count - 2, new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
-          _ => CommunityPatchSubModule.Current.ShowOptions(), _groupEscMenuOptsKey, false));
+          _ => CommunityPatchSubModule.Current.ShowOptions(), GroupEscMenuOptsKey, false));
 
         ____menuItems = newList;
         return;
@@ -75,11 +78,10 @@ namespace CommunityPatch.Patches {
       newList.Insert(newList.Count - 2, new EscapeMenuItemVM(new TextObject("{=MoreOptions}More Options"), _ => {
         var options = new List<InquiryElement>();
 
-        foreach (var item in customOptions) {
+        foreach (var item in customOptions)
           options.Add(new InquiryElement(item, item.ActionText, null, !item.IsDisabled, null));
-        }
 
-        options.Add(new InquiryElement(_groupEscMenuOptsKey, new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(), null));
+        options.Add(new InquiryElement(GroupEscMenuOptsKey, new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(), null));
 
         InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
           new TextObject("{=MoreOptions}More Options").ToString(),
@@ -91,7 +93,7 @@ namespace CommunityPatch.Patches {
           null,
           selection => {
             var picked = selection.FirstOrDefault()?.Identifier;
-            if (picked == _groupEscMenuOptsKey) {
+            if (picked == GroupEscMenuOptsKey) {
               CommunityPatchSubModule.Current.ShowOptions();
               return;
             }

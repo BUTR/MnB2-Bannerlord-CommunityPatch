@@ -5,6 +5,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
@@ -13,9 +14,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultClanPoliticsModel).GetMethod("CalculateInfluenceChangeInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultClanPoliticsModel).GetMethod("CalculateInfluenceChangeInternal", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(SupremeAuthorityPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(SupremeAuthorityPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -75,9 +76,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
       var ruler = clan?.Kingdom?.Ruler;
       var leader = clan?.Leader;
-      if (ruler != null && ruler == leader && ruler.GetPerkValue(perk)) {
+      if (ruler != null && ruler == leader && ruler.GetPerkValue(perk))
         influenceChange.Add(perk.PrimaryBonus, perk.Name);
-      }
     }
 
   }

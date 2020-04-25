@@ -8,6 +8,7 @@ using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
@@ -16,9 +17,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultCharacterStatsModel).GetMethod(nameof(DefaultCharacterStatsModel.MaxHitpoints), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultCharacterStatsModel).GetMethod(nameof(DefaultCharacterStatsModel.MaxHitpoints), Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(PeakFormPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(PeakFormPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -52,7 +53,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       if (!hash.MatchesAnySha256(Hashes))
         return false;
-      
+
       if (_perk.PrimaryBonus != 0f)
         return null;
 
@@ -94,7 +95,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
     public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
       var result = __result;
 
-      var explainedNumber = new ExplainedNumber(result, explanation, null);
+      var explainedNumber = new ExplainedNumber(result, explanation);
 
       var perk = ActivePatch._perk;
 

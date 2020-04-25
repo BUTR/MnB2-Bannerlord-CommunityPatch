@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
+using CommunityPatch.Behaviors;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -19,7 +19,6 @@ namespace CommunityPatch {
 
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;
-
 
     protected override void OnSubModuleLoad() {
       var module = Module.CurrentModule;
@@ -41,7 +40,7 @@ namespace CommunityPatch {
 
       base.OnSubModuleLoad();
     }
-    
+
     protected override void OnBeforeInitialModuleScreenSetAsRoot() {
       var module = Module.CurrentModule;
 
@@ -57,10 +56,7 @@ namespace CommunityPatch {
         }
       }
 
-      if (!DontGroupThirdPartyMenuOptions)
-        MenuCleaner.CleanUpMainMenu();
-
-      if (DisableIntroVideo) {
+      if (DisableIntroVideo)
         try {
           typeof(Module)
             .GetField("_splashScreenPlayed", BindingFlags.NonPublic | BindingFlags.Instance)
@@ -69,7 +65,6 @@ namespace CommunityPatch {
         catch (Exception ex) {
           Error(ex, "Couldn't disable intro video.");
         }
-      }
 
       base.OnBeforeInitialModuleScreenSetAsRoot();
     }
@@ -90,6 +85,13 @@ namespace CommunityPatch {
       ApplyPatches(game);
 
       base.OnGameInitializationFinished(game);
+    }
+
+    protected override void OnGameStart(Game game, IGameStarter gameStarterObject) {
+      if (game.GameType is Campaign) {
+        var cgs = (CampaignGameStarter) gameStarterObject;
+        cgs.AddBehavior(new CommunityPatchCampaignBehavior());
+      }
     }
 
   }

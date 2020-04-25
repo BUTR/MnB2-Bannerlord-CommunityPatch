@@ -4,12 +4,14 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Control.Bow {
 
   public class BattleEquippedPatch : ExtraAmmoPerksPatch<BattleEquippedPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(BattleEquippedPatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(BattleEquippedPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
+
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -21,9 +23,10 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
     static bool CanApplyPerk(Hero hero, WeaponComponentData weaponComponentData) =>
       WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
       hero.GetPerkValue(DefaultPerks.Bow.BattleEquipped);
-    
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) => ApplyPerk(__instance, 6, CanApplyPerk);
 
   }
+
 }

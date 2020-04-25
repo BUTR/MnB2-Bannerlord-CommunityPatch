@@ -79,9 +79,8 @@ namespace CommunityPatch {
         var opCodeValue = instr.Key.Value;
         var operand = instr.Value;
 
-        for (var i = 0; i < opCode.Size; ++i) {
+        for (var i = 0; i < opCode.Size; ++i)
           buf[i] = (byte) (opCodeValue >> (i * 8));
-        }
 
         hasher.TransformBlock(buf, 0, opCode.Size, null, 0);
 #if DEBUG_METHOD_SIGNATURE

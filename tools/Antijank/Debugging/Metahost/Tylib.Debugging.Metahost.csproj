@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A89796B6-140F-45E4-9F97-103C44447AA0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Antijank.Debugging</RootNamespace>
+    <AssemblyName>Antijank.Debugging.Metahost</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CLR_DEBUGGING_PROCESS_FLAGS.cs" />
+    <Compile Include="ICLRDebugging.cs" />
+    <Compile Include="ICLRDebuggingLibraryProvider.cs" />
+    <Compile Include="ICLRMetaHost.cs" />
+    <Compile Include="ICLRMetaHostPolicy.cs" />
+    <Compile Include="ICLRRuntimeInfo.cs" />
+    <Compile Include="ICLRStrongName.cs" />
+    <Compile Include="IEnumUnknown.cs" />
+    <Compile Include="ISequentialStream.cs" />
+    <Compile Include="IStream.cs" />
+    <Compile Include="METAHOST_POLICY_FLAGS.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="tagSTATSTG.cs" />
+    <Compile Include="_CLR_DEBUGGING_VERSION.cs" />
+    <Compile Include="_FILETIME.cs" />
+    <Compile Include="_LARGE_INTEGER.cs" />
+    <Compile Include="_ULARGE_INTEGER.cs" />
+    <Compile Include="__MIDL___MIDL_itf_metahost_0000_0001_0001.cs" />
+    <Compile Include="__MIDL___MIDL_itf_metahost_0000_0002_0001.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

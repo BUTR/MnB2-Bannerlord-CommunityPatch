@@ -6,6 +6,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
@@ -15,9 +16,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo =
-      typeof(DefaultVillageProductionCalculatorModel).GetMethod(nameof(DefaultVillageProductionCalculatorModel.CalculateDailyFoodProductionAmount), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      typeof(DefaultVillageProductionCalculatorModel).GetMethod(nameof(DefaultVillageProductionCalculatorModel.CalculateDailyFoodProductionAmount), Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(AgrarianPatch).GetMethod("Postfix", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(AgrarianPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -83,9 +84,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref float __result, Village village) {
       var perk = ActivePatch._perk;
-      if (!(village.Bound?.Town?.Governor?.GetPerkValue(perk) ?? false)) {
+      if (!(village.Bound?.Town?.Governor?.GetPerkValue(perk) ?? false))
         return;
-      }
 
       __result += (int) (__result * perk.PrimaryBonus);
     }

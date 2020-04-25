@@ -4,13 +4,14 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
   public class ExtraArrowsPatch : ExtraAmmoPerksPatch<ExtraArrowsPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(ExtraArrowsPatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+    private static readonly MethodInfo PatchMethodInfo = typeof(ExtraArrowsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
+
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -19,15 +20,16 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       Applied = true;
     }
 
-    static bool CanApplyPerk(Hero hero, WeaponComponentData weaponComponentData) => 
-      WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows && 
+    static bool CanApplyPerk(Hero hero, WeaponComponentData weaponComponentData) =>
+      WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
       hero.GetPerkValue(DefaultPerks.Athletics.ExtraArrows);
-      
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) {
-      if (!HasMount(__instance)) {
-        ApplyPerk(__instance, 2, CanApplyPerk);      
-      }
+      if (!HasMount(__instance))
+        ApplyPerk(__instance, 2, CanApplyPerk);
     }
+
   }
+
 }

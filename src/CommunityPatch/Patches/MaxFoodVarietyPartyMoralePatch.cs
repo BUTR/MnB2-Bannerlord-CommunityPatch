@@ -5,6 +5,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
@@ -14,9 +15,9 @@ namespace CommunityPatch.Patches {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo =
-      typeof(DefaultPartyMoraleModel).GetMethod("CalculateFoodVarietyMoraleBonus", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      typeof(DefaultPartyMoraleModel).GetMethod("CalculateFoodVarietyMoraleBonus", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(MaxFoodVarietyPartyMoralePatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(MaxFoodVarietyPartyMoralePatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -57,9 +58,8 @@ namespace CommunityPatch.Patches {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(MobileParty party, ref ExplainedNumber result) {
-      if (party.ItemRoster.FoodVariety > 10) {
-        result.Add(party.ItemRoster.FoodVariety - 4f, GameTexts.FindText("str_food_bonus_morale", (string) null));
-      }
+      if (party.ItemRoster.FoodVariety > 10)
+        result.Add(party.ItemRoster.FoodVariety - 4f, GameTexts.FindText("str_food_bonus_morale"));
     }
 
   }

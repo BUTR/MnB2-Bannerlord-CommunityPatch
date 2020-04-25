@@ -1,5 +1,10 @@
 using System;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 using TaleWorlds.Engine;
+using TaleWorlds.Library;
+using Path = System.IO.Path;
 
 namespace CommunityPatch {
 
@@ -12,7 +17,7 @@ namespace CommunityPatch {
         return _binSubDir;
 
       try {
-        _binSubDir = Utilities.GetConfigsPath();
+        _binSubDir = Common.ConfigName;
       }
       catch (NullReferenceException) {
         _binSubDir = "Win64_Shipping_Client";
@@ -28,13 +33,161 @@ namespace CommunityPatch {
         return _configsDir;
 
       try {
-        _configsDir = Utilities.GetConfigsPath();
+        _configsDir = EnsureTrailingDirectorySeparatorAndNormalize(Utilities.GetConfigsPath());
       }
       catch (NullReferenceException) {
-        _configsDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Mount and Blade II Bannerlord", "Configs");
+        _configsDir = EnsureTrailingDirectorySeparatorAndNormalize(Path.Combine(
+          Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+          "Mount and Blade II Bannerlord",
+          "Configs"
+        ));
       }
 
       return _configsDir;
+    }
+
+    private static string EnsureTrailingDirectorySeparatorAndNormalize(string path) {
+      var sb = new StringBuilder(path);
+
+      NormalizeSeparators(sb);
+
+      if (sb[sb.Length - 1] != Path.DirectorySeparatorChar)
+        sb.Append(Path.DirectorySeparatorChar);
+
+      return Path.IsPathRooted(path)
+        ? new Uri(sb.ToString()).LocalPath
+        : sb.ToString();
+    }
+
+    private static void NormalizeSeparators(StringBuilder sb) {
+      sb.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+      var l = sb.Length;
+      for (;;) {
+        sb.Replace(DoubleDirSeparator, DirSeparator);
+        var nl = sb.Length;
+        if (nl == l)
+          break;
+
+        l = nl;
+      }
+    }
+
+    private static string _gameBaseDir;
+
+    public static string GetGameBaseDir() {
+      try {
+        return _gameBaseDir ??= EnsureTrailingDirectorySeparatorAndNormalize(
+          Path.GetDirectoryName(Path.GetDirectoryName(GetGameBinDir().TrimEnd('\\', '/'))));
+      }
+      catch {
+        return null;
+      }
+    }
+
+    private static string _gameModsDir;
+
+    public static string GetModulesDir() {
+      try {
+        return _gameModsDir ??= EnsureTrailingDirectorySeparatorAndNormalize(
+          Path.Combine(GetGameBaseDir(), "Modules"));
+      }
+      catch {
+        return null;
+      }
+    }
+
+    private static string _gameBinDir;
+
+    private static readonly string DirSeparator = new string(Path.DirectorySeparatorChar, 1);
+
+    private static readonly string DoubleDirSeparator = new string(Path.DirectorySeparatorChar, 2);
+
+    public static string GetGameBinDir()
+      => _gameBinDir ??= EnsureTrailingDirectorySeparatorAndNormalize(
+        Path.GetDirectoryName(new Uri(
+          typeof(TaleWorlds.MountAndBlade.MBGameManager).Assembly.CodeBase
+        ).LocalPath));
+
+    public static bool IsOfficialAssembly(this Assembly asm) {
+      var path = new Uri(asm.CodeBase).LocalPath;
+      return IsOfficialPath(path);
+    }
+
+    public static bool IsOfficialPath(string path) {
+      // even if this isn't a dir, add a slash for matching purposes
+      var dir = EnsureTrailingDirectorySeparatorAndNormalize(path);
+
+      var gameBinDir = GetGameBinDir();
+      if (dir.StartsWith(gameBinDir, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+      var modsDir = GetModulesDir();
+
+      var nativeBinDir = EnsureTrailingDirectorySeparatorAndNormalize(Path.Combine(modsDir, "Native", "bin", GetBinSubDir()));
+      if (dir.StartsWith(nativeBinDir, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+      var sbBinDir = EnsureTrailingDirectorySeparatorAndNormalize(Path.Combine(modsDir, "SandBox", "bin", GetBinSubDir()));
+      if (dir.StartsWith(sbBinDir, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+      var sbcBinDir = EnsureTrailingDirectorySeparatorAndNormalize(Path.Combine(modsDir, "SandBoxCore", "bin", GetBinSubDir()));
+      if (dir.StartsWith(sbcBinDir, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+      var smBinDir = EnsureTrailingDirectorySeparatorAndNormalize(Path.Combine(modsDir, "StoryMode", "bin", GetBinSubDir()));
+      if (dir.StartsWith(smBinDir, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+      var cbBinDir = EnsureTrailingDirectorySeparatorAndNormalize(Path.Combine(modsDir, "CustomBattle", "bin", GetBinSubDir()));
+      if (dir.StartsWith(cbBinDir, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+      return false;
+    }
+
+    public static bool IsModuleAssembly(Assembly asm) {
+      if (asm.IsDynamic)
+        return false;
+
+      var asmPath = new Uri(asm.CodeBase).LocalPath;
+      var modsDir = GetModulesDir();
+      return asmPath.StartsWith(modsDir, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool IsModuleAssembly(Assembly asm, out ModuleInfo mod) {
+      if (asm.IsDynamic) {
+        mod = null;
+        return false;
+      }
+
+      try {
+        var asmPath = new Uri(asm.CodeBase).LocalPath;
+        var modsDir = GetModulesDir();
+        var isMod = asmPath.StartsWith(modsDir, StringComparison.OrdinalIgnoreCase);
+
+        if (asmPath.Length <= modsDir.Length) {
+          mod = null;
+          return false;
+        }
+
+        var modsSubDir = asmPath.Substring(modsDir.Length);
+        var slashIndex = modsSubDir.IndexOf(Path.DirectorySeparatorChar);
+        if (slashIndex == -1) {
+          mod = null; // wtf?
+          return true;
+        }
+
+        modsSubDir = modsSubDir.Substring(0, slashIndex);
+        var mods = ModuleInfo.GetModules();
+        mod = mods.FirstOrDefault(m => m.Alias == modsSubDir);
+
+        return isMod;
+      }
+      catch {
+        mod = null;
+        return false;
+      }
     }
 
   }

@@ -25,14 +25,13 @@ namespace CommunityPatch {
         }
 
         try {
-          if (patch.IsApplicable(game) ?? false) {
+          if (patch.IsApplicable(game) ?? false)
             try {
               patch.Apply(game);
             }
             catch (Exception ex) {
               Error(ex, $"Error while applying patch: {patch.GetType().Name}");
             }
-          }
         }
         catch (Exception ex) {
           Error(ex, $"Error while checking if patch is applicable: {patch.GetType().Name}");

@@ -1,0 +1,104 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <Configurations>Release;Debug</Configurations>
+        <Platforms>x64</Platforms>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>8</LangVersion>
+        <Version>0.0.1</Version>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch</RepositoryUrl>
+        <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="$(MnB2BannerlordBinDir)\System.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.MountAndBlade.Launcher.exe">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(MnB2BannerlordBinDir)\Steamworks.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(MnB2BannerlordBinDir)\Mono.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Bannerlord.exe.config" />
+        <Content Include="Bannerlord.exe.config">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="TaleWorlds.MountAndBlade.Launcher.exe.config" />
+        <Content Include="TaleWorlds.MountAndBlade.Launcher.exe.config">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Costura.Fody" Version="4.1.0" PrivateAssets="All" />
+        <PackageReference Include="Fody" Version="6.1.1" PrivateAssets="All" />
+        <PackageReference Include="InlineIL.Fody" Version="1.4.0" PrivateAssets="All" />
+        <PackageReference Include="Lib.Harmony" Version="2.0.0.9" />
+        <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" />
+        <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="2.0.0-beta.20213.1" />
+        <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+        <PackageReference Include="ModuleInit.Fody" Version="2.1.0" />
+        <PackageReference Include="Sigil" Version="5.0.0" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
+        <PackageReference Include="TextCopy" Version="3.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="PathHelpers.cs">
+        <WouldDependOn>PathHelpers</WouldDependOn>
+      </Compile>
+    </ItemGroup>
+
+    <Target Name="FixDuplicateJetBrainsAnnotationsReferenceBefore" BeforeTargets="CoreCompile">
+        <Message Importance="high" Text="FixDuplicateJetBrainsAnnotationsReferenceBefore" />
+        <ItemGroup>
+            <RefToRemove Include="@(ReferencePath)" Condition="$([System.String]::Copy(&quot;%(Filename)&quot;).Contains('JetBrains.Annotations'))" />
+            <Reference Remove="@(RefToRemove)" />
+            <RefPathToRemove Include="@(ReferencePath)" Condition="$([System.String]::Copy(&quot;%(Filename)&quot;).Contains('JetBrains.Annotations'))" />
+            <ReferencePath Remove="@(RefPathToRemove)" />
+            <RefPath2ToRemove Include="@(ReferencePathWithRefAssemblies)" Condition="$([System.String]::Copy(&quot;%(Filename)&quot;).Contains('JetBrains.Annotations'))" />
+            <ReferencePathWithRefAssemblies Remove="@(RefPath2ToRemove)" />
+        </ItemGroup>
+        <Message Importance="high" Text="Removing Reference: @(RefToRemove)" />
+        <Message Importance="high" Text="Removing ReferencePath: @(RefPathToRemove)" />
+        <Message Importance="high" Text="Removing ReferencePath: @(RefPath2ToRemove)" />
+        <Message Importance="high" Text="ReferencePath: $(ReferencePath)" />
+    </Target>
+
+    <Target Name="CopyToGameDir" AfterTargets="Build">
+        <ItemGroup>
+            <FilesToCopy Include="$(OutputPath)\Antijank.dll" />
+            <FilesToCopy Include="$(OutputPath)\0Harmony.dll" />
+            <FilesToCopy Include="$(OutputPath)\*.exe.config" />
+        </ItemGroup>
+        <Message Importance="high" Text="Copying: @(FilesToCopy)" />
+        <Copy UseHardlinksIfPossible="true" SourceFiles="@(FilesToCopy)" DestinationFolder="$(MnB2BannerlordBinDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    </Target>
+
+    <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
+        <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
+        <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
+        <PropertyGroup>
+            <SourceRevisionId>$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
+        </PropertyGroup>
+        <Message Importance="high" Text="Shortened SCI Version: $(SourceRevisionId)" />
+    </Target>
+</Project>

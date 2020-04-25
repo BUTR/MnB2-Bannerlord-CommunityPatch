@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
@@ -16,12 +17,12 @@ namespace CommunityPatch.Patches {
       // using assembly qualified name here
       // ReSharper disable once PossibleNullReferenceException
       = typeof(Hero).GetMethod("get_MapFaction",
-        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        Public | NonPublic | Instance | Static | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo
       = typeof(MapFactionLogicLoopPatch)
         .GetMethod(nameof(Prefix),
-          BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+          Public | NonPublic | Static | DeclaredOnly);
 
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

@@ -3,14 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using HarmonyLib;
+using JetBrains.Annotations;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.MountAndBlade.ViewModelCollection;
 using Module = TaleWorlds.MountAndBlade.Module;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch {
 
-  public static class MenuCleaner {
+  [UsedImplicitly]
+  [HarmonyPatch(typeof(InitialMenuVM), MethodType.Constructor)]
+  public class GroupMainMenuOptionsPatch {
+
+    [UsedImplicitly]
+    public static void Prefix() {
+      if (!CommunityPatchSubModule.DontGroupThirdPartyMenuOptions)
+        CleanUpMainMenu();
+    }
 
     private const int MaxMenuLength = 8;
 
@@ -19,29 +31,37 @@ namespace CommunityPatch {
     internal static List<InitialStateOption> GetThirdPartyOptionsMenus()
       => _modOptionsMenus ??= Module.CurrentModule.GetInitialStateOptions()
         .Where(IsThirdPartyOption)
-        .Concat(_groupedOptionsMenus ?? (IEnumerable<InitialStateOption>) Array.Empty<InitialStateOption>())
+        .Concat(GroupedOptionsMenus ?? (IEnumerable<InitialStateOption>) Array.Empty<InitialStateOption>())
         .ToList();
 
     private static bool _alreadyCleanedUpMainMenu;
 
-    internal static List<InitialStateOption> _groupedOptionsMenus;
+    internal static List<InitialStateOption> GroupedOptionsMenus;
 
-    public static void CleanUpMainMenu() {
+    internal static void CleanUpMainMenu() {
       if (_alreadyCleanedUpMainMenu)
         return;
 
       _alreadyCleanedUpMainMenu = true;
       var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
+      try {
+        Array.Sort(menu, Comparer<InitialStateOption>
+          .Create((a, b)
+            => a.OrderIndex.CompareTo(b.OrderIndex)));
+      }
+      catch {
+        // well whatever
+      }
 
       if (menu.Length <= MaxMenuLength)
         return;
 
-      if (_groupedOptionsMenus != null)
+      if (GroupedOptionsMenus != null)
         return;
 
       var menuLength = menu.Length;
 
-      _groupedOptionsMenus = new List<InitialStateOption>();
+      GroupedOptionsMenus = new List<InitialStateOption>();
       for (var i = menuLength - 1; i > 0; --i) {
         var item = menu[i];
 
@@ -51,15 +71,27 @@ namespace CommunityPatch {
         if (menuLength <= MaxMenuLength)
           break;
 
-        _groupedOptionsMenus.Add(item);
+        GroupedOptionsMenus.Add(item);
         menu[i] = null;
         --menuLength;
       }
 
+      GroupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
+        var order = a.OrderIndex.CompareTo(b.OrderIndex);
+        if (order == 0)
+          order = string.Compare((a.Id ?? ""), b.Id ?? "", StringComparison.OrdinalIgnoreCase);
+        if (order == 0)
+          order = string.Compare((a.Name.ToString() ?? ""), b.Name.ToString() ?? "", StringComparison.OrdinalIgnoreCase);
+        if (order == 0)
+          order = a.GetHashCode().CompareTo(b.GetHashCode());
+        return order;
+      }));
+
       Module.CurrentModule.ClearStateOptions();
-      foreach (var opt in menu)
+      foreach (var opt in menu) {
         if (opt != null)
           Module.CurrentModule.AddInitialStateOption(opt);
+      }
 
       Module.CurrentModule.AddInitialStateOption(new InitialStateOption(
         "MoreOptions",
@@ -77,7 +109,8 @@ namespace CommunityPatch {
           || optAsmName.StartsWith("SandBox.")
           || optAsmName.StartsWith("SandBoxCore.")
           || optAsmName.StartsWith("StoryMode."))
-          return false;
+          if (optAsm.IsOfficialAssembly())
+            return false;
       }
       catch (Exception) {
         return true;
@@ -87,7 +120,7 @@ namespace CommunityPatch {
     }
 
     internal static void ShowMoreMainMenuOptions()
-      => ShowOptions(_groupedOptionsMenus);
+      => ShowOptions(GroupedOptionsMenus);
 
     internal static void ShowOptions(List<InitialStateOption> moreOptions)
       => InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
@@ -113,7 +146,7 @@ namespace CommunityPatch {
           }, null);
         }, null));
 
-    private static readonly FieldInfo InitOptActField = typeof(InitialStateOption).GetField("_action", BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo InitOptActField = typeof(InitialStateOption).GetField("_action", NonPublic | Instance);
 
   }
 

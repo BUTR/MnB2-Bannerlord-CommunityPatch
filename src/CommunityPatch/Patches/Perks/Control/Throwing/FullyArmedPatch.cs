@@ -4,13 +4,14 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Control.Throwing {
-  
-  public sealed class FullyArmedPatch : ExtraAmmoPerksPatch<FullyArmedPatch>{
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(FullyArmedPatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+  public sealed class FullyArmedPatch : ExtraAmmoPerksPatch<FullyArmedPatch> {
+
+    private static readonly MethodInfo PatchMethodInfo = typeof(FullyArmedPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
+
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -27,4 +28,5 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
     private static void Postfix(Agent __instance) => ApplyPerk(__instance, 1, CanApplyPerk);
 
   }
+
 }

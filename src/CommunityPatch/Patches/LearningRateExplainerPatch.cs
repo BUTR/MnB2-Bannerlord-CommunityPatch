@@ -8,6 +8,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
@@ -17,26 +18,26 @@ namespace CommunityPatch.Patches {
     public bool Applied { get; private set; }
 
     private static readonly MethodInfo TargetMethodInfo1 = typeof(DefaultCharacterDevelopmentModel)
-      .GetMethod("CalculateLearningLimit", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+      .GetMethod("CalculateLearningLimit", Public | Instance | DeclaredOnly,
         null, CallingConventions.Any, new[] {typeof(Hero), typeof(SkillObject), typeof(StatExplainer)}, null);
 
     private static readonly MethodInfo TargetMethodInfo2 = typeof(DefaultCharacterDevelopmentModel)
-      .GetMethod("CalculateLearningLimit", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+      .GetMethod("CalculateLearningLimit", Public | Instance | DeclaredOnly,
         null, CallingConventions.Any, new[] {typeof(int), typeof(int), typeof(TextObject), typeof(StatExplainer)}, null);
 
     private static readonly MethodInfo CheckMethodInfo1 = typeof(DefaultCharacterDevelopmentModel)
-      .GetMethod("CalculateLearningRate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+      .GetMethod("CalculateLearningRate", Public | Instance | DeclaredOnly,
         null, CallingConventions.Any, new[] {typeof(Hero), typeof(SkillObject), typeof(StatExplainer)}, null);
 
     private static readonly MethodInfo CheckMethodInfo2 = typeof(DefaultCharacterDevelopmentModel)
-      .GetMethod("CalculateLearningRate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+      .GetMethod("CalculateLearningRate", Public | Instance | DeclaredOnly,
         null, CallingConventions.Any, new[] {typeof(int), typeof(int), typeof(int), typeof(int), typeof(TextObject), typeof(StatExplainer)}, null);
 
     private static readonly MethodInfo PatchMethodInfo1 = typeof(LearningRateExplainerPatch)
-      .GetMethod(nameof(CalculateLearning1Limit), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      .GetMethod(nameof(CalculateLearning1Limit), NonPublic | Static | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo2 = typeof(LearningRateExplainerPatch)
-      .GetMethod(nameof(CalculateLearning2Limit), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      .GetMethod(nameof(CalculateLearning2Limit), NonPublic | Static | DeclaredOnly);
 
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield return CheckMethodInfo1;

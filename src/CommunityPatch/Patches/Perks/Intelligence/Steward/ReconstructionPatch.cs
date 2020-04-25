@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Actions;
@@ -8,6 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
@@ -16,9 +15,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(IncreaseSettlementHealthAction).GetMethod("ApplyInternal", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(IncreaseSettlementHealthAction).GetMethod("ApplyInternal", NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(ReconstructionPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(ReconstructionPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -85,7 +84,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
       percentage *= perk.PrimaryBonus;
     }
-
 
   }
 

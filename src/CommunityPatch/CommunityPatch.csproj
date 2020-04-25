@@ -14,8 +14,6 @@
         <OutputPath>../../bin/Win64_Shipping_Client</OutputPath>
         <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
         <LangVersion>8</LangVersion>
-        <MnB2BannerlordBinDir>../../../../bin/Win64_Shipping_Client</MnB2BannerlordBinDir>
-        <MnB2BannerlordLauncher>$(MnB2BannerlordBinDir)/TaleWorlds.MountAndBlade.Launcher.exe</MnB2BannerlordLauncher>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch</RepositoryUrl>
@@ -25,19 +23,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\System.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\System.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Steamworks.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\Steamworks.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="..\..\..\..\bin\Win64_Shipping_Client\Mono.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\Mono.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
@@ -62,11 +60,14 @@
             <GeneratePathProperty>True</GeneratePathProperty>
             <NoWarn>NU1701</NoWarn>
         </PackageReference>
+        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.3.3" />
         <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
         <PackageReference Include="Sigil" Version="5.0.0" />
+        <PackageReference Include="System.Numerics.Vectors" Version="4.4.0" />
         <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
+        <PackageReference Include="TextCopy" Version="3.0.2" />
         <PackageReference Include="Tomlyn" Version="0.1.2" />
     </ItemGroup>
 
@@ -75,13 +76,11 @@
             <WouldDependOn>$([System.Text.RegularExpressions.Regex]::Replace('%(Filename)', '^(.*?)\..*$', '$1.cs'))</WouldDependOn>
             <DependentUpon Condition="'%(DependentUpon)' == '' And '%(WouldDependOn)' != '%(Filename)'">%(WouldDependOn)</DependentUpon>
         </Compile>
+        <Compile Update="Patches\GroupMainMenuOptionsPatch.cs">
+          <WouldDependOn>MenuCleanerPatch</WouldDependOn>
+        </Compile>
     </ItemGroup>
-    
-    
-    <ItemGroup>
-        <Folder Include="Patches\Perks\Intelligence" />
-    </ItemGroup>
-    
+
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
         <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
         <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
