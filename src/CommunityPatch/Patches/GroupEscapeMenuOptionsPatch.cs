@@ -6,13 +6,10 @@ using System.Threading;
 using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.Core;
-using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade.ViewModelCollection;
 using static System.Reflection.BindingFlags;
-using Module = TaleWorlds.MountAndBlade.Module;
-using Path = System.IO.Path;
 
 namespace CommunityPatch.Patches {
 

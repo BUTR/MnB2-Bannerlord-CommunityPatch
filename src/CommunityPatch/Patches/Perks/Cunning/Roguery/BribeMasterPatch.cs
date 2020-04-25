@@ -5,7 +5,6 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 

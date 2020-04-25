@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
-using System.Reflection.Emit;
 using System.Threading;
 using Sigil;
-using Sigil.NonGeneric;
 using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch {
