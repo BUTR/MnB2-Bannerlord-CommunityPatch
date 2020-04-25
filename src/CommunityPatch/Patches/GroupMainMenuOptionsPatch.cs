@@ -3,15 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using HarmonyLib;
+using JetBrains.Annotations;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
-using static System.Reflection.BindingFlags;
+using TaleWorlds.MountAndBlade.ViewModelCollection;
 using Module = TaleWorlds.MountAndBlade.Module;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch {
 
-  public static class MenuCleaner {
+  [UsedImplicitly]
+  [HarmonyPatch(typeof(InitialMenuVM), MethodType.Constructor)]
+  public class GroupMainMenuOptionsPatch {
+
+    [UsedImplicitly]
+    public static void Prefix() {
+      if (!CommunityPatchSubModule.DontGroupThirdPartyMenuOptions)
+        CleanUpMainMenu();
+    }
 
     private const int MaxMenuLength = 8;
 
@@ -20,17 +31,14 @@ namespace CommunityPatch {
     internal static List<InitialStateOption> GetThirdPartyOptionsMenus()
       => _modOptionsMenus ??= Module.CurrentModule.GetInitialStateOptions()
         .Where(IsThirdPartyOption)
-        .Concat(_groupedOptionsMenus ?? (IEnumerable<InitialStateOption>) Array.Empty<InitialStateOption>())
+        .Concat(GroupedOptionsMenus ?? (IEnumerable<InitialStateOption>) Array.Empty<InitialStateOption>())
         .ToList();
 
     private static bool _alreadyCleanedUpMainMenu;
 
-    internal static List<InitialStateOption> _groupedOptionsMenus;
+    internal static List<InitialStateOption> GroupedOptionsMenus;
 
-    public static void CleanUpMainMenu()
-      => SynchronizationContext.Current.Post(_ => CleanUpMainMenuInternal(), null);
-
-    private static void CleanUpMainMenuInternal() {
+    internal static void CleanUpMainMenu() {
       if (_alreadyCleanedUpMainMenu)
         return;
 
@@ -48,12 +56,12 @@ namespace CommunityPatch {
       if (menu.Length <= MaxMenuLength)
         return;
 
-      if (_groupedOptionsMenus != null)
+      if (GroupedOptionsMenus != null)
         return;
 
       var menuLength = menu.Length;
 
-      _groupedOptionsMenus = new List<InitialStateOption>();
+      GroupedOptionsMenus = new List<InitialStateOption>();
       for (var i = menuLength - 1; i > 0; --i) {
         var item = menu[i];
 
@@ -63,12 +71,12 @@ namespace CommunityPatch {
         if (menuLength <= MaxMenuLength)
           break;
 
-        _groupedOptionsMenus.Add(item);
+        GroupedOptionsMenus.Add(item);
         menu[i] = null;
         --menuLength;
       }
 
-      _groupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
+      GroupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
         var order = a.OrderIndex.CompareTo(b.OrderIndex);
         if (order == 0)
           order = string.Compare((a.Id ?? ""), b.Id ?? "", StringComparison.OrdinalIgnoreCase);
@@ -101,7 +109,7 @@ namespace CommunityPatch {
           || optAsmName.StartsWith("SandBox.")
           || optAsmName.StartsWith("SandBoxCore.")
           || optAsmName.StartsWith("StoryMode."))
-          if (PathHelpers.IsOfficialAssembly(optAsm))
+          if (optAsm.IsOfficialAssembly())
             return false;
       }
       catch (Exception) {
@@ -112,7 +120,7 @@ namespace CommunityPatch {
     }
 
     internal static void ShowMoreMainMenuOptions()
-      => ShowOptions(_groupedOptionsMenus);
+      => ShowOptions(GroupedOptionsMenus);
 
     internal static void ShowOptions(List<InitialStateOption> moreOptions)
       => InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(

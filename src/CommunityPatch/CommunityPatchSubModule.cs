@@ -56,9 +56,6 @@ namespace CommunityPatch {
         }
       }
 
-      if (!DontGroupThirdPartyMenuOptions)
-        MenuCleaner.CleanUpMainMenu();
-
       if (DisableIntroVideo)
         try {
           typeof(Module)

@@ -76,6 +76,9 @@
             <WouldDependOn>$([System.Text.RegularExpressions.Regex]::Replace('%(Filename)', '^(.*?)\..*$', '$1.cs'))</WouldDependOn>
             <DependentUpon Condition="'%(DependentUpon)' == '' And '%(WouldDependOn)' != '%(Filename)'">%(WouldDependOn)</DependentUpon>
         </Compile>
+        <Compile Update="Patches\GroupMainMenuOptionsPatch.cs">
+          <WouldDependOn>MenuCleanerPatch</WouldDependOn>
+        </Compile>
     </ItemGroup>
 
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
