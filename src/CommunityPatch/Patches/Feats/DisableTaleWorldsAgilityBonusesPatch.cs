@@ -32,8 +32,6 @@ namespace CommunityPatch.Patches.Feats {
     }
 
     public override bool? IsApplicable(Game game) {
-      if (Applied) return false;
-
       if (TargetMethodInfo == null) {
         CommunityPatchSubModule.Error("DisableTaleWorldsAgilityBonusesPatch:  Invalid target method");
         return false;

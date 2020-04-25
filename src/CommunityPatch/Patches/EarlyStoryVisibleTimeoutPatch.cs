@@ -8,6 +8,7 @@ using Mono.Cecil.Cil;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using TaleWorlds.MountAndBlade;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
@@ -64,7 +65,13 @@ namespace CommunityPatch.Patches {
 
     public bool? IsApplicable(Game game) {
       // if they remove the const, they probably got rid of the time limit
-      if (FirstPhaseTimeLimitInYearsField == null || game.GameType.GetType().FullName != "StoryMode.CampaignStoryMode")
+      if (FirstPhaseTimeLimitInYearsField == null)
+        return false;
+
+      if (GameNetwork.IsMultiplayer)
+        return false;
+
+      if (Type.GetType("StoryMode.CampaignStoryMode, StoryMode, Version=1.0.0.0, Culture=neutral", false) == null)
         return false;
 
       if (FirstPhaseQuestRemainingTimeHiddenGetters.Count == 0)

@@ -80,7 +80,6 @@
         <Message Importance="high" Text="Removing ReferencePath: @(RefPathToRemove)" />
         <Message Importance="high" Text="Removing ReferencePath: @(RefPath2ToRemove)" />
         <Message Importance="high" Text="ReferencePath: $(ReferencePath)" />
-        
     </Target>
 
     <Target Name="CopyToGameDir" AfterTargets="Build">

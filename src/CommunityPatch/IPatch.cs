@@ -8,7 +8,7 @@ namespace CommunityPatch {
   [PublicAPI]
   public interface IPatch {
 
-    bool? IsApplicable(Game game);
+    bool? IsApplicable([CanBeNull] Game game);
 
     void Apply(Game game);
 

@@ -67,7 +67,7 @@ namespace CommunityPatch.Patches.Feats {
                 Hero.MainHero.IsHumanPlayerCharacter &&
                 Hero.MainHero.CharacterObject.GetFeatValue(DefaultFeats.Cultural.AseraiCheapCaravans)) {
 
-                int creditAmount = (int) (DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus * (__state - Hero.MainHero.Gold));
+                var creditAmount = (int) (DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus * (__state - Hero.MainHero.Gold));
 
                 if (creditAmount > 0) {
                     InformationManager.DisplayMessage(new InformationMessage(AseraiCheapCaravansFlavorText.ToString()));
