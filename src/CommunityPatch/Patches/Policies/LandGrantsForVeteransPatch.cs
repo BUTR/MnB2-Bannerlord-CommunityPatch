@@ -66,10 +66,10 @@ namespace CommunityPatch.Patches.Policies {
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo1,
         new HarmonyMethod(PatchMethodInfo1Prefix),
         new HarmonyMethod(PatchMethodInfo1Postfix));
-      
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo2,
         postfix: new HarmonyMethod(PatchMethodInfo2));
-      
+
       Applied = true;
     }
 
@@ -81,7 +81,7 @@ namespace CommunityPatch.Patches.Policies {
       var hash1 = TargetMethodInfo1.MakeCilSignatureSha256();
       if (!hash1.MatchesAnySha256(Hashes1))
         return false;
-      
+
       var patchInfo2 = Harmony.GetPatchInfo(TargetMethodInfo2);
       if (AlreadyPatchedByOthers(patchInfo2))
         return false;
@@ -89,7 +89,7 @@ namespace CommunityPatch.Patches.Policies {
       var hash2 = TargetMethodInfo2.MakeCilSignatureSha256();
       return hash2.MatchesAnySha256(Hashes2);
     }
-    
+
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Prefix1(Town town, ref StatExplainer explanation)
@@ -110,15 +110,14 @@ namespace CommunityPatch.Patches.Policies {
         }
       }
     }
-    
+
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void Postfix2( 
+    private static void Postfix2(
       Settlement settlement,
       ref float meleeEliteTroopRate,
-      ref float rangedEliteTroopRate) 
-    {
-      if(!(settlement.OwnerClan?.Kingdom?.ActivePolicies.Contains(DefaultPolicies.LandGrantsForVeterans) ?? false))
+      ref float rangedEliteTroopRate) {
+      if (!(settlement.OwnerClan?.Kingdom?.ActivePolicies.Contains(DefaultPolicies.LandGrantsForVeterans) ?? false))
         return;
 
       meleeEliteTroopRate += 0.1f;

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,30 +14,44 @@ using TaleWorlds.Localization;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
+
   public class GoodMaterialsPatch : PatchBase<GoodMaterialsPatch> {
+
     public override bool Applied { get; protected set; }
 
     private static readonly Type MapSiegeProductionVmType = Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+
     private static readonly MethodInfo AiTargetMethodInfo = typeof(SiegeEvent).GetMethod(nameof(SiegeEvent.DoSiegeAction), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    private static readonly MethodInfo PlayerTargetMethodInfo = MapSiegeProductionVmType?.GetMethod("OnPossibleMachineSelection", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+    private static readonly MethodInfo PlayerTargetMethodInfo = MapSiegeProductionVmType.GetMethod("OnPossibleMachineSelection", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo MaxHitPointsTargetMethodInfo = typeof(SiegeEvent.SiegeEngineConstructionProgress).GetMethod("get_MaxHitPoints", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo TooltipTargetMethodInfo = SiegeTooltipHelper.TargetMethodInfo;
-    
+
     private static readonly MethodInfo AiPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(AiPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PlayerPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(PlayerPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PlayerPatchMethodInfoPrefix = typeof(GoodMaterialsPatch).GetMethod(nameof(PlayerPrefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo MaxHitPointsPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(MaxHitPointsPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo TooltipPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(TooltipPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
+    private static readonly PropertyInfo MapSiegeProductionVmSiegeProperty = MapSiegeProductionVmType.GetProperty("Siege", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+    private static readonly PropertyInfo MapSiegeProductionVmPlayerSideProperty = MapSiegeProductionVmType.GetProperty("PlayerSide", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AiTargetMethodInfo;
       yield return PlayerTargetMethodInfo;
       yield return MaxHitPointsTargetMethodInfo;
     }
-    
+
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "EJCrymMr");
-    
+
     private PerkObject _perk;
 
     private static readonly byte[][] AiHashes = {
@@ -48,7 +63,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x2D, 0x7C, 0x3F, 0xF2, 0xE6, 0xF3, 0x70, 0xAE
       }
     };
-    
+
     private static readonly byte[][] PlayerHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -58,7 +73,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x1D, 0xD0, 0xCA, 0x8C, 0xDE, 0x57, 0xD5, 0xA5
       }
     };
-    
+
     private static readonly byte[][] MaxHitPointsHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -70,7 +85,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     };
 
     private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
-    
+
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
       if (_perk == null) return false;
@@ -78,16 +93,16 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       if (PlayerTargetMethodInfo == null) return false;
       if (MaxHitPointsTargetMethodInfo == null) return false;
       if (TooltipTargetMethodInfo == null) return false;
-      
+
       var aiPatchInfo = Harmony.GetPatchInfo(AiTargetMethodInfo);
       if (AlreadyPatchedByOthers(aiPatchInfo)) return false;
-      
+
       var playerPatchInfo = Harmony.GetPatchInfo(PlayerTargetMethodInfo);
       if (AlreadyPatchedByOthers(playerPatchInfo)) return false;
-      
+
       var maxHitPointsPatchInfo = Harmony.GetPatchInfo(MaxHitPointsTargetMethodInfo);
       if (AlreadyPatchedByOthers(maxHitPointsPatchInfo)) return false;
-      
+
       var tooltipPatchInfo = Harmony.GetPatchInfo(TooltipTargetMethodInfo);
       if (AlreadyPatchedByOthers(tooltipPatchInfo)) return false;
 
@@ -96,12 +111,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var maxHitPointsHashes = MaxHitPointsTargetMethodInfo.MakeCilSignatureSha256();
       var tooltipHashes = TooltipTargetMethodInfo.MakeCilSignatureSha256();
 
-      return aiHash.MatchesAnySha256(AiHashes) && 
+      return aiHash.MatchesAnySha256(AiHashes) &&
         playerHash.MatchesAnySha256(PlayerHashes) &&
         maxHitPointsHashes.MatchesAnySha256(MaxHitPointsHashes) &&
         tooltipHashes.MatchesAnySha256(TooltipHashes);
     }
-    
+
     public override void Apply(Game game) {
       var textObjStrings = TextObject.ConvertToStringList(
         new List<TextObject> {
@@ -109,7 +124,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
           _perk.Description
         }
       );
-      
+
       _perk.Initialize(
         textObjStrings[0],
         textObjStrings[1],
@@ -130,7 +145,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       Applied = true;
     }
-    
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void AiPostfix(ref SiegeEvent __instance, SiegeEvent.SiegeEnginesContainer siegeEngines, SiegeStrategyActionModel.SiegeAction siegeAction) {
       if (siegeAction != SiegeStrategyActionModel.SiegeAction.ConstructNewSiegeEngine) return;
@@ -152,61 +167,57 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var reservedSiegeEngineCount = playerSideSiegeEvent.SiegeEngines.ReservedSiegeEngines.Count;
       __state = new Tuple<int, int>(deployedSiegeEngineCount, reservedSiegeEngineCount);
     }
-    
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void PlayerPostfix(ref Object __instance, ref Tuple<int, int> __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
       var playerSideSiegeEvent = siegeEvent.GetSiegeEventSide(GetPlayerSideFromVm(__instance));
-      
+
       if (!HasSiegeEngineJustBeenConstructed(playerSideSiegeEvent, __state.Item1, __state.Item2)) return;
 
       var justDeployedEngine = playerSideSiegeEvent.SiegeEngines.DeployedSiegeEngines.Last();
       ApplyPerkToSiegeEngine(justDeployedEngine, playerSideSiegeEvent);
     }
-    
+
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
+    public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress? engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
-      if (siegeEventSide == null) return;
-      
+      if (siegeEventSide == null || engineInProgress == null) return;
+
       CalculateBonusFlatHpAndRateFromPerk(engineInProgress, siegeEventSide, out var bonusFlatHp, out var bonusHpRate);
       SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusHpRate);
       SiegeTooltipHelper.UpdateMaxHpTooltip(__result, bonusFlatHp);
     }
-    
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     // ReSharper disable once RedundantAssignment
     public static void MaxHitPointsPostfix(ref float __result, ref SiegeEvent.SiegeEngineConstructionProgress __instance)
       => __result = SiegeEngineConstructionExtraDataManager.GetMaxHitPoints(__instance);
 
-    private static ISiegeEventSide GetSiegeContainerSide(SiegeEvent siegeEvent, SiegeEvent.SiegeEnginesContainer siegeEngines) 
+    private static ISiegeEventSide GetSiegeContainerSide(SiegeEvent siegeEvent, SiegeEvent.SiegeEnginesContainer siegeEngines)
       => siegeEvent.GetSiegeEventSide(siegeEvent.BesiegerCamp.SiegeEngines == siegeEngines ? BattleSideEnum.Attacker : BattleSideEnum.Defender);
-    
-    private static void ApplyPerkToSiegeEngine(SiegeEvent.SiegeEngineConstructionProgress justDeployedEngine, ISiegeEventSide sideSiegeEvent)
-    {
+
+    private static void ApplyPerkToSiegeEngine(SiegeEvent.SiegeEngineConstructionProgress justDeployedEngine, ISiegeEventSide sideSiegeEvent) {
       CalculateBonusFlatHpAndRateFromPerk(justDeployedEngine, sideSiegeEvent, out var bonusFlatHp, out _);
       justDeployedEngine.SetHitpoints(justDeployedEngine.Hitpoints + bonusFlatHp);
       SiegeEngineConstructionExtraDataManager.SetMaxHitPoints(justDeployedEngine, justDeployedEngine.Hitpoints);
     }
-    
-    private static SiegeEvent GetSiegeEventFromVm(object vm) {
-      var propertyInfo = MapSiegeProductionVmType.GetProperty("Siege", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-      return (SiegeEvent)propertyInfo?.GetValue(vm);
-    }
-    
+
+    private static SiegeEvent GetSiegeEventFromVm(object vm)
+      => (SiegeEvent) MapSiegeProductionVmSiegeProperty?.GetValue(vm);
+
     private static BattleSideEnum GetPlayerSideFromVm(object vm) {
-      var propertyInfo = MapSiegeProductionVmType.GetProperty("PlayerSide", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-      return (BattleSideEnum) (propertyInfo != null ? propertyInfo.GetValue(vm) : BattleSideEnum.None);
+      return (BattleSideEnum) (MapSiegeProductionVmPlayerSideProperty != null ? MapSiegeProductionVmPlayerSideProperty.GetValue(vm) : BattleSideEnum.None);
     }
 
     private static bool HasSiegeEngineJustBeenConstructed(ISiegeEventSide playerSiegeEvent, int deployedSiegeEngineCount, int reservedSiegeEngineCount) {
       if (playerSiegeEvent.SiegeEngines.DeployedSiegeEngines.Count <= deployedSiegeEngineCount) return false;
+
       return playerSiegeEvent.SiegeEngines.ReservedSiegeEngines.Count == reservedSiegeEngineCount;
     }
-    
-    private static void CalculateBonusFlatHpAndRateFromPerk(SiegeEvent.SiegeEngineConstructionProgress justDeployedEngine, 
-      ISiegeEventSide sideSiegeEvent, out float bonusFlatHp, out float bonusHpRate) 
-    {
+
+    private static void CalculateBonusFlatHpAndRateFromPerk(SiegeEvent.SiegeEngineConstructionProgress justDeployedEngine,
+      ISiegeEventSide sideSiegeEvent, out float bonusFlatHp, out float bonusHpRate) {
       var perk = ActivePatch._perk;
       var partyMemberHealth = new ExplainedNumber(justDeployedEngine.SiegeEngine.MaxHitPoints);
       var partyMemberRate = new ExplainedNumber(100);
@@ -219,5 +230,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       bonusFlatHp = partyMemberHealth.ResultNumber - partyMemberHealth.BaseNumber;
       bonusHpRate = partyMemberRate.ResultNumber - partyMemberRate.BaseNumber;
     }
+
   }
+
 }

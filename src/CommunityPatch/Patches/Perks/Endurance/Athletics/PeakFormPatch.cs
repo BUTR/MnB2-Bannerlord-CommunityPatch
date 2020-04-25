@@ -52,7 +52,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       if (!hash.MatchesAnySha256(Hashes))
         return false;
-      
+
       if (_perk.PrimaryBonus != 0f)
         return null;
 

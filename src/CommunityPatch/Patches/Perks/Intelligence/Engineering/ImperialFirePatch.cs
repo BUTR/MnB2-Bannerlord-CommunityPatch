@@ -13,16 +13,17 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
   public class ImperialFirePatch : PatchBase<ImperialFirePatch> {
+
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo AttackerTargetMethodInfo =
       Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
         .GetMethod("GetAllAttackerRangedMachines", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+
     private static readonly MethodInfo DefenderTargetMethodInfo =
       Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
         .GetMethod("GetAllDefenderMachines", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+
     private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ImperialFirePatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -41,7 +42,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x84, 0xD2, 0xD4, 0x6D, 0xC1, 0x30, 0x36, 0x43
       }
     };
-    
+
     private static readonly byte[][] DefenderHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -60,10 +61,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     {
       if (_perk == null) return false;
       if (_perk.PrimaryBonus != 0.3f) return false;
-      
+
       var attackerPatchInfo = Harmony.GetPatchInfo(AttackerTargetMethodInfo);
       if (AlreadyPatchedByOthers(attackerPatchInfo)) return false;
-      
+
       var defenderPatchInfo = Harmony.GetPatchInfo(DefenderTargetMethodInfo);
       if (AlreadyPatchedByOthers(defenderPatchInfo)) return false;
 
@@ -101,9 +102,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public static void Postfix(ref IEnumerable<SiegeEngineType> __result) {
       if (Hero.MainHero == null) return;
       if (AnyPartyMemberHasThePerkActive(Hero.MainHero.PartyBelongedTo)) return;
+
       __result = RemoveFireEngines(__result);
     }
-    
+
     private static bool AnyPartyMemberHasThePerkActive(MobileParty party) {
       var perk = ActivePatch._perk;
       var partyMemberValue = new ExplainedNumber(0f);
@@ -115,11 +117,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       return partyMemberValue.ResultNumber.IsEqualOrBiggerThan(1f);
     }
-    
-    private static IEnumerable<SiegeEngineType> RemoveFireEngines(IEnumerable<SiegeEngineType> engineTypes) 
-      => engineTypes.Where(x => 
+
+    private static IEnumerable<SiegeEngineType> RemoveFireEngines(IEnumerable<SiegeEngineType> engineTypes)
+      => engineTypes.Where(x =>
         x != DefaultSiegeEngineTypes.FireBallista &&
         x != DefaultSiegeEngineTypes.FireCatapult &&
         x != DefaultSiegeEngineTypes.FireOnager);
+
   }
+
 }

@@ -16,6 +16,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultBuildingEffectModel).GetMethod(nameof(DefaultBuildingEffectModel.GetBuildingEffectAmount), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfoPostfix = typeof(EverydayEngineerPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -49,7 +50,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-
       var textObjStrings = TextObject.ConvertToStringList(
         new List<TextObject> {
           _perk.Name,
@@ -84,5 +84,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       PerkHelper.AddPerkBonusForTown(perk, building.Town, ref totalEffect);
       __result = totalEffect.ResultNumber;
     }
+
   }
+
 }

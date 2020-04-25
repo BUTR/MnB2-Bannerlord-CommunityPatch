@@ -17,8 +17,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TooltipTargetMethodInfo = SiegeTooltipHelper.TargetMethodInfo;
+
     private static readonly MethodInfo BombardTargetMethodInfo = typeof(SiegeEvent).GetMethod("BombardHitEngine", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo TooltipPatchMethodInfo = typeof(BallisticsPatch).GetMethod(nameof(TooltipPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo BombardPatchMethodInfo = typeof(BallisticsPatch).GetMethod(nameof(BombardPrefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -27,8 +30,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     private PerkObject _perk;
-    
+
     private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
+
     private static readonly byte[][] BombardHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -52,7 +56,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       var tooltipPatchInfo = Harmony.GetPatchInfo(TooltipTargetMethodInfo);
       if (AlreadyPatchedByOthers(tooltipPatchInfo)) return false;
-      
+
       var bombardPatchInfo = Harmony.GetPatchInfo(BombardTargetMethodInfo);
       if (AlreadyPatchedByOthers(bombardPatchInfo)) return false;
 
@@ -91,38 +95,37 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;
-      
+
       if (!IsCatapult(engineInProgress.SiegeEngine)) return;
-      
+
       CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRate, out var bonusDamage);
       SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRate);
       SiegeTooltipHelper.UpdateRangedDamageToWallsTooltip(__result, bonusDamage);
       SiegeTooltipHelper.UpdateRangedEngineDamageTooltip(__result, bonusDamage);
     }
-    
+
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void BombardPrefix(ISiegeEventSide siegeEventSide, SiegeEngineType attackerEngineType, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
       if (!IsCatapult(attackerEngineType)) return;
+
       CalculateBonusDamageAndRates(attackerEngineType, siegeEventSide, out _, out var bonusDamage);
       damagedEngine.SetHitpoints(damagedEngine.Hitpoints - bonusDamage);
     }
-    
+
     private static bool IsCatapult(SiegeEngineType engine)
       => engine == DefaultSiegeEngineTypes.Catapult || engine == DefaultSiegeEngineTypes.FireCatapult;
-    
+
     private static void CalculateBonusDamageAndRates(
       SiegeEngineType siegeEngine,
-      ISiegeEventSide siegeEventSide, out float bonusRateOnly, out float bonusDamageOnly) 
-    {
+      ISiegeEventSide siegeEventSide, out float bonusRateOnly, out float bonusDamageOnly) {
       var perk = ActivePatch._perk;
       var baseDamage = siegeEngine.Damage;
       var partyMemberDamage = new ExplainedNumber(baseDamage);
       var partyMemberRate = new ExplainedNumber(100f);
       var parties = siegeEventSide.SiegeParties.Where(x => x.MobileParty != null);
 
-      foreach (var party in parties)
-      {
+      foreach (var party in parties) {
         PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, ref partyMemberRate);
         PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, ref partyMemberDamage);
       }
@@ -130,5 +133,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       bonusRateOnly = partyMemberRate.ResultNumber - 100;
       bonusDamageOnly = partyMemberDamage.ResultNumber - baseDamage;
     }
+
   }
+
 }

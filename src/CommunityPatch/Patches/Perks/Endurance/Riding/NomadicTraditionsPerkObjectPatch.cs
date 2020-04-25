@@ -43,5 +43,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield break;
     }
+
   }
+
 }

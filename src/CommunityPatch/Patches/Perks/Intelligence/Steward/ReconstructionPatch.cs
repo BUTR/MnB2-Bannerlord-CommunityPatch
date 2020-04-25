@@ -86,7 +86,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       percentage *= perk.PrimaryBonus;
     }
 
-
   }
 
 }

@@ -7,13 +7,17 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
   public static class RaidingHelper {
 
     private const float RaidMinHitDamage = 0.05f;
+
     private const float PredictionForHitMinDamage = 0.049f;
 
     public static readonly FieldInfo IsFinishCalled = typeof(MapEvent).GetField("_isFinishCalled", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     public static readonly FieldInfo NextSettlementDamage = typeof(MapEvent).GetField("_nextSettlementDamage", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     public static readonly PropertyInfo SettlementHitPoints = typeof(Settlement).GetProperty("SettlementHitPoints", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     public static readonly MethodInfo TargetMethodInfo = typeof(MapEvent).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    
+
     public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -23,18 +27,17 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
         0x8D, 0xE1, 0x1A, 0x96, 0x71, 0x39, 0x59, 0xE6
       }
     };
-    
-    public static bool IsNotRaidingEvent(MapEvent __instance)
-    {
+
+    public static bool IsNotRaidingEvent(MapEvent __instance) {
       if (IsFinished(__instance)) return true;
       if (__instance.DiplomaticallyFinished) return true;
       if (__instance.EventType != MapEvent.BattleTypes.Raid) return true;
       if (__instance.DefenderSide.TroopCount > 0) return true;
+
       return __instance.AttackerSide.LeaderParty?.MobileParty == null;
     }
 
-    public static bool IsTheRaidHitNotHappeningNow(MapEvent __instance, out float damageAccumulated)
-    {
+    public static bool IsTheRaidHitNotHappeningNow(MapEvent __instance, out float damageAccumulated) {
       var damage = ((float) Math.Sqrt(__instance.AttackerSide.TroopCount) + 5f) / 500f * (float) CampaignTime.DeltaTime.ToHours;
       var resistance = __instance.MapEventSettlement.SettlementHitPoints > 0.75f ? 2f : 1f;
       var realDamage = damage / resistance;
@@ -49,12 +52,12 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       var currentHp = (float) SettlementHitPoints.GetValue(mapEvent.MapEventSettlement);
       SettlementHitPoints.SetValue(mapEvent.MapEventSettlement, currentHp + extraHitPoints);
     }
-    
-    private static bool IsFinished(MapEvent mapEvent) 
+
+    private static bool IsFinished(MapEvent mapEvent)
       => (bool) IsFinishCalled.GetValue(mapEvent);
-    
+
     private static float GetDamageAccumulated(MapEvent mapEvent)
-      => (float)NextSettlementDamage.GetValue(mapEvent);
+      => (float) NextSettlementDamage.GetValue(mapEvent);
 
   }
 

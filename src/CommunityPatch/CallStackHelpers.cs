@@ -54,10 +54,10 @@ namespace CommunityPatch {
       GetCallStackDepth = dm.CreateDelegate();
     }
 
-
     public static void Init() {
       // static constructor will init
     }
+
   }
 
 }

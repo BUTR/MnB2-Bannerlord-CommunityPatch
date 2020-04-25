@@ -109,9 +109,8 @@ namespace CommunityPatch {
           if (i == 0)
             sb.AppendLine("  None recorded.");
         }
-        else {
+        else
           sb.AppendLine("  Recording disabled.");
-        }
       }
       catch (Exception ex) {
         sb.Append("  *** ERROR: ").Append(ex.GetType().Name).Append(": ").AppendLine(ex.Message);

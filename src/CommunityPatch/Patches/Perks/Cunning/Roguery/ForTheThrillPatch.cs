@@ -10,10 +10,13 @@ using TaleWorlds.Localization;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
+
   public class ForTheThrillPatch : PatchBase<ForTheThrillPatch> {
+
     public override bool Applied { get; protected set; }
-    
+
     private static readonly MethodInfo TargetMethodInfo = typeof(MapEvent).GetMethod("ApplyRaidResult", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfoPrefix = typeof(ForTheThrillPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -31,7 +34,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
         0x23, 0xE2, 0x25, 0x97, 0x10, 0x2C, 0xA5, 0xAA
       }
     };
-    
+
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "WACam22Q");
 
@@ -52,7 +55,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
           _perk.Description
         }
       );
-      
+
       _perk.Initialize(
         textObjStrings[0],
         textObjStrings[1],
@@ -63,8 +66,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
         _perk.SecondaryRole, _perk.SecondaryBonus,
         _perk.IncrementType
       );
-      
+
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, new HarmonyMethod(PatchMethodInfoPrefix));
       Applied = true;
     }
@@ -74,7 +78,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public static void Prefix(ref MapEvent __instance) {
       var attackers = __instance.AttackerSide.Parties.Where(x => x.MobileParty != null).ToArray();
       var moraleGain = CalculateMoralGain(attackers);
-      
+
       foreach (var attacker in attackers)
         attacker.MobileParty.RecentEventsMorale += moraleGain;
     }
@@ -82,12 +86,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     private static float CalculateMoralGain(IEnumerable<PartyBase> attackers) {
       var moraleGain = new ExplainedNumber(4f);
       var perk = ActivePatch._perk;
-      
+
       foreach (var attacker in attackers)
         PerkHelper.AddPerkBonusForParty(perk, attacker.MobileParty, ref moraleGain);
-      
+
       return moraleGain.ResultNumber;
     }
+
   }
 
 }

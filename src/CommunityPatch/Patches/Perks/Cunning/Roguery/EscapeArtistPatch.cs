@@ -12,10 +12,11 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
   public sealed class EscapeArtistPatch : PatchBase<EscapeArtistPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultPlayerCaptivityModel).GetMethod("CheckTimeElapsedMoreThanHours", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(EscapeArtistPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -54,7 +55,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
           _perk.Description
         }
       );
-      
+
       _perk.Initialize(
         textObjStrings[0],
         textObjStrings[1],
@@ -65,12 +66,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
         _perk.SecondaryRole, _perk.SecondaryBonus,
         SkillEffect.EffectIncrementType.AddFactor
       );
-      
+
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
-    
+
     // ReSharper disable once RedundantAssignment
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool Prefix(ref bool __result, CampaignTime eventBeginTime, float hoursToWait) {
@@ -78,11 +80,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       var elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;
       var randomNumber = PlayerCaptivity.RandomNumber;
       var perkReduction = 1f - (Hero.MainHero.GetPerkValue(perk) ? perk.PrimaryBonus : 0f);
-      
+
       var totalHoursToWait = hoursToWait * (0.5 + randomNumber) * perkReduction;
       __result = totalHoursToWait < elapsedHoursUntilNow;
-      
+
       return false;
     }
+
   }
+
 }

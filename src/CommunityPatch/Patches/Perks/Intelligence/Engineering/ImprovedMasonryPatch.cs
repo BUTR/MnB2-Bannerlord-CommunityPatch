@@ -10,10 +10,14 @@ using TaleWorlds.Localization;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
+
   public class ImprovedMasonryPatch : PatchBase<ImprovedMasonryPatch> {
+
     public override bool Applied { get; protected set; }
-    
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultWallHitPointCalculationModel).GetMethod(nameof(DefaultWallHitPointCalculationModel.CalculateMaximumWallHitPoint), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+    private static readonly MethodInfo TargetMethodInfo =
+      typeof(DefaultWallHitPointCalculationModel).GetMethod(nameof(DefaultWallHitPointCalculationModel.CalculateMaximumWallHitPoint), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ImprovedMasonryPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -31,7 +35,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0xD4, 0x28, 0x10, 0xEE, 0x76, 0x6D, 0x29, 0xE8
       }
     };
-    
+
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "R60kenU3");
 
@@ -40,7 +44,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     {
       if (_perk == null) return false;
       if (_perk.PrimaryBonus != 0.3f) return false;
-      
+
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
 
@@ -77,11 +81,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public static void Postfix(ref float __result, Town town, StatExplainer explanation = null) {
       var perk = ActivePatch._perk;
       var totalHP = new ExplainedNumber(__result, explanation);
-      
+
       PerkHelper.AddPerkBonusForTown(perk, town, ref totalHP);
-      
+
       __result = totalHP.ResultNumber;
     }
+
   }
 
 }

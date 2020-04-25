@@ -10,6 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 using Harmony = HarmonyLib.Harmony;
 
 namespace CommunityPatch.Patches {
+
   public sealed class MenuWhenEncounteringAnArmyPatch : PatchBase<MenuWhenEncounteringAnArmyPatch> {
 
     public override bool Applied { get; protected set; }
@@ -31,7 +32,8 @@ namespace CommunityPatch.Patches {
       }
     };
 
-    public override void Reset(){}
+    public override void Reset() {
+    }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -53,57 +55,54 @@ namespace CommunityPatch.Patches {
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
     }
-    
+
     private static readonly FieldInfo EncounteredPartyField = typeof(PlayerEncounter).GetField("_encounteredParty", BindingFlags.Instance | BindingFlags.NonPublic);
 
     private static readonly FieldInfo MapEventStateField = typeof(PlayerEncounter).GetField("_mapEventState", BindingFlags.Instance | BindingFlags.NonPublic);
-    
+
     private static readonly FieldInfo StateHandledField = typeof(PlayerEncounter).GetField("_stateHandled", BindingFlags.Instance | BindingFlags.NonPublic);
-    
+
     private static readonly FieldInfo DefenderPartyField = typeof(PlayerEncounter).GetField("_defenderParty", BindingFlags.Instance | BindingFlags.NonPublic);
-    
+
     private static readonly FieldInfo MeetingDoneField = typeof(PlayerEncounter).GetField("_meetingDone", BindingFlags.Instance | BindingFlags.NonPublic);
-    
-    
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool Prefix(PlayerEncounter __instance) {
-      if (!CommunityPatchSubModule.EnableMenuWhenEncouteringAnArmy) {
+      if (!CommunityPatchSubModule.EnableMenuWhenEncouteringAnArmy)
         return true;
-      }
-      
+
       if (EncounteredPartyField == null || MapEventStateField == null || StateHandledField == null || DefenderPartyField == null || MeetingDoneField == null) {
         CommunityPatchSubModule.Error($"{typeof(MenuWhenEncounteringAnArmyPatch).Name}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
         return true;
       }
-      
+
       var attacker = (PartyBase) EncounteredPartyField.GetValue(__instance);
       if (attacker.IsSettlement)
-      {
-        foreach (var defender in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties)
-        {
-          if (!defender.IsSettlement)
-          {
+        foreach (var defender in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties) {
+          if (!defender.IsSettlement) {
             attacker = defender;
             break;
           }
         }
-      }
+
       Campaign.Current.CurrentConversationContext = ConversationContext.PartyEncounter;
       MapEventStateField.SetValue(__instance, PlayerEncounterState.Begin);
       StateHandledField.SetValue(__instance, true);
 
       var defenderParty = (PartyBase) DefenderPartyField.GetValue(__instance);
-      
-      if (PlayerEncounter.PlayerIsAttacker && defenderParty.IsMobile && defenderParty.MobileParty.Army != null && defenderParty.MobileParty.Army.LeaderParty == defenderParty.MobileParty && !defenderParty.MobileParty.Army.LeaderParty.AttachedParties.Contains(MobileParty.MainParty))
-      {
+
+      if (PlayerEncounter.PlayerIsAttacker && defenderParty.IsMobile && defenderParty.MobileParty.Army != null && defenderParty.MobileParty.Army.LeaderParty == defenderParty.MobileParty
+        && !defenderParty.MobileParty.Army.LeaderParty.AttachedParties.Contains(MobileParty.MainParty))
         GameMenu.SwitchToMenu("army_encounter");
-      }
-      else
-      {
+      else {
         MeetingDoneField.SetValue(__instance, true);
-        CampaignMission.OpenConversationMission(new ConversationCharacterData(CharacterObject.PlayerCharacter, PartyBase.MainParty, false, false, false, false), new ConversationCharacterData(attacker.Leader, attacker, false, false, false, false), "", "");
+        CampaignMission.OpenConversationMission(new ConversationCharacterData(CharacterObject.PlayerCharacter, PartyBase.MainParty, false, false, false, false),
+          new ConversationCharacterData(attacker.Leader, attacker, false, false, false, false), "", "");
       }
+
       return false;
     }
+
   }
-} 
+
+}

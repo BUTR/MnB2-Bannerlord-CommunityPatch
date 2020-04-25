@@ -6,6 +6,8 @@ namespace CommunityPatch.Behaviors {
 
   public class CommunityPatchCampaignBehavior : CampaignBehaviorBase {
 
+    private static readonly FieldInfo PartyPureSpeedLastCheckVersionField = typeof(MobileParty).GetField("_partyPureSpeedLastCheckVersion", BindingFlags.Instance | BindingFlags.NonPublic);
+
     public override void RegisterEvents()
     {
       CampaignEvents.PerkOpenedEvent.AddNonSerializedListener(this, OnPerkOpened);
@@ -13,10 +15,8 @@ namespace CommunityPatch.Behaviors {
 
     private void OnPerkOpened(Hero hero, PerkObject openedPerk)
     {
-      if (hero != null && openedPerk == DefaultPerks.Riding.NomadicTraditions) {
-        var versionField = typeof(MobileParty).GetField("_partyPureSpeedLastCheckVersion", BindingFlags.Instance | BindingFlags.NonPublic);
-        versionField.SetValue(hero.PartyBelongedTo, -1);
-      }
+      if (hero != null && openedPerk == DefaultPerks.Riding.NomadicTraditions)
+        PartyPureSpeedLastCheckVersionField.SetValue(hero.PartyBelongedTo, -1);
     }
 
     public override void SyncData(IDataStore dataStore)

@@ -80,9 +80,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     // ReSharper disable once t
     public static void Postfix(ref int __result, Village village, int marketIncome) {
       var perk = ActivePatch._perk;
-      if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false)) {
+      if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))
         return;
-      }
 
       if (village.VillageType.PrimaryProduction.IsFood)
         return;

@@ -12,8 +12,11 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
   public sealed class EvisceratorPatch : PatchBase<EvisceratorPatch> {
+
     public override bool Applied { get; protected set; }
+
     private static readonly MethodInfo TargetMethodInfo = typeof(AgentMoraleInteractionLogic).GetMethod("OnAgentRemoved", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(EvisceratorPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -75,36 +78,35 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool Prefix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
-      
+
       if (affectorCharacter == null) return false;
       if (affectedAgent.Character == null) return false;
       if (agentState != AgentState.Killed && agentState != AgentState.Unconscious) return false;
       if (affectedAgent.Team == null) return false;
-      
+
       var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled(affectedAgent);
       var moralChangeFriend = moralChangesTuple.Item1;
       var moralChangeEnemy = moralChangesTuple.Item2;
-      
+
       if (!AnyMoralChanges(moralChangeEnemy, moralChangeFriend)) return false;
 
-      if (affectorCharacter.GetPerkValue(ActivePatch._perk)) 
+      if (affectorCharacter.GetPerkValue(ActivePatch._perk))
         moralChangeFriend += moralChangeFriend * ActivePatch._perk.PrimaryBonus / -100;
-      
+
       __instance.ApplyAoeMoraleEffect(
-        affectedAgent.GetWorldPosition(), 
-        affectorAgent.GetWorldPosition(), 
-        affectedAgent.Team, 
-        moralChangeFriend, 
-        moralChangeEnemy, 
-        10f, 
-        a => a.IsActive() && a.Formation != null && a.Formation == affectedAgent.Formation, 
+        affectedAgent.GetWorldPosition(),
+        affectorAgent.GetWorldPosition(),
+        affectedAgent.Team,
+        moralChangeFriend,
+        moralChangeEnemy,
+        10f,
+        a => a.IsActive() && a.Formation != null && a.Formation == affectedAgent.Formation,
         a => a.IsActive() && a.Formation != null && a.Formation == affectorAgent.Formation);
 
       return false;
     }
 
-    private static bool AnyMoralChanges(float moralChangeEnemy, float moralChangeFriend)
-    {
+    private static bool AnyMoralChanges(float moralChangeEnemy, float moralChangeFriend) {
       // ReSharper disable once CompareOfFloatsByEqualityOperator
       if (moralChangeEnemy != 0f) return true;
 

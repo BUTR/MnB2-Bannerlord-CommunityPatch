@@ -11,10 +11,11 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
   public class TacticalSuperiorityPatch : PatchBase<TacticalSuperiorityPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultCombatSimulationModel).GetMethod(nameof(DefaultCombatSimulationModel.SimulateHit), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(TacticalSuperiorityPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -66,6 +67,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       );
 
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
@@ -77,5 +79,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
       __result += (int) (__result * perk.PrimaryBonus);
     }
+
   }
+
 }

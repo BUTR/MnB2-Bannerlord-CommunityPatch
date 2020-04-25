@@ -83,9 +83,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref float __result, Village village) {
       var perk = ActivePatch._perk;
-      if (!(village.Bound?.Town?.Governor?.GetPerkValue(perk) ?? false)) {
+      if (!(village.Bound?.Town?.Governor?.GetPerkValue(perk) ?? false))
         return;
-      }
 
       __result += (int) (__result * perk.PrimaryBonus);
     }

@@ -4,12 +4,13 @@ using TaleWorlds.CampaignSystem;
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering.Stubs {
 
   public static class SiegeEngineConstructionExtraDataManager {
+
     private static readonly ConditionalWeakTable<SiegeEvent.SiegeEngineConstructionProgress, SiegeEngineConstructionData> Links
       = new ConditionalWeakTable<SiegeEvent.SiegeEngineConstructionProgress, SiegeEngineConstructionData>();
 
-    public static void SetMaxHitPoints(SiegeEvent.SiegeEngineConstructionProgress construction, float maxHp) 
+    public static void SetMaxHitPoints(SiegeEvent.SiegeEngineConstructionProgress construction, float maxHp)
       => GetDataOrCreate(construction).MaxHitPoints = maxHp;
-    
+
     public static float GetMaxHitPoints(SiegeEvent.SiegeEngineConstructionProgress construction)
       => GetDataOrCreate(construction).MaxHitPoints;
 
@@ -25,9 +26,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering.Stubs {
       Links.Add(construction, data);
       return data;
     }
+
   }
 
   public class SiegeEngineConstructionData {
+
     public float MaxHitPoints { get; set; }
+
   }
+
 }

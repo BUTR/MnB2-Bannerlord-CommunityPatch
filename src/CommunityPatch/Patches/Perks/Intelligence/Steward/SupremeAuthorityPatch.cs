@@ -75,9 +75,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
       var ruler = clan?.Kingdom?.Ruler;
       var leader = clan?.Leader;
-      if (ruler != null && ruler == leader && ruler.GetPerkValue(perk)) {
+      if (ruler != null && ruler == leader && ruler.GetPerkValue(perk))
         influenceChange.Add(perk.PrimaryBonus, perk.Name);
-      }
     }
 
   }

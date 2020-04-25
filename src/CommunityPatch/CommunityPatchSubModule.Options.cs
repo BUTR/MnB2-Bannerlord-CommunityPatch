@@ -14,7 +14,7 @@ namespace CommunityPatch {
       get => Options.Get<bool>(nameof(DisableIntroVideo));
       set => Options.Set(nameof(DisableIntroVideo), value);
     }
-    
+
     internal static bool EnableMenuWhenEncouteringAnArmy {
       get => Options.Get<bool>(nameof(EnableMenuWhenEncouteringAnArmy));
       set => Options.Set(nameof(EnableMenuWhenEncouteringAnArmy), value);
@@ -39,7 +39,7 @@ namespace CommunityPatch {
         DisableIntroVideo ? "Enable Intro Videos" : "Disable Intro Videos",
         null
       ));
-      
+
       elements.Add(new InquiryElement(
         nameof(EnableMenuWhenEncouteringAnArmy),
         EnableMenuWhenEncouteringAnArmy ? " Disable Menu When Encountering an Army" : "Enable Menu When Encountering an Army",
@@ -95,7 +95,7 @@ namespace CommunityPatch {
           ShowMessage($"Intro Videos: {(DisableIntroVideo ? "Disabled" : "Enabled")}.");
           Options.Save();
           break;
-        
+
         case nameof(EnableMenuWhenEncouteringAnArmy):
           EnableMenuWhenEncouteringAnArmy = !EnableMenuWhenEncouteringAnArmy;
           ShowMessage($"Menu When Encountering an Army: {(EnableMenuWhenEncouteringAnArmy ? "Enabled" : "Disabled")}.");

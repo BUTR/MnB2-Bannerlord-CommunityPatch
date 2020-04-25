@@ -7,9 +7,10 @@ using TaleWorlds.MountAndBlade;
 
 namespace CommunityPatch.Patches.Perks.Control.Throwing {
 
-  public sealed class BattleReadyPatch : ExtraAmmoPerksPatch<BattleReadyPatch>{
+  public sealed class BattleReadyPatch : ExtraAmmoPerksPatch<BattleReadyPatch> {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(BattleReadyPatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -24,6 +25,7 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) => ApplyPerk(__instance, 2, CanApplyPerk);
-    
+
   }
+
 }

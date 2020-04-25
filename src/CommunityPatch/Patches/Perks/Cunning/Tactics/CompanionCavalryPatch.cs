@@ -12,8 +12,11 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
   public sealed class CompanionCavalryPatch : PatchBase<CompanionCavalryPatch> {
+
     public override bool Applied { get; protected set; }
+
     private static readonly MethodInfo TargetMethodInfo = typeof(AgentMoraleInteractionLogic).GetMethod("OnAgentRemoved", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(CompanionCavalryPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -52,7 +55,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
           _perk.Description
         }
       );
-      
+
       _perk.Initialize(
         textObjStrings[0],
         textObjStrings[1],
@@ -74,7 +77,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
     public static void Postfix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
       var affectorLeaderCharacter = (CharacterObject) affectorAgent?.Team?.Leader?.Character;
-      
+
       if (affectorCharacter == null) return;
       if (affectorLeaderCharacter?.GetPerkValue(ActivePatch._perk) != true) return;
       if (!affectorAgent.HasMount) return;
@@ -84,16 +87,18 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
       var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled(affectedAgent);
       var moralChangeFriend = moralChangesTuple.Item1 * ActivePatch._perk.PrimaryBonus;
-      
+
       __instance.ApplyAoeMoraleEffect(
-        affectedAgent.GetWorldPosition(), 
-        affectorAgent.GetWorldPosition(), 
-        affectedAgent.Team, 
-        moralChangeFriend, 
-        0f, 
-        10f, 
-        a => a.IsActive() && a.Formation != null && a.Formation == affectedAgent.Formation, 
+        affectedAgent.GetWorldPosition(),
+        affectorAgent.GetWorldPosition(),
+        affectedAgent.Team,
+        moralChangeFriend,
+        0f,
+        10f,
+        a => a.IsActive() && a.Formation != null && a.Formation == affectedAgent.Formation,
         a => a.IsActive() && a.Formation != null && a.Formation == affectorAgent.Formation);
     }
+
   }
+
 }

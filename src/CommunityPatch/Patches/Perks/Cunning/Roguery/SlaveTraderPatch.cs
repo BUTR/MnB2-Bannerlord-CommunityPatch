@@ -10,10 +10,11 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
   public sealed class SlaveTraderPatch : PatchBase<SlaveTraderPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(CharacterObject).GetMethod(nameof(CharacterObject.PrisonerRansomValue), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(SlaveTraderPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -65,6 +66,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       );
 
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
@@ -78,5 +80,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
       __result += (int) (__result * perk.PrimaryBonus);
     }
+
   }
+
 }

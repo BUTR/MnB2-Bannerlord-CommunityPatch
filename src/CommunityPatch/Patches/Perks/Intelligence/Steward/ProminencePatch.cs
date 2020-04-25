@@ -73,14 +73,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     private static void Postfix(Clan clan, ref ExplainedNumber influenceChange) {
       var perk = ActivePatch._perk;
 
-      if (clan?.IsUnderMercenaryService ?? true) {
+      if (clan?.IsUnderMercenaryService ?? true)
         return;
-      }
 
       var ruler = clan.Kingdom?.Ruler;
-      if (ruler != null && ruler != clan.Leader && clan.Leader.GetPerkValue(perk)) {
+      if (ruler != null && ruler != clan.Leader && clan.Leader.GetPerkValue(perk))
         influenceChange.Add(perk.PrimaryBonus, perk.Name);
-      }
     }
 
   }

@@ -11,10 +11,12 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
   public sealed class BribeMasterPatch : PatchBase<BribeMasterPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultBribeCalculationModel).GetMethod(nameof(DefaultBribeCalculationModel.GetBribeToEnterLordsHall), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo =
+      typeof(DefaultBribeCalculationModel).GetMethod(nameof(DefaultBribeCalculationModel.GetBribeToEnterLordsHall), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(BribeMasterPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -48,6 +50,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
@@ -56,7 +59,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public static void Postfix(ref int __result) {
       var perk = ActivePatch._perk;
       if (!Hero.MainHero.GetPerkValue(perk)) return;
+
       __result = (int) (__result * System.Math.Abs(perk.PrimaryBonus));
     }
+
   }
+
 }

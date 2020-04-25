@@ -14,8 +14,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPower), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    private static readonly MethodInfo WithoutBoostTargetMethodInfo = typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPowerWithoutBoost), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo =
+      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPower), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+    private static readonly MethodInfo WithoutBoostTargetMethodInfo =
+      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPowerWithoutBoost), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfoPostfix = typeof(BuilderPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -34,7 +38,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x51, 0x2C, 0x5C, 0x04, 0x23, 0xC8, 0xF4, 0x85
       }
     };
-    
+
     private static readonly byte[][] WithoutBoostHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -52,7 +56,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public override bool? IsApplicable(Game game) {
       if (_perk == null) return false;
       if (_perk.PrimaryBonus != 0.3f) return false;
-      
+
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
 
@@ -68,7 +72,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
           _perk.Description
         }
       );
-      
+
       _perk.Initialize(
         textObjStrings[0],
         textObjStrings[1],
@@ -79,12 +83,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         _perk.SecondaryRole, _perk.SecondaryBonus,
         _perk.IncrementType
       );
-      
+
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
       CommunityPatchSubModule.Harmony.Patch(WithoutBoostTargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
-      
+
       Applied = true;
     }
 
@@ -99,11 +103,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var perk = ActivePatch._perk;
       var productionPowerBonus = new ExplainedNumber(productionPower, explanation);
       productionPowerBonus.AddFactor(perk.PrimaryBonus, perk.Name);
-      
+
       productionPower = (int) productionPowerBonus.ResultNumber;
     }
-    
+
     private static bool HasGovernorWithBuilderPerk(Town town)
       => town.Governor?.GetPerkValue(ActivePatch._perk) == true;
+
   }
+
 }

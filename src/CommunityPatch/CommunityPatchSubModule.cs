@@ -61,7 +61,7 @@ namespace CommunityPatch {
       if (!DontGroupThirdPartyMenuOptions)
         MenuCleaner.CleanUpMainMenu();
 
-      if (DisableIntroVideo) {
+      if (DisableIntroVideo)
         try {
           typeof(Module)
             .GetField("_splashScreenPlayed", BindingFlags.NonPublic | BindingFlags.Instance)
@@ -70,7 +70,6 @@ namespace CommunityPatch {
         catch (Exception ex) {
           Error(ex, "Couldn't disable intro video.");
         }
-      }
 
       base.OnBeforeInitialModuleScreenSetAsRoot();
     }

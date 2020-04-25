@@ -37,7 +37,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x51, 0x2C, 0x5C, 0x04, 0x23, 0xC8, 0xF4, 0x85
       }
     };
-    
+
     private static readonly byte[][] WithoutBoostHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -56,7 +56,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     {
       if (_perk == null) return false;
       if (_perk.PrimaryBonus != 0.3f) return false;
-      
+
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
 
@@ -70,7 +70,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
       CommunityPatchSubModule.Harmony.Patch(WithoutBoostTargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
-      
+
       Applied = true;
     }
 
@@ -83,23 +83,26 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var perk = ActivePatch._perk;
 
       if (town.BuildingsInProgress.IsEmpty()) return;
+
       var building = town.BuildingsInProgress.Peek();
-      
+
       if (!ShouldApplyConstructionExpertPerk(town, building)) return;
 
       var productionPowerBonus = new ExplainedNumber(productionPower, explanation);
       productionPowerBonus.AddFactor(perk.PrimaryBonus, perk.Name);
-      
+
       productionPower = (int) productionPowerBonus.ResultNumber;
     }
-    
+
     private static bool ShouldApplyConstructionExpertPerk(Town town, Building building)
       => HasGovernorWithConstructionExpert(town) && IsWallOrFortificationBuilding(building);
-    
+
     private static bool HasGovernorWithConstructionExpert(Town town)
       => town.Governor?.GetPerkValue(ActivePatch._perk) == true;
 
     private static bool IsWallOrFortificationBuilding(Building building)
       => building.BuildingType == DefaultBuildingTypes.Wall || building.BuildingType == DefaultBuildingTypes.Fortifications;
+
   }
+
 }

@@ -57,9 +57,8 @@ namespace CommunityPatch.Patches {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(MobileParty party, ref ExplainedNumber result) {
-      if (party.ItemRoster.FoodVariety > 10) {
+      if (party.ItemRoster.FoodVariety > 10)
         result.Add(party.ItemRoster.FoodVariety - 4f, GameTexts.FindText("str_food_bonus_morale", (string) null));
-      }
     }
 
   }

@@ -49,9 +49,8 @@ namespace CommunityPatch {
     private static void TryGetTypeDefinitionPatch(ref DefinitionContext __instance, ref object __result, ref object saveId) {
       if (__result != null)
         return;
-
     }
-    
+
   }
 
 }

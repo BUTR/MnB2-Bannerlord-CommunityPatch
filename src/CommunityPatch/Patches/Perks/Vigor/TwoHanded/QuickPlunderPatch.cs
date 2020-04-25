@@ -12,10 +12,11 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
   public sealed class QuickPlunderPatch : PatchBase<QuickPlunderPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = RaidingHelper.TargetMethodInfo;
+
     private static readonly MethodInfo PatchMethodInfo = typeof(QuickPlunderPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -63,6 +64,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       );
 
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
@@ -71,11 +73,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public static void Prefix(ref MapEvent __instance) {
       if (RaidingHelper.IsNotRaidingEvent(__instance)) return;
       if (RaidingHelper.IsTheRaidHitNotHappeningNow(__instance, out var damageAccumulated)) return;
+
       ApplyPerkBonusToRaidHit(__instance, damageAccumulated);
     }
 
-    private static void ApplyPerkBonusToRaidHit(MapEvent __instance, float hitDamage)
-    {
+    private static void ApplyPerkBonusToRaidHit(MapEvent __instance, float hitDamage) {
       var perk = ActivePatch._perk;
       var partyMemberHitDamage = new ExplainedNumber(hitDamage);
 
@@ -84,5 +86,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
       RaidingHelper.SetHitDamage(__instance, partyMemberHitDamage.ResultNumber);
     }
+
   }
+
 }

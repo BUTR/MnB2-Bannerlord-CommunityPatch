@@ -11,10 +11,13 @@ using TaleWorlds.Localization;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
+
   public class ScavengerPatch : PatchBase<ScavengerPatch> {
+
     public override bool Applied { get; protected set; }
-    
+
     private static readonly MethodInfo TargetMethodInfo = LootCollectorHelper.GiveShareOfLootToPartyMethod;
+
     private static readonly MethodInfo PatchMethodInfoPrefix = typeof(ScavengerPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -32,13 +35,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x28, 0x63, 0x8F, 0x51, 0x94, 0x2A, 0x8C, 0x5F
       }
     };
-    
+
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "cYjeJTb8");
 
     public override bool? IsApplicable(Game game) {
       if (_perk == null) return false;
-      
+
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
 
@@ -74,12 +77,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public static void Prefix(ref object __instance, PartyBase partyToReceiveLoot, PartyBase winnerParty, float lootAmount) {
       var lootFactor = CalculateLootFactor(winnerParty);
       if (lootFactor.IsZero()) return;
-      
+
       var casualtiesInBattle = LootCollectorHelper.GetCasualtiesInBattle(__instance);
       var casualtiesShare = GetCasualtiesShare(lootAmount, casualtiesInBattle);
       DistributeCasualtiesLoot(__instance, partyToReceiveLoot, winnerParty, casualtiesShare, lootFactor);
     }
-    
+
     private static float CalculateLootFactor(PartyBase winnerParty) {
       var explainedNumber = new ExplainedNumber(1f);
 
@@ -88,24 +91,25 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       return explainedNumber.ResultNumber - explainedNumber.BaseNumber;
     }
-    
+
     private static List<TroopRosterElement> GetCasualtiesShare(float lootAmount, TroopRoster casualtiesInBattle) {
       var casualtiesShare = new List<TroopRosterElement>();
-      
+
       for (var i = casualtiesInBattle.Count - 1; i >= 0; i--) {
         var troopSize = casualtiesInBattle.GetElementNumber(i);
         var troop = casualtiesInBattle.GetCharacterAtIndex(i);
         var emptyTroop = new TroopRosterElement(troop);
-        
+
         for (var trooper = 0; trooper < troopSize; trooper++) {
           if (!(MBRandom.RandomFloat < lootAmount)) continue;
+
           casualtiesShare.Add(emptyTroop);
         }
       }
 
       return casualtiesShare;
     }
-    
+
     private static void DistributeCasualtiesLoot(object __instance, PartyBase partyToReceiveLoot, PartyBase winnerParty, List<TroopRosterElement> casualties, float lootFactor) {
       if (winnerParty == PartyBase.MainParty) {
         LootCasualtiesForPlayer(__instance, partyToReceiveLoot, casualties, lootFactor);
@@ -114,7 +118,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       LootCasualtiesForAi(__instance, partyToReceiveLoot, casualties, lootFactor);
     }
-    
+
     private static void LootCasualtiesForPlayer(object __instance, PartyBase partyToReceiveLoot, List<TroopRosterElement> casualties, float lootFactor) {
       var playerLoot = LootCollectorHelper.LootCasualties(__instance, casualties, lootFactor);
       partyToReceiveLoot.ItemRoster.Add(playerLoot);
@@ -128,5 +132,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       gold = MBMath.Round(gold * 0.5f * lootFactor);
       GiveGoldAction.ApplyBetweenCharacters(null, partyToReceiveLoot.LeaderHero, gold);
     }
+
   }
+
 }

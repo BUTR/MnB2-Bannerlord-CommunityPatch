@@ -1,7 +1,7 @@
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
   public partial class NomadicTraditionsPatch {
-    
+
     private static readonly byte[][] HashesPureSpeed = {
       new byte[] {
         // e1.2.0.226110
@@ -11,7 +11,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0x9C, 0xDC, 0x50, 0x6E, 0xA6, 0x7E, 0xEB, 0xEF
       }
     };
-    
+
     private static readonly byte[][] HashesCavalryRatioModifier = {
       new byte[] {
         // e1.2.0.226110
@@ -21,7 +21,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0x1D, 0x82, 0xB9, 0x4A, 0x26, 0x4B, 0xB8, 0xFA
       }
     };
-    
+
     private static readonly byte[][] HashesMountedFootmenRatioModifier = {
       new byte[] {
         // e1.2.0.226110
@@ -31,7 +31,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0x3E, 0x9D, 0xE9, 0x6A, 0xAE, 0x70, 0x27, 0x14
       }
     };
-    
+
     private static readonly byte[][] HashesBaseSpeedForParty = {
       new byte[] {
         // e1.2.0.226110
@@ -47,5 +47,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       CavalryRatioModifierMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesCavalryRatioModifier) &&
       MountedFootmenRatioModifierMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesMountedFootmenRatioModifier) &&
       BaseSpeedMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesBaseSpeedForParty);
+
   }
+
 }

@@ -49,10 +49,9 @@ namespace CommunityPatch.Patches {
             || optAsmName.StartsWith("TaleWorlds.")
             || optAsmName.StartsWith("SandBox.")
             || optAsmName.StartsWith("SandBoxCore.")
-            || optAsmName.StartsWith("StoryMode.")) {
+            || optAsmName.StartsWith("StoryMode."))
             if (PathHelpers.IsOfficialAssembly(actAsm))
               continue;
-          }
         }
         catch {
           // yeah, it's 3rd party.
@@ -80,9 +79,8 @@ namespace CommunityPatch.Patches {
       newList.Insert(newList.Count - 2, new EscapeMenuItemVM(new TextObject("{=MoreOptions}More Options"), _ => {
         var options = new List<InquiryElement>();
 
-        foreach (var item in customOptions) {
+        foreach (var item in customOptions)
           options.Add(new InquiryElement(item, item.ActionText, null, !item.IsDisabled, null));
-        }
 
         options.Add(new InquiryElement(_groupEscMenuOptsKey, new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(), null));
 

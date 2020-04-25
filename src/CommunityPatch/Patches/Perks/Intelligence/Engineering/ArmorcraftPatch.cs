@@ -9,15 +9,19 @@ using TaleWorlds.MountAndBlade;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
+
   public class ArmorcraftPatch : PatchBase<ArmorcraftPatch> {
+
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.GetBaseArmorEffectivenessForBodyPart), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ArmorcraftPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
-    
+
     public override void Reset()
       => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "zi4GGkEj");
 
@@ -32,20 +36,20 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x69, 0x8A, 0x83, 0x59, 0xE4, 0x75, 0xDA, 0x00
       }
     };
-    
+
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
       if (_perk == null) return false;
       if (_perk.PrimaryBonus != 0.3f) return false;
-      
+
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
     }
-    
+
     public override void Apply(Game game) {
       var textObjStrings = TextObject.ConvertToStringList(
         new List<TextObject> {
@@ -69,7 +73,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
       Applied = true;
     }
-    
+
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref float __result, ref Agent __instance) {
@@ -79,10 +83,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       var hero = character.HeroObject;
       if (hero == null) return;
-      
+
       var perk = ActivePatch._perk;
-      if (hero.GetPerkValue(perk)) 
+      if (hero.GetPerkValue(perk))
         __result += __result * perk.PrimaryBonus;
     }
+
   }
+
 }

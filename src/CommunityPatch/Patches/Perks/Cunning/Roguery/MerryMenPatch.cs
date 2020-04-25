@@ -12,10 +12,12 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
   public sealed class MerryMenPatch : PatchBase<MerryMenPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo BanditsJoinTargetMethodInfo = typeof(BanditsCampaignBehavior).GetMethod("conversation_bandits_will_join_player_on_condition", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+    private static readonly MethodInfo BanditsJoinTargetMethodInfo =
+      typeof(BanditsCampaignBehavior).GetMethod("conversation_bandits_will_join_player_on_condition", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+
     private static readonly MethodInfo BanditsJoinPatchMethodInfo = typeof(MerryMenPatch).GetMethod(nameof(PrefixBanditsJoin), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -39,16 +41,17 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     public override bool? IsApplicable(Game game) {
       if (_perk == null) return false;
-      
+
       var banditsJoinPatchInfo = Harmony.GetPatchInfo(BanditsJoinTargetMethodInfo);
       if (AlreadyPatchedByOthers(banditsJoinPatchInfo)) return false;
-      
+
       var banditsJoinHash = BanditsJoinTargetMethodInfo.MakeCilSignatureSha256();
       return banditsJoinHash.MatchesAnySha256(BanditsJoinHashes);
     }
 
     public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(BanditsJoinTargetMethodInfo, new HarmonyMethod(BanditsJoinPatchMethodInfo));
       Applied = true;
     }
@@ -60,14 +63,16 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     private static bool ApplyPerkToMakeRecruitable(ref bool intimidated) {
       var perk = ActivePatch._perk;
       if (MobileParty.MainParty.LeaderHero?.GetPerkValue(perk) != true) return true;
-      
+
       intimidated = PartyBaseHelper.DoesSurrenderIsLogicalForParty(
-        MobileParty.ConversationParty, 
-        MobileParty.MainParty, 
+        MobileParty.ConversationParty,
+        MobileParty.MainParty,
         // requires that the bandits be merely less than 100% of our strength to surrender.
         1f);
 
       return false;
     }
+
   }
+
 }

@@ -27,6 +27,13 @@ namespace CommunityPatch.Patches {
       }
     };
 
+    private static readonly FieldInfo MaxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+
+    private static readonly FieldInfo AmmoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+
+    private static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
+      .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+
     public override void Reset(){}
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -48,26 +55,25 @@ namespace CommunityPatch.Patches {
     }
 
     protected static void ApplyPerk(Agent agent, int ammoAmount, Func<Hero, WeaponComponentData, bool> canApplyPerk) {
-      if (agent.IsHero && agent.Character is CharacterObject charObj) {
-        var hero = charObj.HeroObject;
-        var property = typeof(MissionEquipment)
-          .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
-        var missionWeapons = (MissionWeapon[]) property.GetValue(agent.Equipment);
+      if (!agent.IsHero || !(agent.Character is CharacterObject charObj))
+        return;
 
-        for (var i = 0; i < missionWeapons.Length; i++) {
-          if (!missionWeapons[i].Weapons.IsEmpty()) {
-            var weaponComponentData = missionWeapons[i].Weapons[0];
-            if (weaponComponentData != null && canApplyPerk(hero, weaponComponentData)) {
-                var maxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                var ammoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-                var newMaxAmmo = (short) ((short) maxAmmoField.GetValue(missionWeapons[i]) + ammoAmount);
-                object boxed = missionWeapons[i];
-                ammoField.SetValue(boxed, newMaxAmmo);
-                maxAmmoField.SetValue(boxed, newMaxAmmo);
-                missionWeapons[i] = (MissionWeapon) boxed;
-            }
-          }
-        }
+      var hero = charObj.HeroObject;
+      var missionWeapons = (MissionWeapon[]) WeaponSlotsProperty.GetValue(agent.Equipment);
+
+      for (var i = 0; i < missionWeapons.Length; i++) {
+        if (missionWeapons[i].Weapons.IsEmpty())
+          continue;
+
+        var weaponComponentData = missionWeapons[i].Weapons[0];
+        if (weaponComponentData == null || !canApplyPerk(hero, weaponComponentData))
+          continue;
+
+        var newMaxAmmo = (short) ((short) MaxAmmoField.GetValue(missionWeapons[i]) + ammoAmount);
+        object boxed = missionWeapons[i];
+        AmmoField.SetValue(boxed, newMaxAmmo);
+        MaxAmmoField.SetValue(boxed, newMaxAmmo);
+        missionWeapons[i] = (MissionWeapon) boxed;
       }
     }
   }

@@ -13,17 +13,23 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
   public sealed class BriberPatch : PatchBase<BriberPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo VillagerBribeTargetMethodInfo = typeof(VillagerCampaignBehavior).GetMethod("IsBribeFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+
     private static readonly MethodInfo VillagerSurrenderTargetMethodInfo = typeof(VillagerCampaignBehavior).GetMethod("IsSurrenderFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+
     private static readonly MethodInfo CaravansBribeTargetMethodInfo = typeof(CaravansCampaignBehavior).GetMethod("IsBribeFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+
     private static readonly MethodInfo CaravansSurrenderTargetMethodInfo = typeof(CaravansCampaignBehavior).GetMethod("IsSurrenderFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
 
     private static readonly MethodInfo VillagerBribePatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixVillageBribe), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo VillagerSurrenderPatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixVillageSurrender), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo CaravansBribePatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixCaravansBribe), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo CaravansSurrenderPatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixCaravansSurrender), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -44,7 +50,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
         0xBF, 0x96, 0xDF, 0x03, 0xA1, 0xEA, 0xAE, 0x19
       }
     };
-    
+
     private static readonly byte[][] VillagerSurrenderHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -54,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
         0xEC, 0xA3, 0x9B, 0xB0, 0x3B, 0x67, 0x39, 0x5A
       }
     };
-    
+
     private static readonly byte[][] CaravansBribeHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -64,7 +70,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
         0x3C, 0xB5, 0x24, 0xCB, 0x11, 0x97, 0x44, 0x54
       }
     };
-    
+
     private static readonly byte[][] CaravansSurrenderHashes = {
       new byte[] {
         // e1.1.0.225190
@@ -80,26 +86,26 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     public override bool? IsApplicable(Game game) {
       if (_perk == null) return false;
-      
+
       var villagerBribePatchInfo = Harmony.GetPatchInfo(VillagerBribeTargetMethodInfo);
       if (AlreadyPatchedByOthers(villagerBribePatchInfo)) return false;
-      
+
       var villagerSurrenderPatchInfo = Harmony.GetPatchInfo(VillagerSurrenderTargetMethodInfo);
       if (AlreadyPatchedByOthers(villagerSurrenderPatchInfo)) return false;
-      
+
       var caravansBribePatchInfo = Harmony.GetPatchInfo(CaravansBribeTargetMethodInfo);
       if (AlreadyPatchedByOthers(caravansBribePatchInfo)) return false;
-      
+
       var caravansSurrenderPatchInfo = Harmony.GetPatchInfo(CaravansSurrenderTargetMethodInfo);
       if (AlreadyPatchedByOthers(caravansSurrenderPatchInfo)) return false;
-      
+
       var villagerBribeHash = VillagerBribeTargetMethodInfo.MakeCilSignatureSha256();
       var villagerSurrenderHash = VillagerSurrenderTargetMethodInfo.MakeCilSignatureSha256();
       var caravansBribeHash = CaravansBribeTargetMethodInfo.MakeCilSignatureSha256();
       var caravansSurrenderHash = CaravansSurrenderTargetMethodInfo.MakeCilSignatureSha256();
-      return villagerBribeHash.MatchesAnySha256(VillagerBribeHashes) && 
+      return villagerBribeHash.MatchesAnySha256(VillagerBribeHashes) &&
         villagerSurrenderHash.MatchesAnySha256(VillagerSurrenderHashes) &&
-        caravansBribeHash.MatchesAnySha256(CaravansBribeHashes) && 
+        caravansBribeHash.MatchesAnySha256(CaravansBribeHashes) &&
         caravansSurrenderHash.MatchesAnySha256(CaravansSurrenderHashes);
     }
 
@@ -123,6 +129,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       );
 
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(VillagerBribeTargetMethodInfo, new HarmonyMethod(VillagerBribePatchMethodInfo));
       CommunityPatchSubModule.Harmony.Patch(VillagerSurrenderTargetMethodInfo, new HarmonyMethod(VillagerSurrenderPatchMethodInfo));
       CommunityPatchSubModule.Harmony.Patch(CaravansBribeTargetMethodInfo, new HarmonyMethod(CaravansBribePatchMethodInfo));
@@ -136,42 +143,44 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       __result = Bribe(3, .05f, .4f);
       return false;
     }
-    
+
     // ReSharper disable once RedundantAssignment
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool PrefixVillageSurrender(ref bool __result) {
       __result = Bribe(4, .05f, .1f);
       return false;
     }
-    
+
     // ReSharper disable once RedundantAssignment
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool PrefixCaravansBribe(ref bool __result) {
       __result = Bribe(4, .1f, .6f);
       return false;
     }
-    
+
     // ReSharper disable once RedundantAssignment
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool PrefixCaravansSurrender(ref bool __result) {
       __result = Bribe(7, .1f, .1f);
       return false;
     }
-    
+
     private static bool Bribe(int randomIndex, float phaseOneAcceptablePowerRatio, float phaseTwoAcceptablePowerRatio) {
       var isLogicalSurrender = PartyBaseHelper.DoesSurrenderIsLogicalForParty(MobileParty.ConversationParty, MobileParty.MainParty, phaseOneAcceptablePowerRatio);
       var bribeSuccessChances = isLogicalSurrender ? 67 : 33;
       var perk = ActivePatch._perk;
 
       if (MobileParty.MainParty.LeaderHero?.GetPerkValue(perk) == true)
-        bribeSuccessChances += (int)perk.PrimaryBonus;
+        bribeSuccessChances += (int) perk.PrimaryBonus;
 
       if (MobileParty.ConversationParty.Party.Random.GetValue(randomIndex) > bribeSuccessChances) return false;
-      
+
       return PartyBaseHelper.DoesSurrenderIsLogicalForParty(
-        MobileParty.ConversationParty, 
-        MobileParty.MainParty, 
+        MobileParty.ConversationParty,
+        MobileParty.MainParty,
         phaseTwoAcceptablePowerRatio);
     }
+
   }
+
 }
