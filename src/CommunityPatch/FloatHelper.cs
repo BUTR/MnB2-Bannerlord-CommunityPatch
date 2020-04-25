@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 namespace CommunityPatch {
 
   public static class FloatHelper {
+    // NOTE: AggressiveInlining is preferred here to reduce these showing up in call stacks, not so much performance
 
     private const float Tolerance = 0.0001f;
 
@@ -16,7 +17,7 @@ namespace CommunityPatch {
       => Math.Abs(value - target) > Tolerance;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsEqualOrBiggerThan(this float value, float target)
+    public static bool IsEqualOrGreaterThan(this float value, float target)
       => value.IsEqualTo(target) || value > target;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

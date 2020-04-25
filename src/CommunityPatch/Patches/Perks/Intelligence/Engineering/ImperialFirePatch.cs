@@ -116,7 +116,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         foreach (var armyParty in party.Army?.Parties)
           PerkHelper.AddPerkBonusForParty(perk, armyParty, ref partyMemberValue);
 
-      return partyMemberValue.ResultNumber.IsEqualOrBiggerThan(1f);
+      return partyMemberValue.ResultNumber.IsEqualOrGreaterThan(1f);
     }
 
     private static IEnumerable<SiegeEngineType> RemoveFireEngines(IEnumerable<SiegeEngineType> engineTypes)
