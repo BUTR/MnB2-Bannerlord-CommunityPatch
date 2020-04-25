@@ -143,7 +143,7 @@ namespace Antijank {
       return false;
     }
 
-    private static bool waitForSortKeysReset = false;
+    private static bool waitForKeysReset = false;
 
     public static void LauncherUICtorPostfix(LauncherUI __instance, UserDataManager userDataManager, UIContext context, Action onClose, Action onMinimize) {
       LauncherUI = __instance;
@@ -159,35 +159,76 @@ namespace Antijank {
         }, null);
 
         var ctrl = input.IsControlDown();
-        var s = input.IsKeyDown(InputKey.S);
 
-        if (waitForSortKeysReset) {
-          if (!ctrl || !s)
-            waitForSortKeysReset = false;
+        if (waitForKeysReset) {
+          if (!ctrl)
+            waitForKeysReset = false;
           return;
         }
 
-        var wantsToSort = ctrl && s;
-        if (!wantsToSort)
+        if (!ctrl)
           return;
 
-        waitForSortKeysReset = true;
-        Console.WriteLine("Sorting modules list.");
-        ref var launcherVm = ref _launcherVmAccessor(__instance);
-        var isMultiplayer = launcherVm.IsMultiplayer;
+        if (input.IsKeyDown(InputKey.S)) {
+          waitForKeysReset = true;
+          Console.WriteLine("Sorting modules list.");
+          ref var launcherVm = ref _launcherVmAccessor(__instance);
 
-        var dict = ModuleList.ToDictionary(mi => mi.Id);
+          var dict = ModuleList.ToDictionary(mi => mi.Id);
 
-        var list = ModuleList
-          .OrderTopologicallyBy(mi => mi.DependedModuleIds.Select(id => dict[id]))
-          .ThenBy(mi => mi.IsNative() ? 0 : 1)
-          .ThenBy(mi => mi.Alias)
-          .ToList();
+          var list = ModuleList
+            .OrderTopologicallyBy(mi => mi.DependedModuleIds.Select(id => dict[id]))
+            .ThenBy(mi => mi.IsNative() ? 0 : 1)
+            .ThenBy(mi => mi.Alias)
+            .ToList();
 
-        IdentitySort(launcherVm.ModsData.Modules, list);
+          IdentitySort(launcherVm.ModsData.Modules, list);
 
-        _gauntletMovieAccessor(__instance)
-          .RefreshDataSource(launcherVm);
+          _gauntletMovieAccessor(__instance)
+            .RefreshDataSource(launcherVm);
+          return;
+        }
+
+        if (input.IsKeyDown(InputKey.C)) {
+          Console.WriteLine("Copying modules list to clipboard.");
+          var modsList = string.Join("\n",
+            ModuleList
+              .Where(m => m.IsSelected)
+              .Select(m => m.Id));
+          TextCopy.Clipboard.SetText(modsList);
+          waitForKeysReset = true;
+          return;
+        }
+
+        if (input.IsKeyDown(InputKey.V)) {
+          Console.WriteLine("Pasting modules list from clipboard.");
+          ref var launcherVm = ref _launcherVmAccessor(__instance);
+          var inputText = TextCopy.Clipboard.GetText() ?? "";
+          var ids = inputText.Split(new[] {
+            ", ", ",",
+            "; ", ";",
+            "\r\n",
+            "\r", "\n"
+          }, StringSplitOptions.RemoveEmptyEntries);
+          var idSet = new HashSet<string>(ids);
+          IdentitySort(launcherVm.ModsData.Modules, ids);
+          foreach (var mod in launcherVm.ModsData.Modules) {
+            var info = mod.Info;
+            if (info.IsNative() || info.IsOfficial)
+              continue;
+
+            var id = info.Id;
+            if (idSet.Contains(id)) {
+              mod.IsSelected = true;
+            }
+            else {
+              mod.IsSelected = false;
+            }
+          }
+
+          FixSequence(launcherVm.ModsData.Modules);
+          waitForKeysReset = true;
+        }
       }
 
       context.EventManager.AddLateUpdateAction(context.Root, KeyWatcher, 5);
@@ -271,6 +312,16 @@ namespace Antijank {
         => sorted.FindIndex(x => x == a.Info)
           .CompareTo(sorted.FindIndex(x => x == b.Info))));
 
+    private static void IdentitySort(MBBindingList<LauncherModuleVM> list, IReadOnlyList<string> sorted)
+      => list.Sort(Comparer<LauncherModuleVM>.Create((a, b)
+        => {
+        var indexA = sorted.FindIndex(x => x == a.Info.Id);
+        if (indexA == -1) indexA = int.MaxValue;
+        var indexB = sorted.FindIndex(x => x == b.Info.Id);
+        if (indexB == -1) indexB = int.MaxValue;
+        return indexA.CompareTo(indexB);
+      }));
+
     public static IReadOnlyList<ModuleInfo> ModuleList { get; private set; }
 
     private static void UnblockModule(ModuleInfo moduleInfo) {
@@ -318,22 +369,19 @@ namespace Antijank {
 
     private static void ChangeIsSelectedOf(LauncherModsVM mods, UserData userData, bool isMultiplayer, LauncherModuleVM targetModule) {
       if (targetModule.IsSelected) {
-        using (var enumerator = mods.Modules.GetEnumerator()) {
-          while (enumerator.MoveNext()) {
-            var launcherModuleVm = enumerator.Current;
-            if (launcherModuleVm == null)
-              continue;
+        foreach (var module in mods.Modules) {
+          if (module == null)
+            continue;
 
-            launcherModuleVm.IsSelected |= targetModule.Info.DependedModuleIds.Contains(launcherModuleVm.Info.Id);
-          }
-
-          return;
+          module.IsSelected |= targetModule.Info.DependedModuleIds
+            .Contains(module.Info.Id);
         }
+
+        return;
       }
 
-      foreach (var launcherModuleVm2 in mods.Modules) {
+      foreach (var launcherModuleVm2 in mods.Modules)
         launcherModuleVm2.IsSelected &= !launcherModuleVm2.Info.DependedModuleIds.Contains(targetModule.Info.Id);
-      }
     }
 
   }

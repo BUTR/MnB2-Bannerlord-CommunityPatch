@@ -300,13 +300,13 @@ namespace CommunityPatch {
         try {
           ms.Position = 0;
           using var sr = new StreamReader(ms, Encoding.UTF8);
-          Input.SetClipboardText(sr.ReadToEnd());
+          TextCopy.Clipboard.SetText(sr.ReadToEnd());
           ShowMessage("Diagnostics also copied to system clipboard.");
         }
         catch {
           ShowMessage($"Writing report to system clipboard failed!");
           try {
-            Input.SetClipboardText(fullPath);
+            TextCopy.Clipboard.SetText(fullPath);
             ShowMessage("Writing diagnostic file path to clipboard instead.");
           }
           catch (Exception ex) {
