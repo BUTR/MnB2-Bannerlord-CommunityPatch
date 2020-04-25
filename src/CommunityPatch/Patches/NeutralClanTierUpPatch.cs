@@ -6,6 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
@@ -14,9 +15,9 @@ namespace CommunityPatch.Patches {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(HeroSpawnCampaignBehavior).GetMethod("OnClanTierIncreased", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(HeroSpawnCampaignBehavior).GetMethod("OnClanTierIncreased", NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(NeutralClanTierUpPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(NeutralClanTierUpPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

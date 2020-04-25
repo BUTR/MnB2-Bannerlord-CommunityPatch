@@ -11,6 +11,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -21,27 +22,27 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     private static readonly Type MapSiegeProductionVmType = Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 
-    private static readonly MethodInfo AiTargetMethodInfo = typeof(SiegeEvent).GetMethod(nameof(SiegeEvent.DoSiegeAction), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo AiTargetMethodInfo = typeof(SiegeEvent).GetMethod(nameof(SiegeEvent.DoSiegeAction), Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PlayerTargetMethodInfo = MapSiegeProductionVmType.GetMethod("OnPossibleMachineSelection", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PlayerTargetMethodInfo = MapSiegeProductionVmType.GetMethod("OnPossibleMachineSelection", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo MaxHitPointsTargetMethodInfo = typeof(SiegeEvent.SiegeEngineConstructionProgress).GetMethod("get_MaxHitPoints", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo MaxHitPointsTargetMethodInfo = typeof(SiegeEvent.SiegeEngineConstructionProgress).GetMethod("get_MaxHitPoints", Public | Instance | DeclaredOnly);
 
     private static readonly MethodInfo TooltipTargetMethodInfo = SiegeTooltipHelper.TargetMethodInfo;
 
-    private static readonly MethodInfo AiPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(AiPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo AiPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(AiPostfix), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo PlayerPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(PlayerPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PlayerPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(PlayerPostfix), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo PlayerPatchMethodInfoPrefix = typeof(GoodMaterialsPatch).GetMethod(nameof(PlayerPrefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PlayerPatchMethodInfoPrefix = typeof(GoodMaterialsPatch).GetMethod(nameof(PlayerPrefix), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo MaxHitPointsPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(MaxHitPointsPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo MaxHitPointsPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(MaxHitPointsPostfix), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo TooltipPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(TooltipPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TooltipPatchMethodInfoPostfix = typeof(GoodMaterialsPatch).GetMethod(nameof(TooltipPostfix), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly PropertyInfo MapSiegeProductionVmSiegeProperty = MapSiegeProductionVmType.GetProperty("Siege", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly PropertyInfo MapSiegeProductionVmSiegeProperty = MapSiegeProductionVmType.GetProperty("Siege", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly PropertyInfo MapSiegeProductionVmPlayerSideProperty = MapSiegeProductionVmType.GetProperty("PlayerSide", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly PropertyInfo MapSiegeProductionVmPlayerSideProperty = MapSiegeProductionVmType.GetProperty("PlayerSide", NonPublic | Instance | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AiTargetMethodInfo;

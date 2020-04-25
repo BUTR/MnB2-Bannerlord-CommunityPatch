@@ -6,6 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 using Harmony = HarmonyLib.Harmony;
 
@@ -17,10 +18,10 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo TargetMethodInfo =
       typeof(PlayerEncounter)
-        .GetMethod("DoMeetingInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+        .GetMethod("DoMeetingInternal", NonPublic | Instance | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(MenuWhenEncounteringAnArmyPatch)
-      .GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      .GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     private static readonly byte[][] Hashes = {
       new byte[] {
@@ -56,15 +57,15 @@ namespace CommunityPatch.Patches {
       return hash.MatchesAnySha256(Hashes);
     }
 
-    private static readonly FieldInfo EncounteredPartyField = typeof(PlayerEncounter).GetField("_encounteredParty", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo EncounteredPartyField = typeof(PlayerEncounter).GetField("_encounteredParty", Instance | NonPublic);
 
-    private static readonly FieldInfo MapEventStateField = typeof(PlayerEncounter).GetField("_mapEventState", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo MapEventStateField = typeof(PlayerEncounter).GetField("_mapEventState", Instance | NonPublic);
 
-    private static readonly FieldInfo StateHandledField = typeof(PlayerEncounter).GetField("_stateHandled", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo StateHandledField = typeof(PlayerEncounter).GetField("_stateHandled", Instance | NonPublic);
 
-    private static readonly FieldInfo DefenderPartyField = typeof(PlayerEncounter).GetField("_defenderParty", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo DefenderPartyField = typeof(PlayerEncounter).GetField("_defenderParty", Instance | NonPublic);
 
-    private static readonly FieldInfo MeetingDoneField = typeof(PlayerEncounter).GetField("_meetingDone", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo MeetingDoneField = typeof(PlayerEncounter).GetField("_meetingDone", Instance | NonPublic);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool Prefix(PlayerEncounter __instance) {

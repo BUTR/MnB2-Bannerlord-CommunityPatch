@@ -1,10 +1,10 @@
 using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using Sigil;
 using Sigil.NonGeneric;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch {
 
@@ -16,13 +16,13 @@ namespace CommunityPatch {
       var stackFrameHelperType = typeof(object).Assembly.GetType("System.Diagnostics.StackFrameHelper");
 
       var getStackFramesInternal = Type.GetType("System.Diagnostics.StackTrace, mscorlib")
-        ?.GetMethod("GetStackFramesInternal", BindingFlags.Static | BindingFlags.NonPublic);
+        ?.GetMethod("GetStackFramesInternal", Static | NonPublic);
 
       if (getStackFramesInternal == null)
         throw new PlatformNotSupportedException();
 
       var iFrameCountField = stackFrameHelperType
-        .GetField("iFrameCount", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+        .GetField("iFrameCount", NonPublic | Instance | DeclaredOnly);
 
       if (iFrameCountField == null)
         throw new PlatformNotSupportedException();

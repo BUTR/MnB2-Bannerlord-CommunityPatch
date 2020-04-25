@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Behaviors {
 
   public class CommunityPatchCampaignBehavior : CampaignBehaviorBase {
 
-    private static readonly FieldInfo PartyPureSpeedLastCheckVersionField = typeof(MobileParty).GetField("_partyPureSpeedLastCheckVersion", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo PartyPureSpeedLastCheckVersionField = typeof(MobileParty).GetField("_partyPureSpeedLastCheckVersion", Instance | NonPublic);
 
     public override void RegisterEvents()
       => CampaignEvents.PerkOpenedEvent.AddNonSerializedListener(this, OnPerkOpened);

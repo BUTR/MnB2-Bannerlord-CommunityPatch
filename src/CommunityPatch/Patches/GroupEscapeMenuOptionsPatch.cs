@@ -10,6 +10,7 @@ using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade.ViewModelCollection;
+using static System.Reflection.BindingFlags;
 using Module = TaleWorlds.MountAndBlade.Module;
 using Path = System.IO.Path;
 
@@ -20,10 +21,10 @@ namespace CommunityPatch.Patches {
   public static class GroupEscapeMenuOptionsPatch {
 
     public static FieldInfo EscapeMenuItemVmOnExecute = typeof(EscapeMenuItemVM)
-      .GetField("_onExecute", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      .GetField("_onExecute", NonPublic | Instance | DeclaredOnly);
 
     public static FieldInfo EscapeMenuItemVmIdentifier = typeof(EscapeMenuItemVM)
-      .GetField("_identifier", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      .GetField("_identifier", NonPublic | Instance | DeclaredOnly);
 
     private static readonly object _groupEscMenuOptsKey = new object();
 

@@ -6,6 +6,7 @@ using System.Threading;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 using Module = TaleWorlds.MountAndBlade.Module;
 
 namespace CommunityPatch {
@@ -137,7 +138,7 @@ namespace CommunityPatch {
           }, null);
         }, null));
 
-    private static readonly FieldInfo InitOptActField = typeof(InitialStateOption).GetField("_action", BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo InitOptActField = typeof(InitialStateOption).GetField("_action", NonPublic | Instance);
 
   }
 
