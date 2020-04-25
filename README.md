@@ -58,15 +58,25 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Good Materials
     * Everyday Engineer
     * Builder
+    * Armorcraft
+    * Imperial Fire
   * Roguery
     * Party Raiding
     * Eye for Loot
     * For the Thrill
     * Slip into Shadows
     * Briber
+    * Negotiator
+    * Bribe Master
+    * Escape Artist
+    * Slave Trader
+    * Merry men
   * Two Handed
     * Quick Plunder
     * Eviscerate
+  * Tactics
+    * Companion Cavalry
+    * Tactical Superiority
 * Policies
   * Land Grants For Veterans
 * Feats
@@ -115,7 +125,7 @@ If your Bannerlord or local repo are in a different place, you can change the pr
 * [Skauzor](https://www.nexusmods.com/users/3289432) ([Discord](https://discordapp.com/users/123778041934643203))
 * [Zarganoth](https://www.nexusmods.com/users/6940484) ([Discord](https://discordapp.com/users/298985985843396618))
 * [Tynakuh](https://www.nexusmods.com/users/51824126) ([Discord](https://discordapp.com/users/178209384852094976))
-* [wonkotron](https://www.nexusmods.com/users/87193583) ([Discord])(https://discordapp.com/users/171467525660344320))
+* [wonkotron](https://www.nexusmods.com/users/87193583) ([Discord](https://discordapp.com/users/171467525660344320))
 
 ##### Others
 * Xaphedo for providing the banner art

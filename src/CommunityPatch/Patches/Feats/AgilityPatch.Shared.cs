@@ -1,5 +1,6 @@
 using System.Reflection;
 using HarmonyLib;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 
 namespace CommunityPatch.Patches.Feats {
@@ -29,5 +30,20 @@ namespace CommunityPatch.Patches.Feats {
                 0xB9, 0x71, 0xE0, 0x02, 0x8D, 0x58, 0x40, 0x99
             }
         };
+
+        public static float GetEffectBonus(FeatObject feat) {
+            float result = 0f;
+
+            if (feat == null) {
+                CommunityPatchSubModule.Error("AgilityPatchShared.GetEffectBonus():  given feat is null");
+            }
+            else {
+                // As of e1.3.0.226834, feat effect bonuses are stored in % instead of decimal
+                // (i.e. 30f = 30%, rather than 0.30f = 30%)
+                result = feat.EffectBonus < 1.0f ? feat.EffectBonus : feat.EffectBonus / 100.00f;
+            }
+            
+            return result;
+        }
     }
 }

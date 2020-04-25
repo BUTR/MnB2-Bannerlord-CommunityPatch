@@ -49,9 +49,9 @@ namespace CommunityPatch.Patches.Feats {
             var atmosphereModel =
                 Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, mobileParty.GetPosition());
             
-            // Observations as of e1.2.0.226271 is that SnowInfo.Density is between 0.0f and 1.0f
+            // SnowInfo.Density is between 0.0f and 1.0f
             if (atmosphereModel.SnowInfo.Density > 0f) {
-                var explainedNumber = new ExplainedNumber(baseSpeed, explanation, null);
+                var explainedNumber = new ExplainedNumber(__result, explanation, null);
 
                 var movingOnSnowEffectField =
                     AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingOnSnowEffect");
@@ -60,17 +60,21 @@ namespace CommunityPatch.Patches.Feats {
                 var snowDescription = (TextObject) snowDescriptionField.GetValue(__instance);
                 
                 // if there is snow on the ground, apply the movement debuff as a factor of the density
-                float snowDensityDebuff = movingOnSnowEffect * atmosphereModel.SnowInfo.Density;
-                explainedNumber.AddFactor(snowDensityDebuff, snowDescription);
+                float snowDensityDebuff =
+                    movingOnSnowEffect
+                    * atmosphereModel.SnowInfo.Density
+                    * baseSpeed;
+                explainedNumber.Add(snowDensityDebuff, snowDescription);
 
                 // Apply bonus to Sturgian party leaders
                 if (mobileParty.Leader != null &&
                     mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.SturgianSnowAgility)) {
 
-                    float sturgianBonusFactor =
-                        DefaultFeats.Cultural.SturgianSnowAgility.EffectBonus * Math.Abs(snowDensityDebuff);
+                    float sturgianBonus =
+                        AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.SturgianSnowAgility)
+                        * Math.Abs(snowDensityDebuff);
 
-                    explainedNumber.AddFactor(sturgianBonusFactor, DefaultFeats.Cultural.SturgianSnowAgility.Name);
+                    explainedNumber.Add(sturgianBonus, DefaultFeats.Cultural.SturgianSnowAgility.Name);
                 }
 
                 __result = explainedNumber.ResultNumber;
