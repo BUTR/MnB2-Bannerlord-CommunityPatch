@@ -1,5 +1,5 @@
 using System.IO;
-using Com;
+using Antijank.Interop;
 
 namespace Antijank {
 

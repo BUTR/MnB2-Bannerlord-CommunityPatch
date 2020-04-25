@@ -5,12 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using Microsoft.Win32.SafeHandles;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.TwoDimension.Standalone.Native.Windows;
+using static System.Reflection.BindingFlags;
 using Module = TaleWorlds.MountAndBlade.Module;
 using ModuleInfo = TaleWorlds.Library.ModuleInfo;
 using Path = System.IO.Path;
@@ -18,21 +20,6 @@ using Path = System.IO.Path;
 namespace Antijank {
 
   public static class AssemblyResolver {
-
-    public static readonly Harmony Harmony = new Harmony(nameof(Antijank));
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    public static bool HarmonyFileLogPatch(string str) {
-      Console.WriteLine(new string(FileLog.indentChar, FileLog.indentLevel) + str);
-      return false;
-    }
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    public static bool HarmonyFileLogListPatch(List<string> strings) {
-      foreach (var line in strings)
-        Console.WriteLine(new string(FileLog.indentChar, FileLog.indentLevel) + line);
-      return false;
-    }
 
     private static Dictionary<string, Assembly> SafeLoadedAssemblies
       = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
@@ -123,101 +110,24 @@ namespace Antijank {
       }
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    public static bool DoNothing() {
-      return false;
-    }
-
-    private static bool _terminalExceptionLoopCheck = false;
-
     static AssemblyResolver() {
       // here comes the magic
-      var twResolver = typeof(AssemblyLoader).GetMethod("OnAssemblyResolve", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-      Harmony.Patch(typeof(AssemblyLoader).GetMethod(nameof(AssemblyLoader.LoadFrom)),
+      var twResolver = typeof(AssemblyLoader).GetMethod("OnAssemblyResolve", NonPublic | Static | DeclaredOnly);
+      Context.Harmony.Patch(typeof(AssemblyLoader).GetMethod(nameof(AssemblyLoader.LoadFrom)),
         new HarmonyMethod(typeof(AssemblyResolver), nameof(AssemblyLoaderLoadFromPatch)));
       AppDomain.CurrentDomain.AssemblyResolve -= (ResolveEventHandler) Delegate.CreateDelegate(typeof(ResolveEventHandler), twResolver);
 
       if (AppDomain.CurrentDomain.DomainManager is AppDomainManager adm && Options.EnableDiagnosticConsole) {
-        Console.WriteLine("Attempting to direct Harmony logging output to console.");
-        try {
-          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.Log)),
-            new HarmonyMethod(typeof(AssemblyResolver), nameof(HarmonyFileLogPatch)));
-          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.LogBuffered), new[] {typeof(string)}),
-            new HarmonyMethod(typeof(AssemblyResolver), nameof(HarmonyFileLogPatch)));
-          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.LogBuffered), new[] {typeof(List<string>)}),
-            new HarmonyMethod(typeof(AssemblyResolver), nameof(HarmonyFileLogListPatch)));
-          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.FlushBuffer)),
-            new HarmonyMethod(typeof(AssemblyResolver), nameof(DoNothing)));
-          Harmony.Patch(typeof(FileLog).GetMethod(nameof(FileLog.Reset)),
-            new HarmonyMethod(typeof(AssemblyResolver), nameof(DoNothing)));
-          FileLog.Log("Logging Harmony output to console success.");
-          FileLog.FlushBuffer();
-          if (Options.EnableHarmonyDebugLogging)
-            Harmony.DEBUG = true;
-        }
-        catch (Exception e) {
-          Console.WriteLine("Logging Harmony output to console failed.");
-          Log(e);
-        }
+        HarmonyPatch.PatchHarmonyLogging();
       }
 
       var domain = AppDomain.CurrentDomain;
 
       domain.AssemblyResolve += OnAssemblyResolve;
 
-      domain.UnhandledException += (sender, args) => {
-        if (args.IsTerminating) {
-          if (_terminalExceptionLoopCheck) {
-            _terminalExceptionLoopCheck = true;
-            try {
-              AppDomainManager.EnableDiagnosticsConsole();
-              MessageBox.Error(
-                "Check the diagnostic console for detailed output.",
-                "Terminal Unhandled Exception");
-            }
-            catch {
-              // well darn
-            }
-          }
-        }
+      domain.UnhandledException += OnUnhandledException;
 
-        Console.WriteLine("Unhandled Exception:");
-        var ex = args.ExceptionObject as Exception;
-
-        Log(ex);
-
-        try {
-          var modAsm = new StackTrace(ex, false)
-            .FindModuleFromStackTrace(out var modInfo, out var stackFrame);
-          Console.WriteLine();
-          Console.WriteLine($"Possible Source Mod: {modInfo?.Name}");
-          Console.WriteLine($"Possible Source Assembly: {modAsm?.GetName().Name}");
-          Console.WriteLine($"Possible Source Call: {stackFrame?.GetMethod()?.FullDescription()}");
-        }
-        catch {
-          // ok
-        }
-
-        if (!args.IsTerminating)
-          return;
-
-        Console.WriteLine("Exception is terminal.");
-        Console.WriteLine("Press any key to exit.");
-        Console.ReadKey(true);
-        
-        var hWndConsole = Kernel32.GetConsoleWindow();
-        User32.SetActiveWindow(hWndConsole);
-        User32.SetForegroundWindow(hWndConsole);
-      };
-
-      domain.FirstChanceException += (sender, args) => {
-        if (Options.DisableFirstChanceExceptionPrinting)
-          return;
-
-        Console.WriteLine("First Chance Exception:");
-        var ex = args.Exception;
-        Log(ex);
-      };
+      domain.FirstChanceException += OnFirstChanceException;
 
       domain.DomainUnload += (sender, args) => {
         Console.WriteLine("Press any key to exit.");
@@ -225,22 +135,55 @@ namespace Antijank {
       };
     }
 
-    public static void Log(Exception ex) {
-      while (ex != null) {
-        Console.WriteLine(ex.ToString());
+    private static void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs args) {
+      if (Options.DisableFirstChanceExceptionPrinting)
+        return;
 
-        if (ex is ReflectionTypeLoadException rtl) {
-          foreach (var lex in rtl.LoaderExceptions)
-            Log(lex);
-        }
-        else if (ex is AggregateException aex) {
-          foreach (var cex in aex.InnerExceptions)
-            Log(cex);
-          return;
-        }
+      Console.WriteLine("First Chance Exception:");
+      var ex = args.Exception;
+      Logging.Log(ex);
+    }
 
-        ex = ex.InnerException;
+    private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs args) {
+      if (args.IsTerminating) {
+        if (Logging._terminalExceptionLoopCheck) {
+          Logging._terminalExceptionLoopCheck = true;
+          try {
+            AppDomainManager.EnableDiagnosticsConsole();
+            MessageBox.Error("Check the diagnostic console for detailed output.", "Terminal Unhandled Exception");
+          }
+          catch {
+            // well darn
+          }
+        }
       }
+
+      Console.WriteLine("Unhandled Exception:");
+      var ex = args.ExceptionObject as Exception;
+
+      Logging.Log(ex);
+
+      try {
+        var modAsm = new StackTrace(ex, false).FindModuleFromStackTrace(out var modInfo, out var stackFrame);
+        Console.WriteLine();
+        Console.WriteLine($"Possible Source Mod: {modInfo?.Name}");
+        Console.WriteLine($"Possible Source Assembly: {modAsm?.GetName().Name}");
+        Console.WriteLine($"Possible Source Call: {stackFrame?.GetMethod()?.FullDescription()}");
+      }
+      catch {
+        // ok
+      }
+
+      if (!args.IsTerminating)
+        return;
+
+      Console.WriteLine("Exception is terminal.");
+      Console.WriteLine("Press any key to exit.");
+      Console.ReadKey(true);
+
+      var hWndConsole = Kernel32.GetConsoleWindow();
+      User32.SetActiveWindow(hWndConsole);
+      User32.SetForegroundWindow(hWndConsole);
     }
 
     public static void Init() {

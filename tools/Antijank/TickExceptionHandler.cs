@@ -25,7 +25,7 @@ namespace Antijank {
 
     static TickExceptionHandler() {
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ScreenManager_PreTick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -35,7 +35,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ScreenManager_Tick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -45,7 +45,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(SceneScripting
+        Context.Harmony.Patch(SceneScripting
             .GetMethod("Tick", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalSceneTickExceptionPatch), AnyDeclared))
         );
@@ -55,7 +55,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ScriptComponentBehaviour_OnTick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -65,7 +65,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(EngineCallbacksType
+        Context.Harmony.Patch(EngineCallbacksType
             .GetMethod("ManagedScriptHolder_TickComponents", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );
@@ -75,7 +75,7 @@ namespace Antijank {
       }
 
       try {
-        AssemblyResolver.Harmony.Patch(LibraryCallbacksType
+        Context.Harmony.Patch(LibraryCallbacksType
             .GetMethod("Managed_ApplicationTick", AnyDeclared),
           finalizer: new HarmonyMethod(typeof(TickExceptionHandler).GetMethod(nameof(TerminalTickExceptionPatch), AnyDeclared))
         );

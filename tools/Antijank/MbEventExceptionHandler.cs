@@ -23,7 +23,7 @@ namespace Antijank {
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | Any;
 
     static MbEventExceptionHandler() {
-      AssemblyResolver.Harmony.Patch(
+      Context.Harmony.Patch(
         typeof(MbEvent).GetMethod("InvokeList", Declared),
         new HarmonyMethod(typeof(MbEventExceptionHandler).GetMethod(nameof(InvokeListReplacementPatch), Declared)));
 
@@ -37,7 +37,7 @@ namespace Antijank {
       );
 
       foreach (var t in genericEventTypes) {
-        AssemblyResolver.Harmony
+        Context.Harmony
           .Patch(
             t.GetMethod("InvokeList", Declared),
             transpiler: new HarmonyMethod(typeof(MbEventExceptionHandler), nameof(InvokeListReplacementTranspiler))

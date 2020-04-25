@@ -8,7 +8,7 @@ public static class ModuleInitializer {
       CosturaUtility.Initialize();
     }
     catch (Exception ex) {
-      AssemblyResolver.Log(ex);
+      Logging.Log(ex);
     }
   }
 

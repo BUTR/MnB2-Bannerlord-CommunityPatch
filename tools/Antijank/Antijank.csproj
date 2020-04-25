@@ -51,6 +51,7 @@
         <PackageReference Include="Fody" Version="6.1.1" PrivateAssets="All" />
         <PackageReference Include="InlineIL.Fody" Version="1.4.0" PrivateAssets="All" />
         <PackageReference Include="Lib.Harmony" Version="2.0.0.9" />
+        <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" />
         <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="2.0.0-beta.20213.1" />
         <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" PrivateAssets="All" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />

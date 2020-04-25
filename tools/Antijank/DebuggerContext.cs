@@ -70,21 +70,10 @@ namespace Antijank {
         var version = RuntimeEnvironment.GetSystemVersion();
         var clrRt = MetaHost.GetRuntime(version, typeof(ICLRRuntimeInfo).GUID);
 
-        IMetaDataDispenserEx mddx;
-        try {
-          mddx = (IMetaDataDispenserEx) clrRt.GetInterface(
-            typeof(CorMetaDataDispenserClass).GUID,
-            typeof(IMetaDataDispenserEx).GUID
-          );
-        }
-        catch {
-          var mdd = (IMetaDataDispenser) clrRt.GetInterface(
-            typeof(CorMetaDataDispenserClass).GUID,
-            typeof(IMetaDataDispenser).GUID
-          );
-
-          mddx = mdd as IMetaDataDispenserEx ?? throw new PlatformNotSupportedException();
-        }
+        var mddx = (IMetaDataDispenserEx) clrRt.GetInterface(
+          typeof(CorMetaDataDispenserClass).GUID,
+          typeof(IMetaDataDispenserEx).GUID
+        );
 
         var encMode = (CorSetEnC) (uint) mddx.GetOption(MetaDataDispenserOptions.MetaDataSetENC);
 

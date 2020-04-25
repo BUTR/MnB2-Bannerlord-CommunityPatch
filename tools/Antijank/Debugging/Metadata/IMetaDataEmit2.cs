@@ -19,9 +19,23 @@ namespace Antijank.Debugging {
 
     int SaveDeltaToMemory(IntPtr pbData, uint cbData);
 
-    int DefineGenericParam(uint tk, uint ulParamSeq, uint dwParamFlags, [MarshalAs(UnmanagedType.LPWStr)] string szname, uint tkKind, [MarshalAs(UnmanagedType.LPArray)] uint[] rtkConstraints, out uint pgp);
+    int DefineGenericParam(
+      uint tk,
+      uint ulParamSeq,
+      uint dwParamFlags,
+      [MarshalAs(UnmanagedType.LPWStr)] string szname,
+      uint tkKind,
+      [MarshalAs(UnmanagedType.LPArray)] uint[] rtkConstraints,
+      out uint pgp
+    );
 
-    int SetGenericParamProps(uint gp, uint dwParamFlags, [MarshalAs(UnmanagedType.LPWStr)] string szName, uint tkKind, [MarshalAs(UnmanagedType.LPArray)] uint[] rtkConstraints);
+    int SetGenericParamProps(
+      uint gp,
+      uint dwParamFlags,
+      [MarshalAs(UnmanagedType.LPWStr)] string szName,
+      uint tkKind,
+      [MarshalAs(UnmanagedType.LPArray)] uint[] rtkConstraints
+    );
 
     int ResetENCLog();
 

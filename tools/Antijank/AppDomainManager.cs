@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -67,8 +68,8 @@ namespace Antijank {
         switch (name) {
           case "TaleWorlds.MountAndBlade.Launcher":
             LoaderPatch.Init();
-            CustomDebugManager.Init();
-            TickExceptionHandler.Init();
+            //CustomDebugManager.Init();
+            //TickExceptionHandler.Init();
             //MbEventExceptionHandler.Init();
             break;
         }
