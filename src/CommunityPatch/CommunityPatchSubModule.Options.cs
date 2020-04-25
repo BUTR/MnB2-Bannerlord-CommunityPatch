@@ -59,7 +59,7 @@ namespace CommunityPatch {
 
       elements.Add(new InquiryElement(
         nameof(Diagnostics.GenerateReport),
-        "Copy Diagnostics to Clipboard",
+        "Generate Diagnostics Report",
         null
       ));
 #if DEBUG
@@ -76,7 +76,7 @@ namespace CommunityPatch {
 #endif
       InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
         new TextObject("{=CommunityPatchOptions}Community Patch Options").ToString(),
-        new TextObject("{=PickAnOption}Pick an option:").ToString(),
+        null,
         elements,
         true,
         true,
