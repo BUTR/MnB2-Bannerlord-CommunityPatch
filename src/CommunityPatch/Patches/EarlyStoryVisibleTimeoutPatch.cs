@@ -18,6 +18,7 @@ namespace CommunityPatch.Patches {
 
     private static readonly byte[] IsRemainingTimeHiddenGetterBodyIl = {
       // e1.1.2.226306
+      // i.e. IL for "return true"
       (byte) OpCodes.Ldc_I4_1.Value, // 0x17
       (byte) OpCodes.Ret.Value, // 0x2a
     };
@@ -69,10 +70,11 @@ namespace CommunityPatch.Patches {
       if (FirstPhaseTimeLimitInYearsField == null)
         return false;
 
-      if (GameNetwork.IsMultiplayer)
+      Type CampaignStoryModeType = Type.GetType("StoryMode.CampaignStoryMode, StoryMode, Version=1.0.0.0, Culture=neutral", false);
+      if (CampaignStoryModeType == null)
         return false;
 
-      if (Type.GetType("StoryMode.CampaignStoryMode, StoryMode, Version=1.0.0.0, Culture=neutral", false) == null)
+      if (!game.GameType.GetType().IsEquivalentTo(CampaignStoryModeType))
         return false;
 
       if (FirstPhaseQuestRemainingTimeHiddenGetters.Count == 0)
