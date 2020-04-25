@@ -10,12 +10,13 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
   public sealed class BowExpertPatch : AgentWeaponEquippedPatch<BowExpertPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(BowExpertPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(BowExpertPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     private static PerkObject _bowExpert;
 

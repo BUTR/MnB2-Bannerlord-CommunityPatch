@@ -7,6 +7,7 @@ using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
@@ -17,7 +18,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     private static readonly MethodInfo TargetMethodInfo = RaidingHelper.TargetMethodInfo;
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(EyeForLoot).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(EyeForLoot).GetMethod(nameof(Prefix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

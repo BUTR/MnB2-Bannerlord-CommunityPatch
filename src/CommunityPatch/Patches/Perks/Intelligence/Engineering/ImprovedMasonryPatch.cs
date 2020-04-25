@@ -7,6 +7,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -16,9 +17,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo =
-      typeof(DefaultWallHitPointCalculationModel).GetMethod(nameof(DefaultWallHitPointCalculationModel.CalculateMaximumWallHitPoint), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      typeof(DefaultWallHitPointCalculationModel).GetMethod(nameof(DefaultWallHitPointCalculationModel.CalculateMaximumWallHitPoint), Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ImprovedMasonryPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ImprovedMasonryPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

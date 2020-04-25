@@ -7,6 +7,7 @@ using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
@@ -16,9 +17,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo BanditsJoinTargetMethodInfo =
-      typeof(BanditsCampaignBehavior).GetMethod("conversation_bandits_will_join_player_on_condition", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+      typeof(BanditsCampaignBehavior).GetMethod("conversation_bandits_will_join_player_on_condition", NonPublic | DeclaredOnly | Instance);
 
-    private static readonly MethodInfo BanditsJoinPatchMethodInfo = typeof(MerryMenPatch).GetMethod(nameof(PrefixBanditsJoin), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo BanditsJoinPatchMethodInfo = typeof(MerryMenPatch).GetMethod(nameof(PrefixBanditsJoin), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return BanditsJoinTargetMethodInfo;

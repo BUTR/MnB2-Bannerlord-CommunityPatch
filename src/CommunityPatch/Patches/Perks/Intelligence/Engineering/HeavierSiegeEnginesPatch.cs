@@ -8,6 +8,7 @@ using TaleWorlds.Localization;
 using HarmonyLib;
 using Helpers;
 using TaleWorlds.Core.ViewModelCollection;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -16,13 +17,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(SiegeEvent).GetMethod("BombardHitEngine", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(SiegeEvent).GetMethod("BombardHitEngine", NonPublic | Instance | DeclaredOnly);
 
     private static readonly MethodInfo TooltipTargetMethodInfo = SiegeTooltipHelper.TargetMethodInfo;
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(Prefix), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo TooltipPatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(TooltipPostfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TooltipPatchMethodInfo = typeof(HeavierSiegeEnginesPatch).GetMethod(nameof(TooltipPostfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

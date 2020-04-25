@@ -10,12 +10,13 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Control.Bow {
 
   public sealed class BowMountedArcherPatch : AgentWeaponEquippedPatch<BowMountedArcherPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(BowMountedArcherPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(BowMountedArcherPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     private static PerkObject _mountedArcher;
 

@@ -7,6 +7,7 @@ using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
@@ -15,9 +16,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(MapEvent).GetMethod("ApplyRaidResult", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(MapEvent).GetMethod("ApplyRaidResult", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPrefix = typeof(ForTheThrillPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPrefix = typeof(ForTheThrillPatch).GetMethod(nameof(Prefix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

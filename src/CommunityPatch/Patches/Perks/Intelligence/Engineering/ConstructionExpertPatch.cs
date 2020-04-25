@@ -5,6 +5,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -14,12 +15,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo =
-      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPower), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPower), Public | Instance | DeclaredOnly);
 
     private static readonly MethodInfo WithoutBoostTargetMethodInfo =
-      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPowerWithoutBoost), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPowerWithoutBoost), Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ConstructionExpertPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ConstructionExpertPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

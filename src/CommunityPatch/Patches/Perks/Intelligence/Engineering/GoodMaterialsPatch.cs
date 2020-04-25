@@ -160,7 +160,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     // ReSharper disable once RedundantAssignment
-    public static void PlayerPrefix(ref Object __instance, out (int DeployedCount, int ReservedCount) __state) {
+    public static void PlayerPrefix(ref object __instance, out (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
       if (siegeEvent == null) {
         __state = (0, 0);
@@ -174,8 +174,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void PlayerPostfix(ref Object __instance, ref (int DeployedCount, int ReservedCount) __state) {
+    public static void PlayerPostfix(ref object __instance, ref (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
+      if (siegeEvent == null)
+        return;
       var playerSideSiegeEvent = siegeEvent.GetSiegeEventSide(GetPlayerSideFromVm(__instance));
 
       if (!HasSiegeEngineJustBeenConstructed(playerSideSiegeEvent, __state.DeployedCount, __state.ReservedCount)) return;

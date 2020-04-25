@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
@@ -10,13 +11,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     private const float PredictionForHitMinDamage = 0.049f;
 
-    public static readonly FieldInfo IsFinishCalled = typeof(MapEvent).GetField("_isFinishCalled", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    public static readonly FieldInfo IsFinishCalled = typeof(MapEvent).GetField("_isFinishCalled", NonPublic | Instance | DeclaredOnly);
 
-    public static readonly FieldInfo NextSettlementDamage = typeof(MapEvent).GetField("_nextSettlementDamage", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    public static readonly FieldInfo NextSettlementDamage = typeof(MapEvent).GetField("_nextSettlementDamage", NonPublic | Instance | DeclaredOnly);
 
-    public static readonly PropertyInfo SettlementHitPoints = typeof(Settlement).GetProperty("SettlementHitPoints", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    public static readonly PropertyInfo SettlementHitPoints = typeof(Settlement).GetProperty("SettlementHitPoints", NonPublic | Public | Instance | DeclaredOnly);
 
-    public static readonly MethodInfo TargetMethodInfo = typeof(MapEvent).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    public static readonly MethodInfo TargetMethodInfo = typeof(MapEvent).GetMethod("Update", NonPublic | Instance | DeclaredOnly);
 
     public static readonly byte[][] Hashes = {
       new byte[] {

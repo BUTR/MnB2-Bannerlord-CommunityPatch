@@ -5,6 +5,7 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
@@ -14,7 +15,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     public static readonly MethodInfo TargetMethodInfo =
       Type.GetType("SandBox.ViewModelCollection.SandBoxUIHelper, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
-        .GetMethod("GetSiegeEngineInProgressTooltip", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        .GetMethod("GetSiegeEngineInProgressTooltip", NonPublic | Public | Instance | Static | DeclaredOnly);
 
     public static readonly byte[][] TooltipHashes = {
       new byte[] {

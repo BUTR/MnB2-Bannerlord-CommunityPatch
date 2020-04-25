@@ -10,13 +10,14 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.CommunityPatchSubModule;
 
 namespace CommunityPatch.Patches.Perks.Control.Crossbow {
 
   public sealed class CrossbowCavalryPerkPatch : AgentWeaponEquippedPatch<CrossbowCavalryPerkPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowCavalryPerkPatch).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowCavalryPerkPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     private static PerkObject _crossbowCavalry;
 

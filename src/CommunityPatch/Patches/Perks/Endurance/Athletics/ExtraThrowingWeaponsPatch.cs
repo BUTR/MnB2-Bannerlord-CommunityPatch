@@ -4,12 +4,13 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
   public class ExtraThrowingWeapons : ExtraAmmoPerksPatch<ExtraThrowingWeapons> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(ExtraThrowingWeapons).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(ExtraThrowingWeapons).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
     public override void Apply(Game game) {
       if (Applied) return;

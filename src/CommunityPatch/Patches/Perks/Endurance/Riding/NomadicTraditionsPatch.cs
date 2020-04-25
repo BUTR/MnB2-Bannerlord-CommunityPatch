@@ -6,6 +6,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
@@ -14,15 +15,15 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo PureSpeedMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculatePureSpeed", BindingFlags.Public | BindingFlags.Instance);
+    private static readonly MethodInfo PureSpeedMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculatePureSpeed", Public | Instance);
 
-    private static readonly MethodInfo CavalryRatioModifierMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetCavalryRatioModifier", BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly MethodInfo CavalryRatioModifierMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetCavalryRatioModifier", NonPublic | Instance);
 
-    private static readonly MethodInfo MountedFootmenRatioModifierMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetMountedFootmenRatioModifier", BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly MethodInfo MountedFootmenRatioModifierMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetMountedFootmenRatioModifier", NonPublic | Instance);
 
-    private static readonly MethodInfo BaseSpeedMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculateBaseSpeedForParty", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly MethodInfo BaseSpeedMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculateBaseSpeedForParty", Instance | NonPublic);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(NomadicTraditionsPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(NomadicTraditionsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
     private PerkObject _perk;
 

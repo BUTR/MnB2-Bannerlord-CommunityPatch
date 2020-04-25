@@ -8,6 +8,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -15,8 +16,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public override bool Applied { get; protected set; }
 
     private static readonly Type DefaultPartyMoraleModelType = typeof(DefaultPartyMoraleModel);
-    private static readonly MethodInfo TargetMethodInfo = DefaultPartyMoraleModelType.GetMethod(nameof(DefaultPartyMoraleModel.GetEffectivePartyMorale), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ResolutePatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = DefaultPartyMoraleModelType.GetMethod(nameof(DefaultPartyMoraleModel.GetEffectivePartyMorale), Public | Instance | DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ResolutePatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
@@ -139,7 +140,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       => GetMoralePenaltyFromMethodWithExplainedNumber(model, "CalculateFoodVarietyMoraleBonus", party);
 
     private static float GetMoralePenaltyFromMethod(DefaultPartyMoraleModel model, string methodName, MobileParty party) {
-      var method = DefaultPartyMoraleModelType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.NonPublic);
+      var method = DefaultPartyMoraleModelType.GetMethod(methodName, Instance | DeclaredOnly | NonPublic);
       if (method == null) return 0f;
       
       var moraleBonus = (int) method.Invoke(model, new object[] {party});
@@ -147,7 +148,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
     
     private static float GetMoralePenaltyFromMethodWithExplainedNumber(DefaultPartyMoraleModel model, string methodName, MobileParty party) {
-      var method = DefaultPartyMoraleModelType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+      var method = DefaultPartyMoraleModelType.GetMethod(methodName, Instance | NonPublic | DeclaredOnly);
       if (method == null) return 0f;
       
       var args = new object[] { party, new ExplainedNumber(0f) };

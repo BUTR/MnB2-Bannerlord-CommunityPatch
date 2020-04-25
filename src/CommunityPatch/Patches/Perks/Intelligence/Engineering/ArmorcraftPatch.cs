@@ -6,6 +6,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -14,9 +15,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.GetBaseArmorEffectivenessForBodyPart), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.GetBaseArmorEffectivenessForBodyPart), Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ArmorcraftPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ArmorcraftPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

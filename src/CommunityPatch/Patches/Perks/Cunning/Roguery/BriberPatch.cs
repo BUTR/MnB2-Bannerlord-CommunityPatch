@@ -8,6 +8,7 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors.VillageBehaviors;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
@@ -16,21 +17,21 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo VillagerBribeTargetMethodInfo = typeof(VillagerCampaignBehavior).GetMethod("IsBribeFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+    private static readonly MethodInfo VillagerBribeTargetMethodInfo = typeof(VillagerCampaignBehavior).GetMethod("IsBribeFeasible", NonPublic | DeclaredOnly | Instance);
 
-    private static readonly MethodInfo VillagerSurrenderTargetMethodInfo = typeof(VillagerCampaignBehavior).GetMethod("IsSurrenderFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+    private static readonly MethodInfo VillagerSurrenderTargetMethodInfo = typeof(VillagerCampaignBehavior).GetMethod("IsSurrenderFeasible", NonPublic | DeclaredOnly | Instance);
 
-    private static readonly MethodInfo CaravansBribeTargetMethodInfo = typeof(CaravansCampaignBehavior).GetMethod("IsBribeFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+    private static readonly MethodInfo CaravansBribeTargetMethodInfo = typeof(CaravansCampaignBehavior).GetMethod("IsBribeFeasible", NonPublic | DeclaredOnly | Instance);
 
-    private static readonly MethodInfo CaravansSurrenderTargetMethodInfo = typeof(CaravansCampaignBehavior).GetMethod("IsSurrenderFeasible", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance);
+    private static readonly MethodInfo CaravansSurrenderTargetMethodInfo = typeof(CaravansCampaignBehavior).GetMethod("IsSurrenderFeasible", NonPublic | DeclaredOnly | Instance);
 
-    private static readonly MethodInfo VillagerBribePatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixVillageBribe), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo VillagerBribePatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixVillageBribe), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo VillagerSurrenderPatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixVillageSurrender), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo VillagerSurrenderPatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixVillageSurrender), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo CaravansBribePatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixCaravansBribe), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo CaravansBribePatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixCaravansBribe), Public | NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo CaravansSurrenderPatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixCaravansSurrender), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo CaravansSurrenderPatchMethodInfo = typeof(BriberPatch).GetMethod(nameof(PrefixCaravansSurrender), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return VillagerBribeTargetMethodInfo;

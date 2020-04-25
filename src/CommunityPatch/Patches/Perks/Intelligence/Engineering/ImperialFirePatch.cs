@@ -8,6 +8,7 @@ using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -18,13 +19,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     private static readonly MethodInfo AttackerTargetMethodInfo =
       Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
-        .GetMethod("GetAllAttackerRangedMachines", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        .GetMethod("GetAllAttackerRangedMachines", NonPublic | Public | Instance | Static | DeclaredOnly);
 
     private static readonly MethodInfo DefenderTargetMethodInfo =
       Type.GetType("SandBox.ViewModelCollection.MapSiege.MapSiegeProductionVM, SandBox.ViewModelCollection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null")?
-        .GetMethod("GetAllDefenderMachines", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        .GetMethod("GetAllDefenderMachines", NonPublic | Public | Instance | Static | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ImperialFirePatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(ImperialFirePatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AttackerTargetMethodInfo;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
@@ -9,12 +10,13 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
   public sealed class CrossbowExpert : AgentWeaponEquippedPatch<CrossbowExpert> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowExpert).GetMethod(nameof(Prefix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowExpert).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     private static PerkObject _crossbowExpert;
 
@@ -35,6 +37,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
       if (weapon.WeaponClass == WeaponClass.Crossbow) // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData

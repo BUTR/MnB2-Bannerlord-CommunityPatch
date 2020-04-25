@@ -8,10 +8,10 @@ namespace CommunityPatch.Patches.Feats {
   internal sealed class AgilityPatchShared {
 
     public static readonly MethodInfo CalculatePureSpeedMethodInfo =
-      AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), "CalculatePureSpeed");
+      AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), nameof(DefaultPartySpeedCalculatingModel.CalculatePureSpeed));
 
     public static readonly MethodInfo CalculateFinalSpeedMethodInfo =
-      AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), "CalculateFinalSpeed");
+      AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), nameof(DefaultPartySpeedCalculatingModel.CalculateFinalSpeed));
 
     public static readonly byte[][] CalculatePureSpeedHashes = {
       new byte[] {

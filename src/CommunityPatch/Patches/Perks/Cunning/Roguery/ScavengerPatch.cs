@@ -8,6 +8,7 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
@@ -18,7 +19,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     private static readonly MethodInfo TargetMethodInfo = LootCollectorHelper.GiveShareOfLootToPartyMethod;
 
-    private static readonly MethodInfo PatchMethodInfoPrefix = typeof(ScavengerPatch).GetMethod(nameof(Prefix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPrefix = typeof(ScavengerPatch).GetMethod(nameof(Prefix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
