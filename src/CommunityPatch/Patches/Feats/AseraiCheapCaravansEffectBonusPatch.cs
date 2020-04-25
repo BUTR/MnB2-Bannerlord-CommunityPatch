@@ -62,8 +62,8 @@ namespace CommunityPatch.Patches.Feats {
             }
         }
 
-        public override void Reset() {
-            Applied = false;
-        }
+        public override void Reset()
+          => Applied = false;
+
     }
 }

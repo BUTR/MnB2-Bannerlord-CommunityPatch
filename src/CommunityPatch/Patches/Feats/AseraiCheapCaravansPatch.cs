@@ -56,10 +56,9 @@ namespace CommunityPatch.Patches.Feats {
         public override void Reset() { }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static void Prefix(out int __state) {
-            // get player gold and make it available for Postfix
-            __state = Hero.MainHero.Gold;
-        }
+        static void Prefix(out int __state)
+          // get player gold and make it available for Postfix
+          => __state = Hero.MainHero.Gold;
 
         static void Postfix(int __state) {
             // presume the player successfully purchased a caravan if their gold is less than it was at the beginning
