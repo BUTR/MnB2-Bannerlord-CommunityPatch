@@ -42,7 +42,7 @@ namespace CommunityPatch.Patches.Feats {
             ref StatExplainer explanation,
             ref float __result) {
             
-            TerrainType faceTerrainType = Campaign.Current.MapSceneWrapper.GetFaceTerrainType(mobileParty.CurrentNavigationFace);
+            var faceTerrainType = Campaign.Current.MapSceneWrapper.GetFaceTerrainType(mobileParty.CurrentNavigationFace);
 
             if (faceTerrainType == TerrainType.Forest &&
                 mobileParty.Leader != null &&
@@ -53,7 +53,7 @@ namespace CommunityPatch.Patches.Feats {
                 var movingAtForestEffectField = AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingAtForestEffect");
                 var movingAtForestEffect = (float) movingAtForestEffectField.GetValue(__instance);
 
-                float battanianAgilityBonus =
+                var battanianAgilityBonus =
                     AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.BattanianForestAgility)
                     * Math.Abs(movingAtForestEffect)
                     * baseSpeed;

@@ -1,35 +1,35 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
+using Mono.Cecil.Cil;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
   public sealed class EarlyStoryVisibleTimeoutPatch : IPatch {
 
-    private static readonly byte[] IsRemainingTimeHiddenGetterBodyIL = new byte[] {
+    private static readonly byte[] IsRemainingTimeHiddenGetterBodyIl = {
       // e1.1.2.226306
-      // i.e. IL for "return true"
-      0x17, 0x2A
+      OpCodes.Ldc_I4_1.Op1, // 0x17
+      OpCodes.Ret.Op1, // 0x2a
     };
 
+    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase, StoryMode, Version=1.0.0.0, Culture=neutral");
+
     private static readonly List<MethodInfo> FirstPhaseQuestRemainingTimeHiddenGetters =
-      Assembly.Load("StoryMode, Version=1.0.0.0, Culture=neutral").GetTypes()
-        .Where(type => type.Namespace == "StoryMode.Behaviors.Quests.FirstPhase" && IsAQuest(type))
+      FirstPhaseType.Assembly.GetTypes()
+        .Where(type => type.Namespace == "StoryMode.Behaviors.Quests.FirstPhase" && type.IsSubclassOf(typeof(QuestBase)))
         .Select(type => AccessTools.PropertyGetter(type, "IsRemainingTimeHidden")).ToList();
 
-    private static readonly MethodInfo RemainingTimeHiddenGetterPostfixHandle = AccessTools.Method(typeof(EarlyStoryVisibleTimeoutPatch), "RemainingTimeHiddenGetterPostfix");
+    private static readonly MethodInfo RemainingTimeHiddenGetterPostfixHandle = AccessTools.Method(typeof(EarlyStoryVisibleTimeoutPatch), nameof(RemainingTimeHiddenGetterPostfix));
 
     private static readonly Type FirstPhaseCampaignBehaviorType = Type.GetType("StoryMode.Behaviors.FirstPhaseCampaignBehavior, StoryMode, Version=1.0.0.0, Culture=neutral");
-
-    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase, StoryMode, Version=1.0.0.0, Culture=neutral");
 
     private static readonly MethodInfo FirstPhaseInstanceGetter = AccessTools.PropertyGetter(FirstPhaseType, "Instance");
 
@@ -56,9 +56,8 @@ namespace CommunityPatch.Patches {
         return;
 
       CampaignEvents.OnQuestStartedEvent.ClearListeners(this);
-      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters) {
+      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters)
         CommunityPatchSubModule.Harmony.Unpatch(method, RemainingTimeHiddenGetterPostfixHandle);
-      }
 
       Applied = false;
     }
@@ -68,13 +67,16 @@ namespace CommunityPatch.Patches {
       if (FirstPhaseTimeLimitInYearsField == null || game.GameType.GetType().FullName != "StoryMode.CampaignStoryMode")
         return false;
 
+      if (FirstPhaseQuestRemainingTimeHiddenGetters.Count == 0)
+        return false;
+
       foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters) {
         if (AlreadyPatchedByOthers(Harmony.GetPatchInfo(method)))
           return false;
 
         // if any of base game's QuestRemainingTimeHidden getters have been changed the story line
         // may have changed considerably so don't apply
-        if (!method.GetMethodBody().GetILAsByteArray().SequenceEqual(IsRemainingTimeHiddenGetterBodyIL))
+        if (!method.GetMethodBody().GetILAsByteArray().SequenceEqual(IsRemainingTimeHiddenGetterBodyIl))
           return false;
       }
 
@@ -92,9 +94,8 @@ namespace CommunityPatch.Patches {
           .GetRawConstantValue();
       }
       catch {
-        if (!FirstPhaseTimeLimitInYearsField.IsStatic) {
+        if (!FirstPhaseTimeLimitInYearsField.IsStatic)
           throw new InvalidOperationException("FirstPhaseTimeLimitInYears was not static and we do not have an instance");
-        }
 
         return (int) FirstPhaseTimeLimitInYearsField.GetValue(null);
       }
@@ -106,9 +107,8 @@ namespace CommunityPatch.Patches {
       foreach (var quest in Campaign.Current.QuestManager.Quests.ToList())
         SetStoryVisibleTimeoutIfNeeded(quest);
 
-      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters) {
+      foreach (var method in FirstPhaseQuestRemainingTimeHiddenGetters)
         CommunityPatchSubModule.Harmony.Patch(method, postfix: new HarmonyMethod(RemainingTimeHiddenGetterPostfixHandle));
-      }
 
       Applied = true;
     }
@@ -153,11 +153,8 @@ namespace CommunityPatch.Patches {
         CampaignEvents.HourlyTickEvent.ClearListeners(this);
       });
 
-    private static bool IsAQuest(Type type) => type.IsSubclassOf(typeof(QuestBase));
-
-    private static void RemainingTimeHiddenGetterPostfix(ref bool __result) {
-      __result = false;
-    }
+    private static void RemainingTimeHiddenGetterPostfix(ref bool __result)
+      => __result = false;
 
   }
 
