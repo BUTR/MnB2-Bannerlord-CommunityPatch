@@ -58,6 +58,8 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Good Materials
     * Everyday Engineer
     * Builder
+  * Roguery
+    * Scavenger
     * Armorcraft
     * Wall Breaker
     * Imperial Fire
