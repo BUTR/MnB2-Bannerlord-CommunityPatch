@@ -11,7 +11,7 @@ using ModuleInfo = TaleWorlds.Library.ModuleInfo;
 
 namespace Antijank {
 
-  [PublicAPI]
+  
   public static class CallStackHelpers {
 
     public const BindingFlags AnyAccess = Public | NonPublic;

@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [SuppressUnmanagedCodeSecurity]
   [Guid("D05E60C3-848C-4E7D-894E-623320FF6AFA")]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugDataTarget3 {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

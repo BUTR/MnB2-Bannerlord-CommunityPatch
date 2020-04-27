@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugAppDomain2 {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

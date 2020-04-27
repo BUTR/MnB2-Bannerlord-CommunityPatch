@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("90F1A06C-7712-4762-86B5-7A5EBA6BDB02")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICLRRuntimeHost {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

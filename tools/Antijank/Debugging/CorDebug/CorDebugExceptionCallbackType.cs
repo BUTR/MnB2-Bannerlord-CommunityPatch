@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugExceptionCallbackType {
 
     DEBUG_EXCEPTION_FIRST_CHANCE = 1,

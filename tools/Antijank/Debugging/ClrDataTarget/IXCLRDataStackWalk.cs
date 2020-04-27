@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [Guid("E59D8D22-ADA7-49A2-89B5-A415AFCFC95F")]
   [ComImport]
-  [PublicAPI]
+  
   public interface IXCLRDataStackWalk {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

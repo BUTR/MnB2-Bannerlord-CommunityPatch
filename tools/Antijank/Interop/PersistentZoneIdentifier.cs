@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   [ClassInterface(ClassInterfaceType.None)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]

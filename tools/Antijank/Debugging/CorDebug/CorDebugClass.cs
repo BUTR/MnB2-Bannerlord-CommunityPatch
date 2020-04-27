@@ -11,7 +11,7 @@ namespace Antijank.Debugging {
   [Guid("6FEF44D0-39E7-4C77-BE8E-C9F8CF988630")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public class CorDebugClass : ICorDebug, CorDebug {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

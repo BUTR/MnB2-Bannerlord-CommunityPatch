@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Antijank.Debugging {
 
   [Flags]
-  [PublicAPI]
+  
   public enum CorElementType {
 
     ELEMENT_TYPE_PINNED = 0x45,

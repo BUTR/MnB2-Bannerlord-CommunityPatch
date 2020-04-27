@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugChainReason {
 
     CHAIN_NONE,

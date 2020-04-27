@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [ComConversionLoss]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [Guid("E930C679-78AF-4953-8AB7-B0AABF0F9F80")]
-  [PublicAPI]
+  
   public interface ICorDebugProcess4 {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

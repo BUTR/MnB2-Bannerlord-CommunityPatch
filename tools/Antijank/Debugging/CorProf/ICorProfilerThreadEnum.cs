@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("571194F7-25ED-419F-AA8B-7016B3159701")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorProfilerThreadEnum {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

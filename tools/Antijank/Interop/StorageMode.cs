@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   [Flags]
   public enum StorageMode : int {
 

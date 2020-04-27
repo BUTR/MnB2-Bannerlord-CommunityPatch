@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Security;
 using JetBrains.Annotations;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace Antijank.Interop
 {
-	[PublicAPI]
+	
 	[SuppressMessage("ReSharper", "IdentifierTypo")]
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
 	[Serializable]

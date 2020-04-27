@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [SuppressUnmanagedCodeSecurity]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorProfilerModuleEnum {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

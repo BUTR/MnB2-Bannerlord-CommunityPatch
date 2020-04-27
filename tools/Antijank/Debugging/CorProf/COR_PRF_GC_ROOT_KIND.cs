@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum COR_PRF_GC_ROOT_KIND {
 
     COR_PRF_GC_ROOT_STACK = 1,

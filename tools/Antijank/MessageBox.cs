@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
-using TaleWorlds.Diamond;
-using TaleWorlds.Library;
-using TaleWorlds.TwoDimension.Standalone;
 using TaleWorlds.TwoDimension.Standalone.Native.Windows;
 
 namespace Antijank {
 
-  [PublicAPI]
+  
   public static class MessageBox {
 
     [DllImport("user32", SetLastError = true, CharSet = CharSet.Auto, EntryPoint = "MessageBox")]

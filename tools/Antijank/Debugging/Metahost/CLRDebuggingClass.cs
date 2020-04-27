@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("BACC578D-FBDD-48a4-969F-02D932B74634")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public class CLRDebuggingClass : CLRDebugging, ICLRDebugging {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [SuppressUnmanagedCodeSecurity]
   [Guid("B81FF171-20F3-11D2-8DCC-00A0C9B00521")]
   [ComImport]
-  [PublicAPI]
+  
   public interface ITypeNameFactory {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

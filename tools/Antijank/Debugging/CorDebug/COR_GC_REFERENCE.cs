@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Antijank.Debugging {
 
   [StructLayout(LayoutKind.Sequential)]
-  [PublicAPI]
+  
   public struct COR_GC_REFERENCE {
 
     public ICorDebugAppDomain Domain;

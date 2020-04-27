@@ -10,6 +10,10 @@ namespace CommunityPatch {
 
   public static class PathHelpers {
 
+    private static readonly string DirSeparator = new string(Path.DirectorySeparatorChar, 1);
+
+    private static readonly string DoubleDirSeparator = new string(Path.DirectorySeparatorChar, 2);
+
     private static string _binSubDir;
 
     public static string GetBinSubDir() {
@@ -98,10 +102,6 @@ namespace CommunityPatch {
 
     private static string _gameBinDir;
 
-    private static readonly string DirSeparator = new string(Path.DirectorySeparatorChar, 1);
-
-    private static readonly string DoubleDirSeparator = new string(Path.DirectorySeparatorChar, 2);
-
     public static string GetGameBinDir()
       => _gameBinDir ??= EnsureTrailingDirectorySeparatorAndNormalize(
         Path.GetDirectoryName(new Uri(
@@ -156,6 +156,11 @@ namespace CommunityPatch {
     }
 
     public static bool IsModuleAssembly(Assembly asm, out ModuleInfo mod) {
+      if (asm == null) {
+        mod = null; // some kinda typeless method maybe
+        return true;
+      }
+
       if (asm.IsDynamic) {
         mod = null;
         return false;

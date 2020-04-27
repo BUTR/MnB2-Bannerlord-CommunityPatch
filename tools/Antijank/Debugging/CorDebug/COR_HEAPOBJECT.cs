@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Antijank.Debugging {
 
   [StructLayout(LayoutKind.Sequential, Pack = 4)]
-  [PublicAPI]
+  
   public struct COR_HEAPOBJECT {
 
     public ulong address; // The address (in heap) of the object.

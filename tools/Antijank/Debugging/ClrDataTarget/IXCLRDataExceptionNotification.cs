@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [Guid("2D95A079-42A1-4837-818F-0B97D7048E0E")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface IXCLRDataExceptionNotification {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

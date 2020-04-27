@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CLRDataModuleExtentType {
 
     CLRDATA_MODULE_PE_FILE,

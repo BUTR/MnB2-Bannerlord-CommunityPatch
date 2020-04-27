@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security;
-using Antijank.Interop;
 using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
@@ -12,7 +11,7 @@ namespace Antijank.Debugging {
   [SuppressUnmanagedCodeSecurity]
   [Guid("E5CB7A31-7512-11D2-89CE-0080C792E5D8")]
   [ComImport]
-  [PublicAPI]
+  
   public class CorMetaDataDispenserExClass : CorMetaDataDispenserEx {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

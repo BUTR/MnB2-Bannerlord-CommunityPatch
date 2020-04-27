@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("5BED9B15-C079-4D47-BFE2-215A140C07E0")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorProfilerCallback8 : ICorProfilerCallback7 {
 
     /*

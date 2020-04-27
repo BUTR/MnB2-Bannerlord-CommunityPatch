@@ -6,7 +6,7 @@ namespace Antijank.Debugging {
 
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
-  [PublicAPI]
+  
   public struct COR_PRF_GC_GENERATION_RANGE {
 
     public COR_PRF_GC_GENERATION generation;

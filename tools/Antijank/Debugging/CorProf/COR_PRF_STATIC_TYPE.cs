@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum COR_PRF_STATIC_TYPE {
 
     COR_PRF_FIELD_NOT_A_STATIC,

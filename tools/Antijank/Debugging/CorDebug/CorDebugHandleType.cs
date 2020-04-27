@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugHandleType {
 
     HANDLE_STRONG = 1,

@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface IXCLRDataTypeInstance {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

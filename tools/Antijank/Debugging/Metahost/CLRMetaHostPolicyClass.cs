@@ -12,7 +12,7 @@ namespace Antijank.Debugging {
   [Guid("2ebcd49a-1b47-4a61-b13a-4a03701e594b")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public class CLRMetaHostPolicyClass : ICLRMetaHostPolicy {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

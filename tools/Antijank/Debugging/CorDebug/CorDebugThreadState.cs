@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugThreadState {
 
     THREAD_RUN,

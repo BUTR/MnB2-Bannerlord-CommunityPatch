@@ -6,7 +6,7 @@ namespace Antijank.Debugging {
   [CoClass(typeof(CorMetaDataDispenserClass))]
   [Guid("809C652E-7396-11D2-9771-00A0C9B4D50C")]
   [ComImport]
-  [PublicAPI]
+  
   public interface CorMetaDataDispenser : IMetaDataDispenser {
 
   }

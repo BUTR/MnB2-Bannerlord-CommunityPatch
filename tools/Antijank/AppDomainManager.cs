@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
@@ -11,7 +9,7 @@ using TaleWorlds.TwoDimension.Standalone.Native.Windows;
 
 namespace Antijank {
 
-  [PublicAPI]
+  
   public class AppDomainManager : System.AppDomainManager {
 
     private static readonly ConsoleTraceListener ConsoleTraceListener = new ConsoleTraceListener(true);
@@ -68,6 +66,8 @@ namespace Antijank {
         switch (name) {
           case "TaleWorlds.MountAndBlade.Launcher":
             LoaderPatch.Init();
+            if (Options.EnableWidgetFactoryInitializationPatch)
+              WidgetFactoryPatch.Init();
             //CustomDebugManager.Init();
             //TickExceptionHandler.Init();
             //MbEventExceptionHandler.Init();

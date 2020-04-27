@@ -6,6 +6,7 @@
         <RootNamespace />
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64</Platforms>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
 </Project>

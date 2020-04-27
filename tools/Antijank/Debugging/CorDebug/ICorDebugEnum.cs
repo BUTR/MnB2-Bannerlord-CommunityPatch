@@ -5,7 +5,7 @@
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugEnum {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

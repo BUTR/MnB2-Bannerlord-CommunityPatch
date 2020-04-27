@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [Guid("471C35B4-7C2F-4EF0-A945-00F8C38056F1")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICLRDataEnumMemoryRegions {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

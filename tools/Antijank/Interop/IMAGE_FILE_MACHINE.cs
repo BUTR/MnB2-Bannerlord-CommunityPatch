@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   [SuppressMessage("ReSharper", "IdentifierTypo")]
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   public enum IMAGE_FILE_MACHINE : uint

@@ -11,7 +11,7 @@ namespace Antijank.Debugging {
   [SuppressUnmanagedCodeSecurity]
   [ClassInterface(ClassInterfaceType.None)]
   [ComImport]
-  [PublicAPI]
+  
   public class EmbeddedCLRCorDebugClass : ICorDebug, EmbeddedCLRCorDebug {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

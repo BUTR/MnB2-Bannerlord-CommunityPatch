@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugCodeInvokeKind {
 
     CODE_INVOKE_KIND_NONE, // if there is any managed code invoked by this method, it will have

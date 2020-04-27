@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public class InProcCorDebugDataTarget : ICorDebugMutableDataTarget, ICorDebugMetaDataLocator {
 
     private GCHandle _keepAlive;

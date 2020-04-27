@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [Guid("6D05FAE3-189C-4630-A6DC-1C251E1C01AB")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICLRDataTarget2 : ICLRDataTarget {
 
     /*

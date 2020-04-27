@@ -6,12 +6,7 @@
         <PlatformTarget>x64</PlatformTarget>
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64</Platforms>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Reference Include="TaleWorlds.MountAndBlade, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>$(MnB2BannerlordBinDir)\TaleWorlds.MountAndBlade.dll</HintPath>
-      </Reference>
-    </ItemGroup>
 
 </Project>

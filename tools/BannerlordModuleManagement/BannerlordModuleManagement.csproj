@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <LangVersion>8</LangVersion>
+        <Configurations>Release;Debug</Configurations>
+        <Platforms>x64</Platforms>
+        <Platform>x64</Platform>
+        <TargetFramework>net472</TargetFramework>
+        <Title>Bannerlord Module Management</Title>
+        <Authors>Tyler Young</Authors>
+        <Copyright>Copyright © 2020 Tyler Young</Copyright>
+        <LicenseExpression>MIT</LicenseExpression>
+        <PackageOutputDir>$(SolutionDir)</PackageOutputDir>
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+      <DocumentationFile>bin\x64\Release\BannerlordModuleManagement.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="$(MnB2BannerlordBinDir)\System.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.MountAndBlade.Launcher.exe">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="$(MnB2BannerlordBinDir)\Mono.*.dll">
+            <HintPath>%(Identity)</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Facepunch.Steamworks" Version="2.3.3" />
+        <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="PathHelpers.cs">
+            <WouldDependOn>PathHelpers</WouldDependOn>
+        </Compile>
+    </ItemGroup>
+
+</Project>

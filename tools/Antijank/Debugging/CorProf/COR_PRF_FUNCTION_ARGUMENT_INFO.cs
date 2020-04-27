@@ -6,7 +6,7 @@ namespace Antijank.Debugging {
 
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
-  [PublicAPI]
+  
   public struct COR_PRF_FUNCTION_ARGUMENT_INFO {
 
     public uint numRanges;

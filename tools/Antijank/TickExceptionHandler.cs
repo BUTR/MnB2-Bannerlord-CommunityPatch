@@ -1,15 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
 using HarmonyLib;
-using TaleWorlds.CampaignSystem;
-using TaleWorlds.Diamond;
 using TaleWorlds.DotNet;
 using TaleWorlds.Engine;
-using TaleWorlds.SaveSystem.Definition;
 
 namespace Antijank {
 

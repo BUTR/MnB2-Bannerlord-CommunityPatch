@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugUserState {
 
     USER_STOP_REQUESTED = 1,

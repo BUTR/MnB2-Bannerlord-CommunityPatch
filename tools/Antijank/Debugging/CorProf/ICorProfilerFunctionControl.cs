@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [Guid("F0963021-E1EA-4732-8581-E01B0BD3C0C6")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorProfilerFunctionControl {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

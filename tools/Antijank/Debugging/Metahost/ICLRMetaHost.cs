@@ -12,7 +12,7 @@ namespace Antijank.Debugging {
   [Guid("D332DB9E-B9B3-4125-8207-A14884F53216")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICLRMetaHost {
 
     // ICLRRuntimeInfo

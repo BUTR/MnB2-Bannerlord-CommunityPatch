@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CLRDataAddressType {
 
     CLRDATA_ADDRESS_UNRECOGNIZED,

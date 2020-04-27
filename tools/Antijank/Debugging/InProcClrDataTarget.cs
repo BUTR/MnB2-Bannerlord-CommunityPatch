@@ -8,7 +8,7 @@ using Antijank.Interop;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public class InProcClrDataTarget : ICLRDataTarget3, ICLRMetadataLocator, IDisposable {
 
     private GCHandle _keepAlive;

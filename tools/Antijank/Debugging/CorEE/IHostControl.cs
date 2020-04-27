@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("02CA073C-7079-4860-880A-C2F7A449C991")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface IHostControl {
 
     // IHostMemoryManager

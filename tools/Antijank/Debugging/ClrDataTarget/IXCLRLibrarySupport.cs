@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("E5F3039D-2C0C-4230-A69E-12AF1C3E563C")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface IXCLRLibrarySupport {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

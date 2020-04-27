@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CLRDataDetailedFrameType {
 
     CLRDATA_DETFRAME_UNRECOGNIZED,

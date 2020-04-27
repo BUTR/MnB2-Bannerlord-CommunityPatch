@@ -2,15 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using static System.Reflection.Emit.OpCodes;
-using OpCodes = Mono.Cecil.Cil.OpCodes;
 
 namespace Antijank {
 

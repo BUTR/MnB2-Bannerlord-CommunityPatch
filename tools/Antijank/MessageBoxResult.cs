@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Antijank {
 
-  [PublicAPI]
+  
   public enum MessageBoxResult : int {
 
     Error = 0,

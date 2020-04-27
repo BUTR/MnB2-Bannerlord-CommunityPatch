@@ -8,7 +8,7 @@ namespace Antijank.Debugging {
   [Guid("879CAC0A-4A53-4668-B8E3-CB8473CB187F")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugRuntimeUnwindableFrame : ICorDebugFrame {
 
     /*

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,13 +8,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using HarmonyLib;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade.Launcher;
 using TaleWorlds.MountAndBlade.Launcher.UserDatas;
 using Medallion.Collections;
-using TaleWorlds.Engine.GauntletUI;
-using TaleWorlds.Engine.InputSystem;
 using TaleWorlds.GauntletUI;
 using TaleWorlds.GauntletUI.Data;
 using TaleWorlds.InputSystem;
@@ -23,44 +23,37 @@ using Path = System.IO.Path;
 
 namespace Antijank {
 
-  public struct WeightedModuleInfo {
-
-    public ModuleInfo Module;
-
-    public int Weight;
-
-    public WeightedModuleInfo(ModuleInfo mod, int weight) {
-      Module = mod;
-      Weight = weight;
-    }
-
-  }
-
-  public static class LoaderPatch {
+  internal static class LoaderPatch {
 
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
     static LoaderPatch() {
       Context.Harmony.Patch(
         typeof(LauncherModsVM).GetMethod("LoadSubModules", Declared),
-        new HarmonyMethod(typeof(LoaderPatch).GetMethod(nameof(LoadSubModulesPrefix), Declared)));
+        new HarmonyMethod(typeof(LoaderPatch), nameof(LoadSubModulesPrefix)));
 
       Context.Harmony.Patch(
         typeof(LauncherModsVM).GetMethod("ChangeLoadingOrderOf", Declared),
-        new HarmonyMethod(typeof(LoaderPatch).GetMethod(nameof(ChangeLoadingOrderOfPrefix), Declared)));
+        new HarmonyMethod(typeof(LoaderPatch), nameof(ChangeLoadingOrderOfPrefix)));
 
       Context.Harmony.Patch(
         typeof(LauncherUI).GetConstructors(Declared).First(),
-        postfix: new HarmonyMethod(typeof(LoaderPatch).GetMethod(nameof(LauncherUICtorPostfix), Declared)));
+        postfix: new HarmonyMethod(typeof(LoaderPatch), nameof(LauncherUiCtorPostfix)));
+
+      Context.Harmony.Patch(
+        typeof(LauncherUI).GetMethod("Initialize", Declared),
+        postfix: new HarmonyMethod(typeof(LoaderPatch), nameof(LauncherUiInitializePostfix)));
 
       Context.Harmony.Patch(
         typeof(GraphicsForm).GetMethod("UpdateInput", Declared),
-        new HarmonyMethod(typeof(LoaderPatch).GetMethod(nameof(GraphicsFormUpdateInputPatch))));
+        new HarmonyMethod(typeof(LoaderPatch), nameof(GraphicsFormUpdateInputPatch)));
 
       Context.Harmony.Patch(
         typeof(GraphicsForm).GetMethod("MessageHandler", Declared),
-        new HarmonyMethod(typeof(LoaderPatch).GetMethod(nameof(GraphicsFormMessageHandlerPatch))));
+        new HarmonyMethod(typeof(LoaderPatch), nameof(GraphicsFormMessageHandlerPatch)));
     }
+
+    private static readonly byte[] VirtualKeyCodeToInputKeyMap = new byte[256];
 
     public static void Init() {
       // static initializer
@@ -72,20 +65,18 @@ namespace Antijank {
       }
     }
 
-    private static LauncherUI LauncherUI;
-
-    private static UIContext UIContext;
-
     private static AccessTools.FieldRef<LauncherUI, LauncherVM> _launcherVmAccessor;
 
-    private static readonly byte[] VirtualKeyCodeToInputKeyMap = new byte[256];
-
     private static AccessTools.FieldRef<LauncherUI, GauntletMovie> _gauntletMovieAccessor;
+
+    private static GauntletMovie _movie;
+
+    private static LauncherVM _launcherVm;
 
     [DllImport("user32")]
     private static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
-    public static unsafe bool GraphicsFormMessageHandlerPatch(WindowMessage message, ref long wParam, long lParam) {
+    private static bool GraphicsFormMessageHandlerPatch(WindowMessage message, ref long wParam, long lParam) {
       // NOTE: f10, left and right alt are a lost cause here
 
       if (message != WindowMessage.KeyDown && message != WindowMessage.KeyUp)
@@ -102,13 +93,12 @@ namespace Antijank {
 
       wParam = wParam <= VirtualKeyCodeToInputKeyMap.Length
         ? VirtualKeyCodeToInputKeyMap[(byte) wParam]
-        : 0;
+        : 0; // unused slot on TW's key map
 
       return true;
     }
 
-    public static unsafe bool GraphicsFormUpdateInputPatch(
-      StandaloneUIDomain __instance,
+    private static unsafe bool GraphicsFormUpdateInputPatch(
       ref bool ____mouseOverDragArea,
       ref InputData ____oldInputData,
       ref InputData ____currentInputData,
@@ -143,11 +133,17 @@ namespace Antijank {
       return false;
     }
 
-    private static bool waitForKeysReset = false;
+    private static bool _waitForKeysReset;
 
-    public static void LauncherUICtorPostfix(LauncherUI __instance, UserDataManager userDataManager, UIContext context, Action onClose, Action onMinimize) {
-      LauncherUI = __instance;
-      UIContext = context;
+    private static void LauncherUiInitializePostfix(LauncherUI __instance) {
+      _launcherVm = _launcherVmAccessor(__instance);
+      _movie = _gauntletMovieAccessor(__instance);
+    }
+
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+    private static void LauncherUiCtorPostfix(LauncherUI __instance, UserDataManager userDataManager, UIContext context, Action onClose, Action onMinimize) {
+      //_launcherUi = __instance;
+      //_uiContext = context;
       _launcherVmAccessor = AccessTools.FieldRefAccess<LauncherUI, LauncherVM>("_viewModel");
       _gauntletMovieAccessor = AccessTools.FieldRefAccess<LauncherUI, GauntletMovie>("_movie");
 
@@ -160,9 +156,9 @@ namespace Antijank {
 
         var ctrl = input.IsControlDown();
 
-        if (waitForKeysReset) {
+        if (_waitForKeysReset) {
           if (!ctrl)
-            waitForKeysReset = false;
+            _waitForKeysReset = false;
           return;
         }
 
@@ -170,33 +166,24 @@ namespace Antijank {
           return;
 
         if (input.IsKeyDown(InputKey.S)) {
-          waitForKeysReset = true;
+          _waitForKeysReset = true;
           Console.WriteLine("Sorting modules list.");
-          ref var launcherVm = ref _launcherVmAccessor(__instance);
 
-          var dict = ModuleList.ToDictionary(mi => mi.Id);
+          var list = Loader.DefaultSort();
 
-          var list = ModuleList
-            .OrderTopologicallyBy(mi => mi.DependedModuleIds.Select(id => dict[id]))
-            .ThenBy(mi => mi.IsNative() ? 0 : 1)
-            .ThenBy(mi => mi.Alias)
-            .ToList();
-
-          IdentitySort(launcherVm.ModsData.Modules, list);
-
-          _gauntletMovieAccessor(__instance)
-            .RefreshDataSource(launcherVm);
+          var launcherModuleVms = _launcherVm.ModsData.Modules;
+          Loader.IdentitySort(launcherModuleVms, list);
+          _movie.RefreshDataSource(_launcherVm);
           return;
         }
 
         if (input.IsKeyDown(InputKey.C)) {
           Console.WriteLine("Copying modules list to clipboard.");
-          var modsList = string.Join("\n",
-            ModuleList
-              .Where(m => m.IsSelected)
-              .Select(m => m.Id));
+          var modsList = string.Join("\n", Loader.ModuleList
+            .Where(m => m.IsSelected)
+            .Select(m => m.Id));
           TextCopy.Clipboard.SetText(modsList);
-          waitForKeysReset = true;
+          _waitForKeysReset = true;
           return;
         }
 
@@ -211,36 +198,31 @@ namespace Antijank {
             "\r", "\n"
           }, StringSplitOptions.RemoveEmptyEntries);
           var idSet = new HashSet<string>(ids);
-          IdentitySort(launcherVm.ModsData.Modules, ids);
+          Loader.IdentitySort(launcherVm.ModsData.Modules, ids);
           foreach (var mod in launcherVm.ModsData.Modules) {
             var info = mod.Info;
-            if (info.IsNative() || info.IsOfficial)
+            if (info.IsOfficial)
               continue;
 
             var id = info.Id;
-            if (idSet.Contains(id)) {
-              mod.IsSelected = true;
-            }
-            else {
-              mod.IsSelected = false;
-            }
+            mod.IsSelected = idSet.Contains(id);
           }
 
-          FixSequence(launcherVm.ModsData.Modules);
-          waitForKeysReset = true;
+          Loader.FixSequence(launcherVm.ModsData.Modules);
+          _waitForKeysReset = true;
         }
       }
 
       context.EventManager.AddLateUpdateAction(context.Root, KeyWatcher, 5);
     }
 
-    public static bool LoadSubModulesPrefix(LauncherModsVM __instance, UserData ____userData, bool isMultiplayer) {
-      var list = GetOrderedModuleList(____userData, isMultiplayer);
+    private static bool LoadSubModulesPrefix(LauncherModsVM __instance, UserData ____userData, bool isMultiplayer) {
+      var list = Loader.GetOrderedModuleList(____userData, isMultiplayer);
 
-      ModuleList = new MBReadOnlyList<ModuleInfo>(list);
+      Loader.ModuleList = new MBReadOnlyList<ModuleInfo>(list);
 
-      foreach (var module in ModuleList) {
-        UnblockModule(module);
+      foreach (var module in Loader.ModuleList) {
+        Loader.UnblockModule(module);
         var launcherModuleVm = new LauncherModuleVM(module,
           // NOTE: this doesn't actually get used
           (targetModule, insertIndex, tag) => ChangeLoadingOrderOf(__instance, targetModule, insertIndex, tag),
@@ -251,105 +233,8 @@ namespace Antijank {
       return false;
     }
 
-    private static List<ModuleInfo> GetOrderedModuleList(UserData userData, bool isMultiplayer) {
-      var data = isMultiplayer
-        ? userData.MultiplayerData
-        : userData.SingleplayerData;
-
-      var modInfos = ModuleInfo.GetModules()
-        .Where(mod => IsVisible(isMultiplayer, mod))
-        .Select(mod => {
-          var userModData = userData.GetUserModData(isMultiplayer, mod.Id);
-          if (userModData != null)
-            mod.IsSelected = mod.IsSelected || userModData.IsSelected;
-          var id = mod.Id;
-          var pref = data.ModDatas.FindIndex(md => md.Id == id);
-          if (pref < 0) pref = int.MinValue;
-          return new WeightedModuleInfo(mod, pref);
-        })
-        .ToList();
-
-      var dict = modInfos.ToDictionary(mi => mi.Module.Id);
-
-      var list = modInfos
-        .OrderTopologicallyBy(mi => mi.Module.DependedModuleIds.Select(id => dict[id]))
-        .ThenBy(mi => mi.Module.IsNative() ? 0 : 1)
-        .ThenBy(mi => mi.Weight)
-        .Select(mi => mi.Module)
-        .ToList();
-
-      return list;
-    }
-
-    public static void FixSequence(MBBindingList<LauncherModuleVM> list) {
-      var vmDict = list
-        .ToDictionary(vm => vm.Info.Id);
-
-      var copy = list.ToList();
-
-      var nativeIndex = copy.FindIndex(m => m.Info.IsNative());
-      var native = copy[nativeIndex];
-      if (nativeIndex != 0) {
-        copy.RemoveAt(nativeIndex);
-        copy.Insert(0, native);
-      }
-
-      var sorted = copy
-        .StableOrderTopologicallyBy(mod => mod.Info.DependedModuleIds.Select(id => vmDict[id]))
-        .ToList();
-
-      // don't want to fire a bunch of gui update events for clear/inserts, sort is just one
-      IdentitySort(list, sorted);
-    }
-
-    private static void IdentitySort(MBBindingList<LauncherModuleVM> list, IReadOnlyList<LauncherModuleVM> sorted)
-      => list.Sort(Comparer<LauncherModuleVM>.Create((a, b)
-        => sorted.IndexOf(a)
-          .CompareTo(sorted.IndexOf(b))));
-
-    private static void IdentitySort(MBBindingList<LauncherModuleVM> list, IReadOnlyList<ModuleInfo> sorted)
-      => list.Sort(Comparer<LauncherModuleVM>.Create((a, b)
-        => sorted.FindIndex(x => x == a.Info)
-          .CompareTo(sorted.FindIndex(x => x == b.Info))));
-
-    private static void IdentitySort(MBBindingList<LauncherModuleVM> list, IReadOnlyList<string> sorted)
-      => list.Sort(Comparer<LauncherModuleVM>.Create((a, b)
-        => {
-        var indexA = sorted.FindIndex(x => x == a.Info.Id);
-        if (indexA == -1) indexA = int.MaxValue;
-        var indexB = sorted.FindIndex(x => x == b.Info.Id);
-        if (indexB == -1) indexB = int.MaxValue;
-        return indexA.CompareTo(indexB);
-      }));
-
-    public static IReadOnlyList<ModuleInfo> ModuleList { get; private set; }
-
-    private static void UnblockModule(ModuleInfo moduleInfo) {
-      var binDir = new Uri(Path.Combine(
-        Environment.CurrentDirectory,
-        Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Alias)),
-        "bin", Common.ConfigName
-      )).LocalPath;
-
-      if (!Directory.Exists(binDir))
-        return;
-
-      foreach (var file in Directory.EnumerateFiles(binDir)) {
-        var ext = Path.GetExtension(file);
-        if (ext == ".dll")
-          if (SecurityHelpers.UnblockFile(file))
-            Console.WriteLine("Unblocked: " + file);
-      }
-    }
-
-    private static bool IsVisible(bool isMultiplayer, ModuleInfo moduleInfo) {
-      if (isMultiplayer && moduleInfo.IsMultiplayerModule)
-        return true;
-
-      return !isMultiplayer && moduleInfo.IsSingleplayerModule;
-    }
-
-    public static bool ChangeLoadingOrderOfPrefix(LauncherModsVM __instance, LauncherModuleVM targetModule, int insertIndex, string tag) {
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+    private static bool ChangeLoadingOrderOfPrefix(LauncherModsVM __instance, LauncherModuleVM targetModule, int insertIndex, string tag) {
       var index = __instance.Modules.IndexOf(targetModule);
       if (insertIndex == index)
         return false;
@@ -359,7 +244,7 @@ namespace Antijank {
       insertIndex = (int) MathF.Clamp(insertIndex, 0f, __instance.Modules.Count - 1);
       __instance.Modules.RemoveAt(index);
       __instance.Modules.Insert(insertIndex, targetModule);
-      FixSequence(__instance.Modules);
+      Loader.FixSequence(__instance.Modules);
       return false;
     }
 
@@ -367,21 +252,27 @@ namespace Antijank {
     private static void ChangeLoadingOrderOf(LauncherModsVM mods, LauncherModuleVM targetModule, int insertIndex, string tag)
       => ChangeLoadingOrderOfPrefix(mods, targetModule, insertIndex, tag);
 
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     private static void ChangeIsSelectedOf(LauncherModsVM mods, UserData userData, bool isMultiplayer, LauncherModuleVM targetModule) {
-      if (targetModule.IsSelected) {
+      if (targetModule.IsSelected)
         foreach (var module in mods.Modules) {
           if (module == null)
             continue;
 
-          module.IsSelected |= targetModule.Info.DependedModuleIds
+          module.IsSelected |= targetModule.Info
+            .GetDependedModuleIdsWithOptional(Loader.ModuleList)
             .Contains(module.Info.Id);
         }
+      else
+        foreach (var launcherModuleVm2 in mods.Modules) {
+          launcherModuleVm2.IsSelected &= !launcherModuleVm2.Info
+            .DependedModuleIds
+            .Contains(targetModule.Info.Id);
+        }
 
-        return;
-      }
+      Loader.FixSequence(mods.Modules);
 
-      foreach (var launcherModuleVm2 in mods.Modules)
-        launcherModuleVm2.IsSelected &= !launcherModuleVm2.Info.DependedModuleIds.Contains(targetModule.Info.Id);
+      _movie.RefreshDataSource(_launcherVm);
     }
 
   }

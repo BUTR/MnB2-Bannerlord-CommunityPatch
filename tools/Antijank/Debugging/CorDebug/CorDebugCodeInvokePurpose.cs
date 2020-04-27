@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugCodeInvokePurpose {
 
     CODE_INVOKE_PURPOSE_NONE,

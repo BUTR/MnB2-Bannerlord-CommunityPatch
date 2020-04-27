@@ -3,9 +3,7 @@ using System.Reflection;
 
 namespace Antijank {
 
-  static internal class Logging {
-
-    public static bool _terminalExceptionLoopCheck = false;
+  public static class Logging {
 
     public static void Log(Exception ex) {
       while (ex != null) {

@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugGenerationTypes {
 
     Gen0 = 0,

@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("CC7BCB07-8A68-11D2-983C-0000F808342D")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugFrameEnum {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

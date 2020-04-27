@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
@@ -6,7 +5,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   [SuppressMessage("ReSharper", "IdentifierTypo")]
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   [StructLayout(LayoutKind.Sequential, Pack=8)]

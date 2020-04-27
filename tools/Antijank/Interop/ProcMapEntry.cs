@@ -1,12 +1,11 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   public class ProcMapEntry {
 
     private static readonly Regex s_rxProcMaps = new Regex(

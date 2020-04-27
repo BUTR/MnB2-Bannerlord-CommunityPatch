@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugBlockingReason {
 
     BLOCKING_NONE = 0x0,

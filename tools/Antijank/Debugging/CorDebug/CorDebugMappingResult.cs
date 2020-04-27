@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugMappingResult {
 
     MAPPING_PROLOG = 1,

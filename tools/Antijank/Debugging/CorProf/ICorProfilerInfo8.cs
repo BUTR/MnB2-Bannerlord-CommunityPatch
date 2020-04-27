@@ -11,7 +11,7 @@ namespace Antijank.Debugging {
   [SuppressUnmanagedCodeSecurity]
   [ComConversionLoss]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorProfilerInfo8 : ICorProfilerInfo7 {
 
     /*

@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugDebugEventKind {
 
     DEBUG_EVENT_KIND_MODULE_LOADED = 1,

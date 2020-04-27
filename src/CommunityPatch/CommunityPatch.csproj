@@ -20,6 +20,7 @@
         <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
         <Version>0.1.0</Version>
         <Platforms>x64</Platforms>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>

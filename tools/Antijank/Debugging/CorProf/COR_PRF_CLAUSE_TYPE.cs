@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum COR_PRF_CLAUSE_TYPE {
 
     COR_PRF_CLAUSE_NONE,

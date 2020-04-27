@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugRegister {
 
     REGISTER_INSTRUCTION_POINTER,

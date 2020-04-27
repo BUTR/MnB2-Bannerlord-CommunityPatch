@@ -6,7 +6,7 @@ namespace Antijank.Debugging {
 
   [Serializable]
   [StructLayout(LayoutKind.Explicit, Pack = 8, Size = 8)]
-  [PublicAPI]
+  
   public struct FunctionIDOrClientID {
 
     [FieldOffset(0)]

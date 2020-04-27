@@ -7,7 +7,7 @@ namespace Antijank.Debugging {
 
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
-  [PublicAPI]
+  
   public struct CLRDATA_FOLLOW_STUB_BUFFER {
 
     public ulong Data0;

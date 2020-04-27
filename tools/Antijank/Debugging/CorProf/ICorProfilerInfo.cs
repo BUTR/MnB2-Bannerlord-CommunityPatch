@@ -11,7 +11,7 @@ namespace Antijank.Debugging {
   [ComConversionLoss]
   [Guid("28B5557D-3F3F-48B4-90B2-5F9EEA2F6C48")]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorProfilerInfo {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

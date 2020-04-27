@@ -6,7 +6,7 @@ namespace Antijank.Debugging {
 
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
-  [PublicAPI]
+  
   public struct CLRDATA_IL_ADDRESS_MAP {
 
     public uint ilOffset;

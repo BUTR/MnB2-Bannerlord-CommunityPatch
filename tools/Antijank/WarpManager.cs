@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Antijank {
 
-  [PublicAPI]
+  
   public class WarpManager : HostExecutionContextManager {
 
     public static readonly WarpManager Instance = new WarpManager();
@@ -15,7 +15,7 @@ namespace Antijank {
     private readonly LinkedList<WarpContext> _web
       = new LinkedList<WarpContext>();
 
-    [PublicAPI]
+    
     public WarpContext FindContext(int id) {
       lock (_web)
         return _web.FirstOrDefault(ctx => ctx?.Thread?.ManagedThreadId == id);

@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("1A1F204B-1C66-4637-823F-3EE6C744A69C")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugThread4 {
 
     // S_OK (0) for true, S_FALSE (1) for no exception

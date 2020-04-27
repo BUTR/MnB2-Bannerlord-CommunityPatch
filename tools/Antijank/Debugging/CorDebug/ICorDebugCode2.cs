@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [Guid("5F696509-452F-4436-A3FE-4D11FE7E2347")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugCode2 {
 
     // Token: 0x06000149 RID: 329

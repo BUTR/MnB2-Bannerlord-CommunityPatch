@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum COR_PRF_GC_REASON {
 
     COR_PRF_GC_INDUCED = 1,

@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using Antijank.Debugging;
 using Microsoft.Diagnostics.Runtime;
-using Debug = Antijank.Debugging.Debug;
 
 namespace Antijank {
 

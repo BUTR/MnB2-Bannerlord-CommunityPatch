@@ -11,7 +11,7 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICLRRuntimeInfo {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

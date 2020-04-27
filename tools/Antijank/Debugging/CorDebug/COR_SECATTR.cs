@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   public struct COR_SECATTR {
 

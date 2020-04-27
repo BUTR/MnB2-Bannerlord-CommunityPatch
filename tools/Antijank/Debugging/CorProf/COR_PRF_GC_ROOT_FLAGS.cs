@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum COR_PRF_GC_ROOT_FLAGS {
 
     COR_PRF_GC_ROOT_PINNING = 1,

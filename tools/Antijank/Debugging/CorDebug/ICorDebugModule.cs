@@ -12,7 +12,7 @@ namespace Antijank.Debugging {
   [Guid("DBA2D8C1-E5C5-4069-8C13-10A7C6ABF43D")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugModule {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

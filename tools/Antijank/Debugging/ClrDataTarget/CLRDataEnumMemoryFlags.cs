@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CLRDataEnumMemoryFlags {
 
     CLRDATA_ENUM_MEM_DEFAULT,

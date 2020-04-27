@@ -17,6 +17,9 @@ namespace Antijank {
     public static bool EnableDiagnosticConsole
       = HasCommandLineArg("/diag");
 
+    public static bool EnableWidgetFactoryInitializationPatch
+      = HasCommandLineArg("/wfi");
+
   }
 
 }

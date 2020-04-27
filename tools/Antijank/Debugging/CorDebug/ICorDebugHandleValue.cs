@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("029596E8-276B-46A1-9821-732E96BBB00B")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugHandleValue : ICorDebugReferenceValue {
 
     /*

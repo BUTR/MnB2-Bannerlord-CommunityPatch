@@ -8,7 +8,7 @@ using Architecture = Microsoft.Diagnostics.Runtime.Architecture;
 
 namespace Antijank {
 
-  [PublicAPI]
+  
   public class InProcDataReader : IDataReader {
 
     private IDataReader _liveDataReader;

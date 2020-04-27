@@ -1,12 +1,11 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
   [StructLayout(LayoutKind.Sequential)]
-  [PublicAPI]
+  
   public struct COR_TYPEID : IEquatable<COR_TYPEID> {
 
     public ulong token1;

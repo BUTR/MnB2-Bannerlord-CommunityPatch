@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Antijank.Debugging {
 
   [StructLayout(LayoutKind.Explicit, Pack = 4, Size = 20)]
-  [PublicAPI]
+  
   public struct COR_HEAPINFO {
 
     [FieldOffset(0)]

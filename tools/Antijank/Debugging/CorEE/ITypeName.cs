@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [Guid("B81FF171-20F3-11D2-8DCC-00A0C9B00522")]
   [ComImport]
-  [PublicAPI]
+  
   public interface ITypeName {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

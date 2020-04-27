@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [ClassInterface(ClassInterfaceType.None)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public class CLRProfilingClass : CLRProfiling, ICLRProfiling {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

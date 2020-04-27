@@ -6,7 +6,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   [SuppressMessage("ReSharper", "IdentifierTypo")]
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto, Pack=8)]

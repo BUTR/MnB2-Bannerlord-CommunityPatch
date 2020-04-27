@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CLRNativeImageDumpOptions {
 
     CLRNATIVEIMAGE_PE_INFO = 1,

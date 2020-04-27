@@ -8,7 +8,7 @@ namespace Antijank.Debugging {
   [ComConversionLoss]
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
-  [PublicAPI]
+  
   public struct COR_PRF_ASSEMBLY_REFERENCE_INFO {
 
     public IntPtr pbPublicKeyOrToken;

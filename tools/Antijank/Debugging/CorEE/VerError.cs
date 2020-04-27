@@ -7,7 +7,7 @@ namespace Antijank.Debugging {
   [ComConversionLoss]
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
-  [PublicAPI]
+  
   public struct VerError {
 
     public uint flags;

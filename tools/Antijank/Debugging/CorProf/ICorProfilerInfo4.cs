@@ -10,7 +10,7 @@ namespace Antijank.Debugging {
   [Guid("0D8FDCAA-6257-47BF-B1BF-94DAC88466EE")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorProfilerInfo4 : ICorProfilerInfo3 {
 
     /*

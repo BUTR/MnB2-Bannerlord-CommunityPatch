@@ -6,7 +6,7 @@ namespace Antijank.Debugging {
 
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 4)]
-  [PublicAPI]
+  
   public struct COR_IL_MAP {
 
     public uint oldOffset;

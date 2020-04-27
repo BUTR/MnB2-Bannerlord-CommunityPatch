@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   public static class IEnumUnknownExtensions {
 

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Antijank {
 
-  [PublicAPI]
+  
   public class WarpContext : HostExecutionContext {
 
     public WarpContext()

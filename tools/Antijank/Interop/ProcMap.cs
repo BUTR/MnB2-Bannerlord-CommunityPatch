@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Interop {
 
-  [PublicAPI]
+  
   public static class ProcMap {
 
     public static IEnumerable<ProcMapEntry> GetEntries() {

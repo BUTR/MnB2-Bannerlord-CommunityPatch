@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Antijank.Debugging {
 
   [StructLayout(LayoutKind.Sequential)]
-  [PublicAPI]
+  
   public struct COR_ARRAY_LAYOUT {
 
     public COR_TYPEID componentID; // The type of objects the array contains

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Antijank.Debugging {
 
   [Flags]
-  [PublicAPI]
+  
   public enum CorGCReferenceType {
 
     CorHandleStrong = 1 << 0,

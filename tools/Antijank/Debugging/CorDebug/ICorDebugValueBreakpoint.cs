@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [Guid("CC7BCAEB-8A68-11D2-983C-0000F808342D")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugValueBreakpoint : ICorDebugBreakpoint {
 
     /*

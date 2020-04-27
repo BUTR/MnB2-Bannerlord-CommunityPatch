@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using HarmonyLib;
-using Microsoft.Win32.SafeHandles;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.TwoDimension.Standalone.Native.Windows;
@@ -139,15 +138,17 @@ namespace Antijank {
       if (Options.DisableFirstChanceExceptionPrinting)
         return;
 
-      Console.WriteLine("First Chance Exception:");
-      var ex = args.Exception;
-      Logging.Log(ex);
+      Console.WriteLine("First Chance Exception Entry Stack:");
+      Console.WriteLine(new StackTrace(1).ToString());
+      
+      Console.WriteLine("First Chance Exception Details:");
+      Logging.Log(args.Exception);
     }
 
     private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs args) {
       if (args.IsTerminating) {
-        if (Logging._terminalExceptionLoopCheck) {
-          Logging._terminalExceptionLoopCheck = true;
+        if (_terminalExceptionLoopCheck) {
+          _terminalExceptionLoopCheck = true;
           try {
             AppDomainManager.EnableDiagnosticsConsole();
             MessageBox.Error("Check the diagnostic console for detailed output.", "Terminal Unhandled Exception");
@@ -225,7 +226,7 @@ namespace Antijank {
         var resolvable = new LinkedList<(ModuleInfo Mod, SubModuleInfo SubMod)>();
         ModuleInfo reqMi = null;
         SubModuleInfo reqSmi = null;
-        var modules = LoaderPatch.ModuleList;
+        var modules = Loader.ModuleList ??= Loader.GetModuleListFromArguments();
         foreach (var mi in modules) {
           if (!mi.IsSelected)
             continue;
@@ -278,7 +279,7 @@ namespace Antijank {
     }
 
     private static string FindAnyModuleAssembly(string name) {
-      var modList = LoaderPatch.ModuleList;
+      var modList = Loader.ModuleList ??= Loader.GetModuleListFromArguments();
       if (modList == null)
         return null;
 
@@ -314,6 +315,8 @@ namespace Antijank {
 
       return null;
     }
+
+    public static bool _terminalExceptionLoopCheck = false;
 
   }
 

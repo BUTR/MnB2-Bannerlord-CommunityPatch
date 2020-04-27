@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [Guid("3721A26F-8B91-4D98-A388-DB17B356FADB")]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICLRDataEnumMemoryRegionsCallback2 : ICLRDataEnumMemoryRegionsCallback {
 
     /*

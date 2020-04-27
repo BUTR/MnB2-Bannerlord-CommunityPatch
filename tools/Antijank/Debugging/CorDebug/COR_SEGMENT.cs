@@ -1,11 +1,10 @@
-using System;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
   [StructLayout(LayoutKind.Sequential, Pack = 4)]
-  [PublicAPI]
+  
   public struct COR_SEGMENT {
 
     public ulong start; // The start address of the segment.

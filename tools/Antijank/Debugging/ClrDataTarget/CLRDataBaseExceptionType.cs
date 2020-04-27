@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CLRDataBaseExceptionType {
 
     CLRDATA_EXBASE_EXCEPTION,

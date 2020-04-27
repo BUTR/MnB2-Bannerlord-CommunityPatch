@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   [Guid("BA3FEE4C-ECB9-4e41-83B7-183FA41CD859"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   public interface IMetaDataEmit {
 

@@ -12,7 +12,7 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [Guid("E2190695-77B2-492E-8E14-C4B3A7FDD593")]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICLRMetaHostPolicy {
 
     [MethodImpl(MethodImplOptions.InternalCall)]

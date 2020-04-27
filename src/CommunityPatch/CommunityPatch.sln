@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocateSteamApp", "..\..\too
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antijank", "..\..\tools\Antijank\Antijank.csproj", "{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BannerlordModuleManagement", "..\..\tools\BannerlordModuleManagement\BannerlordModuleManagement.csproj", "{5C5A1DC0-947C-42C2-983E-863C19A90CA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -44,5 +46,9 @@ Global
 		{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}.Debug|x64.Build.0 = Debug|x64
 		{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}.Release|x64.ActiveCfg = Release|x64
 		{FEA5614C-CFB0-4A1E-82E2-642BF343EF7D}.Release|x64.Build.0 = Release|x64
+		{5C5A1DC0-947C-42C2-983E-863C19A90CA4}.Debug|x64.ActiveCfg = Debug|x64
+		{5C5A1DC0-947C-42C2-983E-863C19A90CA4}.Debug|x64.Build.0 = Debug|x64
+		{5C5A1DC0-947C-42C2-983E-863C19A90CA4}.Release|x64.ActiveCfg = Release|x64
+		{5C5A1DC0-947C-42C2-983E-863C19A90CA4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal

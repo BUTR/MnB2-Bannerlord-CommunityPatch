@@ -9,7 +9,7 @@ namespace Antijank.Debugging {
   [Guid("B92CC7F7-9D2D-45C4-BC2B-621FCC9DFBF4")]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  [PublicAPI]
+  
   public interface ICorDebugInternalFrame : ICorDebugFrame {
 
     /*

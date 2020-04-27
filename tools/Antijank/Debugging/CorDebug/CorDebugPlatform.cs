@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum CorDebugPlatform {
 
     CORDB_PLATFORM_WINDOWS_X86,

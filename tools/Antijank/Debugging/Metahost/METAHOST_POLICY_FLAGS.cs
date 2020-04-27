@@ -2,7 +2,7 @@
 
 namespace Antijank.Debugging {
 
-  [PublicAPI]
+  
   public enum METAHOST_POLICY_FLAGS {
 
     METAHOST_POLICY_HIGHCOMPAT,
