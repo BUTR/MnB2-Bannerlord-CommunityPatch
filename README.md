@@ -23,6 +23,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Filled To Brim
     * Squires
     * Nomadic Traditions
+    * Horse Grooming
   * Bow
     * Mounted Archer
     * Large Quiver
