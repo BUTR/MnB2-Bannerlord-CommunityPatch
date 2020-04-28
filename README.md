@@ -59,7 +59,6 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Good Materials
     * Everyday Engineer
     * Builder
-  * Roguery
     * Scavenger
     * Armorcraft
     * Wall Breaker
@@ -82,6 +81,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
   * Tactics
     * Companion Cavalry
     * Tactical Superiority
+    * One Step Ahead
 * Policies
   * Land Grants For Veterans
 * Feats
