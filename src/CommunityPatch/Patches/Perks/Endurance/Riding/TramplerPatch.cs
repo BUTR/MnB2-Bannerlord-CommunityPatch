@@ -119,7 +119,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     private static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk)
       => (character as CharacterObject)?.GetPerkValue(perk) ?? false;
 
-    private static int TramplerDamageModifier(int baseDamage) => baseDamage + baseDamage/2; 
+    private static int TramplerDamageModifier(int baseDamage) {
+      var tramplerDamage = baseDamage * (1 + (decimal) DefaultPerks.Riding.Trampler.PrimaryBonus);
+      return tramplerDamage - Math.Truncate(tramplerDamage) >= 0.5m ? (int) Math.Ceiling(tramplerDamage) : (int) Math.Floor(tramplerDamage);
+    }
     
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(BasicCharacterObject attackerAgentCharacter, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
