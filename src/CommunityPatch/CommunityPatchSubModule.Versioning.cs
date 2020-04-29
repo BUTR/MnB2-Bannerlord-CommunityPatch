@@ -12,10 +12,19 @@ namespace CommunityPatch {
 
     [PublicAPI]
     public static ApplicationVersion GameVersion
-      = ModuleInfo.GetModules()
-        .Where(x => x.IsOfficial)
-        .OrderByDescending(x => x.Version, VersionComparer)
-        .FirstOrDefault()?.Version ?? default;
+      = GetGameVersion();
+
+    private static ApplicationVersion GetGameVersion() {
+      try {
+        return ModuleInfo.GetModules()
+          .Where(x => x.IsOfficial)
+          .OrderByDescending(x => x.Version, VersionComparer)
+          .FirstOrDefault()?.Version ?? default;
+      }
+      catch {
+        return new ApplicationVersion(ApplicationVersionType.Invalid, 0, 0, 0, 0);
+      }
+    }
 
   }
 
