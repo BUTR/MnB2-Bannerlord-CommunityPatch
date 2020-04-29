@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Mono.Cecil.Cil;
 using TaleWorlds.CampaignSystem;
@@ -154,14 +155,17 @@ namespace CommunityPatch.Patches {
     private static void ShowNotification(TextObject message, string soundEventPath = "")
       => InformationManager.AddQuickInformation(message, 0, null, soundEventPath);
 
-    private void OnQuestStarted(QuestBase quest)
+    private void OnQuestStarted(QuestBase quest) {
       // defer our updates until some time has passed, because they depend on whether 
       // FirstPhase or SecondPhase is active, and story Phase information is only 
       // updated after all OnQuestStarted handlers have fired.
-      => CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, () => {
+      var onHourlyTickBoxed = new StrongBox<Action>();
+      onHourlyTickBoxed.Value = () => {
         SetStoryVisibleTimeoutIfNeeded(quest);
-        CampaignEvents.HourlyTickEvent.ClearListeners(this);
-      });
+        CampaignEvents.HourlyTickEvent.ClearListeners(onHourlyTickBoxed);
+      };
+      CampaignEvents.HourlyTickEvent.AddNonSerializedListener(onHourlyTickBoxed, onHourlyTickBoxed.Value);
+    }
 
     private static void RemainingTimeHiddenGetterPostfix(ref bool __result)
       => __result = false;
