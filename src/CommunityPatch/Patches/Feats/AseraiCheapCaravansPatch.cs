@@ -12,7 +12,7 @@ namespace CommunityPatch.Patches.Feats {
     public sealed class AseraiCheapCaravansPatch : PatchBase<AseraiCheapCaravansPatch> {
         public override bool Applied { get; protected set; }
         
-        private static readonly Type TargetType = AccessTools.TypeByName("SandBox.LordConversationsCampaignBehavior");
+        private static readonly Type TargetType = Type.GetType("SandBox.LordConversationsCampaignBehavior, SandBox, Version=1.0.0.0, Culture=neutral");
 
         private static readonly MethodInfo TargetMethodInfo = AccessTools.Method(TargetType, "conversation_magistrate_form_a_caravan_accept_on_consequence");
         private static readonly MethodInfo PrefixPatchMethodInfo = AccessTools.Method(typeof(AseraiCheapCaravansPatch), nameof(Prefix));
