@@ -41,11 +41,41 @@ namespace CommunityPatch {
     internal static List<InitialStateOption> GroupedOptionsMenus;
 
     internal static void CleanUpMainMenu() {
-      if (_alreadyCleanedUpMainMenu)
+      var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
+
+      var menuLength = menu.Length;
+
+      if (_alreadyCleanedUpMainMenu) {
+        if (menuLength <= MaxMenuLength + 1)
+          return;
+
+        var changed = false;
+
+        for (var i = menuLength - 1; i > 0; --i) {
+          var item = menu[i];
+
+          if (!IsThirdPartyOption(item))
+            continue;
+
+          var grouped = GroupedOptionsMenus
+            .FirstOrDefault(x => x.Id == item.Id);
+
+          if (grouped == null)
+            continue;
+
+          changed = true;
+
+          GroupedOptionsMenus.Remove(grouped);
+          GroupedOptionsMenus.Add(item);
+        }
+
+        if (changed)
+          SortGroupedOptionMenus();
+
         return;
+      }
 
       _alreadyCleanedUpMainMenu = true;
-      var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
       try {
         Array.Sort(menu, Comparer<InitialStateOption>
           .Create((a, b)
@@ -55,13 +85,11 @@ namespace CommunityPatch {
         // well whatever
       }
 
-      if (menu.Length <= MaxMenuLength)
+      if (menuLength <= MaxMenuLength)
         return;
 
       if (GroupedOptionsMenus != null)
         return;
-
-      var menuLength = menu.Length;
 
       // ReSharper disable InconsistentNaming
       var menuItems = menu
@@ -166,16 +194,7 @@ namespace CommunityPatch {
         --menuLength;
       }
 
-      GroupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
-        var order = a.OrderIndex.CompareTo(b.OrderIndex);
-        if (order == 0)
-          order = string.Compare((a.Id ?? ""), b.Id ?? "", StringComparison.OrdinalIgnoreCase);
-        if (order == 0)
-          order = string.Compare((a.Name.ToString() ?? ""), b.Name.ToString() ?? "", StringComparison.OrdinalIgnoreCase);
-        if (order == 0)
-          order = a.GetHashCode().CompareTo(b.GetHashCode());
-        return order;
-      }));
+      SortGroupedOptionMenus();
 
       Module.CurrentModule.ClearStateOptions();
       foreach (var opt in menu) {
@@ -188,6 +207,18 @@ namespace CommunityPatch {
         new TextObject("{=MoreOptions}More Options"),
         9999, ShowMoreMainMenuOptions, false));
     }
+
+    private static void SortGroupedOptionMenus()
+      => GroupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
+        var order = a.OrderIndex.CompareTo(b.OrderIndex);
+        if (order == 0)
+          order = string.Compare((a.Id ?? ""), b.Id ?? "", StringComparison.OrdinalIgnoreCase);
+        if (order == 0)
+          order = string.Compare((a.Name.ToString() ?? ""), b.Name.ToString() ?? "", StringComparison.OrdinalIgnoreCase);
+        if (order == 0)
+          order = a.GetHashCode().CompareTo(b.GetHashCode());
+        return order;
+      }));
 
     private static bool IsThirdPartyOption(InitialStateOption item) {
       try {
