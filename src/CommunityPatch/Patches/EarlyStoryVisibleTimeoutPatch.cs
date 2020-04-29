@@ -33,7 +33,13 @@ namespace CommunityPatch.Patches {
         .Where(type => type.Namespace == "StoryMode.Behaviors.Quests.FirstPhase" && type.IsSubclassOf(typeof(QuestBase)))
         .Append(Type.GetType("StoryMode.Behaviors.Quests.MeetWithArzagosQuestBehavior+MeetWithArzagosQuest" + StoryModeAsmSpecifierSuffix))
         .Append(Type.GetType("StoryMode.Behaviors.Quests.SupportKingdomQuestBehavior+SupportKingdomQuest" + StoryModeAsmSpecifierSuffix))
-        .Select(type => AccessTools.PropertyGetter(type, "IsRemainingTimeHidden"))
+        .Select(type => {
+          var getter = AccessTools.PropertyGetter(type, "IsRemainingTimeHidden");
+          if (getter.IsStatic) {
+            throw new InvalidOperationException("an IsRemainingTimeHidden property was not an instance property, which we require.");
+          }
+          return getter;
+        })
         .ToList();
 
     private static readonly MethodInfo RemainingTimeHiddenGetterPostfixHandle = AccessTools.Method(typeof(EarlyStoryVisibleTimeoutPatch), nameof(RemainingTimeHiddenGetterPostfix));
@@ -146,9 +152,10 @@ namespace CommunityPatch.Patches {
       if (quest.QuestDueTime == newDueTime)
         return;
 
+      bool prevIsRemainingTimeHidden = quest.IsRemainingTimeHidden;
       quest.ChangeQuestDueTime(newDueTime);
 
-      if (quest.IsRemainingTimeHidden)
+      if (quest.IsRemainingTimeHidden && prevIsRemainingTimeHidden)
         return; // nothing we should show here
 
       ShowNotification(
@@ -172,8 +179,9 @@ namespace CommunityPatch.Patches {
       CampaignEvents.HourlyTickEvent.AddNonSerializedListener(onHourlyTickBoxed, onHourlyTickBoxed.Value);
     }
 
-    private static void RemainingTimeHiddenGetterPostfix(ref bool __result)
-      => __result = false;
+    private static void RemainingTimeHiddenGetterPostfix(ref QuestBase __instance, ref bool __result) {
+      __result = (__instance.QuestDueTime == CampaignTime.Never);
+    }
 
   }
 
