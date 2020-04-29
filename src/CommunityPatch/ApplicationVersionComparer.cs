@@ -10,12 +10,12 @@ namespace CommunityPatch {
 
     private readonly ApplicationVersionTypeComparer _typeComparer = new ApplicationVersionTypeComparer();
 
-    [CanBeNull] private static readonly AccessTools.FieldRef<ApplicationVersion, int> _changeSetGetter;
+    [CanBeNull] private static readonly MethodInfo ChangeSetGetter;
 
     static ApplicationVersionComparer() {
       try {
         // this must not be explicitly referenced for backwards compat; symbol did not exist
-        _changeSetGetter = AccessTools.FieldRefAccess<ApplicationVersion, int>("ChangeSet");
+        ChangeSetGetter = AccessTools.PropertyGetter(typeof(ApplicationVersion), "ChangeSet");
       }
       catch {
         // nope
@@ -39,11 +39,11 @@ namespace CommunityPatch {
       if (revCmpResult != 0)
         return revCmpResult;
 
-      if (_changeSetGetter == null)
+      if (ChangeSetGetter == null)
         return revCmpResult;
 
-      var xChgSet = _changeSetGetter(x);
-      var yChgSet = _changeSetGetter(y);
+      var xChgSet = (int) ChangeSetGetter.Invoke(x, null);
+      var yChgSet = (int) ChangeSetGetter.Invoke(y, null);
 
       return xChgSet.CompareTo(yChgSet);
     }
@@ -56,8 +56,8 @@ namespace CommunityPatch {
         | (obj.Major << 22)
         | (obj.Minor << 15)
         | (obj.Revision << 8)
-        | (_changeSetGetter != null
-          ? _changeSetGetter(obj)
+        | (ChangeSetGetter != null
+          ? (int) ChangeSetGetter.Invoke(obj, null)
           : 0);
 
     [PublicAPI]
