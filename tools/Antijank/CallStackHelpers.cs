@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using JetBrains.Annotations;
+
 using Sigil;
 using static System.Reflection.BindingFlags;
 using ModuleInfo = TaleWorlds.Library.ModuleInfo;

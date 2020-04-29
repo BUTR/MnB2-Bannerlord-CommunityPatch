@@ -10,6 +10,8 @@ public static class ModuleInitializer {
     catch (Exception ex) {
       Logging.Log(ex);
     }
+
+    //AppDomain.CurrentDomain.Load("System.Runtime.Loader");
   }
 
 }

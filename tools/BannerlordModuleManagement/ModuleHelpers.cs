@@ -60,16 +60,29 @@ namespace BannerlordModuleManagement {
         .OrderTopologicallyBy(mi => mi.Module
           .GetDependedModuleIdsWithOptional(modInfos)
           .Select(id => dict[id]))
-        .ThenBy(mi => mi.Module.IsOfficial ? 0 : 1) // official
-        .ThenBy(mi => Math.Min(mi.Module.DependedModuleIds.Count, 1)) // dep roots
-        .ThenBy(mi => char.IsLetter(mi.Module.Alias[0]) || !mi.Module.IsOfficial ? 1 : 0) // prefix
+        .ThenBy(mi => GetLoadGroup(mi.Module))
         .ThenBy(mi => mi.Weight) // user input
         .Select(mi => mi.Module)
         .ToList();
 
       return list;
     }
-
+    
+    private static int GetLoadGroup(ModuleInfo mi) {
+      var prefixed = !char.IsLetter(mi.Alias[0]);
+      var official = mi.IsOfficial;
+      var root = mi.DependedModuleIds.Count == 0;
+      return prefixed && root
+        ? 0
+        : official && root
+          ? 1
+          : root
+            ? 2
+            : official
+              ? 3
+              : 4;
+    }
+    
     private static bool IsVisible(bool isMultiplayer, ModuleInfo moduleInfo) {
       if (isMultiplayer && moduleInfo.IsMultiplayerModule)
         return true;
@@ -118,7 +131,7 @@ namespace BannerlordModuleManagement {
       return mi.DependedModuleIds;
     }
 
-    private static readonly Regex RxModsList = new Regex(@"_MODULES_(?:([^\*]+)(?:\*|_MODULES_))*(?<=_MODULES_)",
+    private static readonly Regex RxModsList = new Regex(@"_MODULES_\*(?:([^\*]+)(?:\*|\*_MODULES_))*(?<=\*_MODULES_)",
       RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
     /// <summary>
@@ -182,9 +195,7 @@ namespace BannerlordModuleManagement {
         .OrderTopologicallyBy(mi
           => mi.GetDependedModuleIdsWithOptional(ModuleList)
             .Select(id => dict[id]))
-        .ThenBy(mi => mi.IsOfficial ? 0 : 1) // official
-        .ThenBy(mi => Math.Min(mi.DependedModuleIds.Count, 1)) // dep roots
-        .ThenBy(mi => char.IsLetter(mi.Alias[0]) || !mi.IsOfficial ? 1 : 0) // prefix
+        .ThenBy(GetLoadGroup)
         .ToList();
       return list;
     }

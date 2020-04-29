@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using JetBrains.Annotations;
+
 using TaleWorlds.TwoDimension.Standalone.Native.Windows;
 
 namespace Antijank {

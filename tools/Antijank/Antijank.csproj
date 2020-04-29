@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
         <Configurations>Release;Debug</Configurations>
+        <Platform>x64</Platform>
         <Platforms>x64</Platforms>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>8</LangVersion>
@@ -11,6 +12,7 @@
         <RepositoryUrl>https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch</RepositoryUrl>
         <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
         <IsPackable>false</IsPackable>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <ItemGroup>
@@ -46,6 +48,13 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+    
+    <ItemGroup>
+        <Content Include="..\..\tools\AntijankProfiler\cmake-build-release\AntijankProfiler.dll">
+            <Link>AntijankProfiler.dll</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Costura.Fody" Version="4.1.0" PrivateAssets="All" />
@@ -53,19 +62,24 @@
         <PackageReference Include="InlineIL.Fody" Version="1.4.0" PrivateAssets="All" />
         <PackageReference Include="Lib.Harmony" Version="2.0.0.9" />
         <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" />
-        <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="2.0.0-beta.20213.1" />
         <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" PrivateAssets="All" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
         <PackageReference Include="ModuleInit.Fody" Version="2.1.0" />
         <PackageReference Include="Sigil" Version="5.0.0" />
+        <PackageReference Include="System.Reflection.Metadata" Version="1.8.0" />
+        <PackageReference Include="System.Reflection.MetadataLoadContext" Version="4.7.1" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
         <PackageReference Include="TextCopy" Version="3.0.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="PathHelpers.cs">
-        <WouldDependOn>PathHelpers</WouldDependOn>
-      </Compile>
+        <Compile Update="PathHelpers.cs">
+            <WouldDependOn>PathHelpers</WouldDependOn>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Antijank.Debugger\Antijank.Debugger.csproj" />
     </ItemGroup>
 
     <Target Name="FixDuplicateJetBrainsAnnotationsReferenceBefore" BeforeTargets="CoreCompile">
@@ -84,16 +98,6 @@
         <Message Importance="high" Text="ReferencePath: $(ReferencePath)" />
     </Target>
 
-    <Target Name="CopyToGameDir" AfterTargets="Build">
-        <ItemGroup>
-            <FilesToCopy Include="$(OutputPath)\Antijank.dll" />
-            <FilesToCopy Include="$(OutputPath)\0Harmony.dll" />
-            <FilesToCopy Include="$(OutputPath)\*.exe.config" />
-        </ItemGroup>
-        <Message Importance="high" Text="Copying: @(FilesToCopy)" />
-        <Copy UseHardlinksIfPossible="true" SourceFiles="@(FilesToCopy)" DestinationFolder="$(MnB2BannerlordBinDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
-    </Target>
-
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
         <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
         <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
@@ -101,5 +105,15 @@
             <SourceRevisionId>$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
         </PropertyGroup>
         <Message Importance="high" Text="Shortened SCI Version: $(SourceRevisionId)" />
+    </Target>
+
+    <Target Name="CopyToGameDir" AfterTargets="Build">
+        <ItemGroup>
+            <FilesToCopy Include="$(OutputPath)\Antijank*.dll" />
+            <FilesToCopy Include="$(OutputPath)\0Harmony.dll" />
+            <FilesToCopy Include="$(OutputPath)\*.exe.config" />
+        </ItemGroup>
+        <Message Importance="high" Text="Copying: @(FilesToCopy)" />
+        <Copy UseHardlinksIfPossible="true" SourceFiles="@(FilesToCopy)" DestinationFolder="$(MnB2BannerlordBinDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
     </Target>
 </Project>

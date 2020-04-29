@@ -26,14 +26,14 @@ namespace BannerlordModuleManagement {
 
           var fullPath = Path.Combine(asmDir, fileName);
 
-          return Assembly.LoadFile(fullPath);
+          return Assembly.LoadFrom(fullPath);
         }
 
         // ReSharper disable once InvertIf
         if (asmName.StartsWith("TaleWorlds.")) {
           var path = SteamHelper.GetSteamAppPath(261550);
           var fullPath = Path.Combine(path, asmName + ".dll");
-          return Assembly.LoadFile(fullPath);
+          return Assembly.LoadFrom(fullPath);
         }
 
         return null;

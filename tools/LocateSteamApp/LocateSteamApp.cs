@@ -34,7 +34,7 @@ public sealed class LocateSteamAppTask : Task {
 
         var fullPath = System.IO.Path.Combine(asmDir, fileName);
 
-        return Assembly.LoadFile(fullPath);
+        return Assembly.LoadFrom(fullPath);
       };
 
   [Required]

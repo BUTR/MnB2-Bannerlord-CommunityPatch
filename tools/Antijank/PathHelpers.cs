@@ -29,6 +29,7 @@ namespace Antijank {
 
       return _binSubDir;
     }
+
     private static string _configsDir;
 
     public static string GetConfigsDir() {
@@ -49,6 +50,15 @@ namespace Antijank {
       return _configsDir;
     }
 
+    public static string Normalize(string path) {
+      var sb = new StringBuilder(path);
+
+      NormalizeSeparators(sb);
+
+      return Path.IsPathRooted(path)
+        ? new Uri(sb.ToString()).LocalPath
+        : sb.ToString();
+    }
 
     private static string EnsureTrailingDirectorySeparatorAndNormalize(string path) {
       var sb = new StringBuilder(path);
@@ -62,12 +72,12 @@ namespace Antijank {
         ? new Uri(sb.ToString()).LocalPath
         : sb.ToString();
     }
-    
+
     public static bool IsOfficialAssembly(this Assembly asm) {
       var path = new Uri(asm.CodeBase).LocalPath;
       return IsOfficialPath(path);
     }
-    
+
     private static void NormalizeSeparators(StringBuilder sb) {
       sb.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
       var l = sb.Length;
@@ -140,7 +150,6 @@ namespace Antijank {
 
     public static string GetGameBinDir()
       => _gameBinDir ??= EnsureTrailingDirectorySeparatorAndNormalize(Path.GetDirectoryName(new Uri(typeof(AssemblyResolver).Assembly.CodeBase).LocalPath));
-
 
     public static bool IsModuleAssembly(Assembly asm) {
       if (asm.IsDynamic)

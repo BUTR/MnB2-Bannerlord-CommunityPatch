@@ -37,6 +37,7 @@ namespace Antijank {
       }, null);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Init() {
       // run static init
     }

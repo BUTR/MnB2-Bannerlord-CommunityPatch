@@ -36,7 +36,7 @@ internal static class Program {
       Assembly TryLoadFromDir(string dir) {
         var path = Path.Combine(dir, fileName);
         return File.Exists(path)
-          ? Assembly.LoadFile(path)
+          ? Assembly.LoadFrom(path)
           : null;
       }
 

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
-using JetBrains.Annotations;
+
 using TaleWorlds.CampaignSystem;
 using static System.Reflection.Emit.OpCodes;
 
@@ -92,7 +92,6 @@ namespace Antijank {
       yield return new CodeInstruction(Ret);
     }
 
-    [UsedImplicitly]
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool InvokeListReplacementPatch(MbEvent __instance, object list)
       => InvokeListReplacementPatchBase(__instance, list);

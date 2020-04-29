@@ -1,0 +1,6 @@
+LIBRARY "AntijankProfiler.dll"
+
+EXPORTS
+    DllGetClassObject PRIVATE
+    DllCanUnloadNow PRIVATE
+    GetCorProfilerInfo PRIVATE

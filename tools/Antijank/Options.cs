@@ -8,6 +8,9 @@ namespace Antijank {
     private static bool HasCommandLineArg(string argStr)
       => Environment.GetCommandLineArgs().Any(arg => arg.Equals(argStr, StringComparison.OrdinalIgnoreCase));
 
+
+    public static bool DisableStartUpDialog
+      = HasCommandLineArg("/no-startup-dialog");
     public static bool EnableHarmonyDebugLogging { get; set; }
       = HasCommandLineArg("/hdiag");
 
@@ -19,6 +22,15 @@ namespace Antijank {
 
     public static bool EnableWidgetFactoryInitializationPatch
       = HasCommandLineArg("/wfi");
+
+    public static bool EnableObjectManagerXmlLoaderPatch
+      = HasCommandLineArg("/omxl");
+
+    public static bool EnableFixMissingProperties
+      = HasCommandLineArg("/fmp");
+
+    public static bool EnableModuleFileScanningPatch
+      = HasCommandLineArg("/mfs");
 
   }
 

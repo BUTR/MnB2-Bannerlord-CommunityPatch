@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
@@ -82,7 +84,31 @@ namespace Antijank {
       return false;
     }
 
-    private static void RecursiveLoadReferencedAssemblies(Assembly asm) {
+    private static unsafe void RecursiveLoadReferencedAssemblies(Assembly asm) {
+      /*
+      if (asm.TryGetRawMetadata(out var blob, out int len)) {
+        var reader = new MetadataReader(blob, len);
+        foreach (var handle in reader.ImportScopes) {
+          var scope = reader.GetImportScope(handle);
+          foreach (var import in scope.GetImports()) {
+            if (import.Kind == ImportDefinitionKind.ImportType) {
+              var typeRef = reader.GetTypeReference((TypeReferenceHandle) import.TargetType);
+              var ns = typeRef.Namespace;
+              var name = typeRef.Name;
+              var maybeAsmRef = typeRef.ResolutionScope;
+              if (maybeAsmRef.Kind != HandleKind.AssemblyReference)
+                Debugger.Break();
+
+              var asmRef = reader.GetAssemblyReference((AssemblyReferenceHandle) maybeAsmRef);
+              var asmName = asmRef.GetAssemblyName();
+
+              Console.WriteLine($"{asmName}!{ns}.{name}");
+            }
+          }
+        }
+      }
+      */
+
       foreach (var asmName in asm.GetReferencedAssemblies())
         if (TryLoadAssembly(asmName.Name, out var refdAsm))
           RecursiveLoadReferencedAssemblies(refdAsm);
@@ -90,7 +116,7 @@ namespace Antijank {
 
     private static Assembly SafeLoadAssembly(string assemblyFile) {
       try {
-        var asm = Assembly.LoadFile(assemblyFile);
+        var asm = Assembly.LoadFrom(assemblyFile);
 
         try {
           RecursiveLoadReferencedAssemblies(asm);
@@ -140,7 +166,7 @@ namespace Antijank {
 
       Console.WriteLine("First Chance Exception Entry Stack:");
       Console.WriteLine(new StackTrace(1).ToString());
-      
+
       Console.WriteLine("First Chance Exception Details:");
       Logging.Log(args.Exception);
     }

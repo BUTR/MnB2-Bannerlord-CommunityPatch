@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.GauntletUI;
@@ -43,13 +44,20 @@ namespace Antijank {
           var existingAsmQualifiedName = existing.AssemblyQualifiedName;
           var incomingIsMod = PathHelpers.IsModuleAssembly(incoming.Assembly, out var incomingMod);
           var existingIsMod = PathHelpers.IsModuleAssembly(existing.Assembly, out var existingMod);
+
+          var incomingCb = new Uri(incoming.Assembly.CodeBase);
+          var existingCb = new Uri(existing.Assembly.CodeBase);
+          var gameCb = new Uri(PathHelpers.GetGameBaseDir());
+          var incomingRelCb = incomingCb.MakeRelativeUri(gameCb).LocalPath;
+          var existingRelCb = existingCb.MakeRelativeUri(gameCb).LocalPath;
+
           var result = MessageBox.Error(
             $"Two GUI widget components have the same symbol, {incoming.Name}.\n\n" +
             $"Incoming: {incomingAsmQualifiedName}\n"
-            + $" - {(incomingIsMod ? incomingMod.Name : "Not from a mod")}\n\n"
+            + $" - {(incomingIsMod ? $"{incomingMod.Name} ({incomingMod.Id})" : "Not from a mod")}\n\n"
             + $"Existing: {existingAsmQualifiedName}\n"
-            + $" - {(existingIsMod ? existingMod.Name : "Not from a mod")}\n\n"
-            + $"Would you like the incoming widget to overwrite the existing widget?",
+            + $" - {(existingIsMod ? $"{existingMod.Name} ({incomingMod.Id})" : "Not from a mod")}\n\n"
+            + "Would you like the incoming widget to overwrite the existing widget?",
             "Conflicting Widgets",
             MessageBoxType.YesNo
           );
@@ -75,9 +83,9 @@ namespace Antijank {
           var result = MessageBox.Error(
             $"Two GUI widget components have the same symbol, {incomingName}.\n\n" +
             $"Incoming: {incomingPath}\n"
-            + $" - {(incomingIsMod ? incomingMod.Name : "Not from a mod")}\n\n"
+            + $" - {(incomingIsMod ? $"{incomingMod.Name} ({incomingMod.Id})" : "Not from a mod")}\n\n"
             + $"Existing: {existingPath}\n"
-            + $" - {(existingIsMod ? existingMod.Name : "Not from a mod")}\n\n"
+            + $" - {(existingIsMod ? $"{incomingMod.Name} ({incomingMod.Id})" : "Not from a mod")}\n\n"
             + $"Would you like the incoming widget to overwrite the existing widget?",
             "Conflicting Widgets",
             MessageBoxType.YesNo

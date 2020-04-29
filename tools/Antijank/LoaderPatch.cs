@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -17,8 +19,10 @@ using Medallion.Collections;
 using TaleWorlds.GauntletUI;
 using TaleWorlds.GauntletUI.Data;
 using TaleWorlds.InputSystem;
+using TaleWorlds.MountAndBlade;
 using TaleWorlds.TwoDimension.Standalone;
 using TaleWorlds.TwoDimension.Standalone.Native.Windows;
+using Module = TaleWorlds.MountAndBlade.Module;
 using Path = System.IO.Path;
 
 namespace Antijank {
@@ -28,6 +32,7 @@ namespace Antijank {
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
     static LoaderPatch() {
+
       Context.Harmony.Patch(
         typeof(LauncherModsVM).GetMethod("LoadSubModules", Declared),
         new HarmonyMethod(typeof(LoaderPatch), nameof(LoadSubModulesPrefix)));
@@ -51,6 +56,12 @@ namespace Antijank {
       Context.Harmony.Patch(
         typeof(GraphicsForm).GetMethod("MessageHandler", Declared),
         new HarmonyMethod(typeof(LoaderPatch), nameof(GraphicsFormMessageHandlerPatch)));
+
+      Context.Harmony.Patch(AccessTools.Method(typeof(Module), "CollectModuleAssemblyTypes"),
+        finalizer: new HarmonyMethod(typeof(LoaderPatch), nameof(CollectModuleAssemblyTypesFinalizer)));
+
+      Context.Harmony.Patch(AccessTools.Method(typeof(Module), "InitializeSubModules"),
+        transpiler: new HarmonyMethod(typeof(LoaderPatch), nameof(InitializeSubModulesTranspiler)));
     }
 
     private static readonly byte[] VirtualKeyCodeToInputKeyMap = new byte[256];
@@ -150,9 +161,8 @@ namespace Antijank {
       var input = context.EventManager.InputContext;
 
       void KeyWatcher(float tick) {
-        SynchronizationContext.Current.Post(_ => {
-          context.EventManager.AddLateUpdateAction(context.Root, KeyWatcher, 5);
-        }, null);
+        SynchronizationContext.Current.Post(_
+          => context.EventManager.AddLateUpdateAction(context.Root, KeyWatcher, 5), null);
 
         var ctrl = input.IsControlDown();
 
@@ -216,6 +226,7 @@ namespace Antijank {
       context.EventManager.AddLateUpdateAction(context.Root, KeyWatcher, 5);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool LoadSubModulesPrefix(LauncherModsVM __instance, UserData ____userData, bool isMultiplayer) {
       var list = Loader.GetOrderedModuleList(____userData, isMultiplayer);
 
@@ -233,6 +244,7 @@ namespace Antijank {
       return false;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     private static bool ChangeLoadingOrderOfPrefix(LauncherModsVM __instance, LauncherModuleVM targetModule, int insertIndex, string tag) {
       var index = __instance.Modules.IndexOf(targetModule);
@@ -273,6 +285,132 @@ namespace Antijank {
       Loader.FixSequence(mods.Modules);
 
       _movie.RefreshDataSource(_launcherVm);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void CollectModuleAssemblyTypesFinalizer(ref Exception __exception, ref Dictionary<string, Type> __result, Assembly moduleAssembly) {
+      var ex = __exception;
+      if (ex != null) {
+        var isMod = PathHelpers.IsModuleAssembly(moduleAssembly, out var mod);
+        MessageBox.Warning("A problem occurred while scanning a module's types.\n"
+          + $"Module: {(isMod ? mod.Name : "Not a mod.")}\n"
+          + $"Assembly: {moduleAssembly.GetName().Name}",
+          "Assembly Type Collection Failure",
+          help: () => {
+            MessageBox.Info(ex.ToString(), "Exception Details");
+          });
+      }
+
+      __result ??= new Dictionary<string, Type>();
+    }
+
+    private static readonly AccessTools.FieldRef<Module, List<MBSubModuleBase>> ModuleSubModulesField
+      = AccessTools.FieldRefAccess<Module, List<MBSubModuleBase>>("_submodules");
+
+    private static readonly MethodInfo MbSubModuleBaseOnSubModuleLoadMethod
+      = AccessTools.Method(typeof(MBSubModuleBase), "OnSubModuleLoad");
+
+    private static readonly MethodInfo OnSubModuleLoadInterceptorMethod = AccessTools.Method(typeof(LoaderPatch), nameof(OnSubModuleLoadInterceptor));
+
+    private static readonly MethodInfo SubModuleCtorInterceptorMethod = AccessTools.Method(typeof(LoaderPatch), nameof(SubModuleCtorInterceptor));
+
+    private static readonly MethodInfo ConstructorInfoInvokeMethod = AccessTools.Method(typeof(ConstructorInfo), nameof(ConstructorInfo.Invoke), new[] {typeof(object[])});
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static object SubModuleCtorInterceptor(ConstructorInfo ctor, object[] args) {
+      try {
+        return ctor.Invoke(args);
+      }
+      catch (Exception ex) {
+        var type = ctor.DeclaringType;
+        var asm = type!.Assembly;
+        var isMod = PathHelpers.IsModuleAssembly(asm, out var mod);
+        var choice = MessageBox.Error("A problem occurred while constructing a submodule.\n"
+          + $"Submodule: {type.AssemblyQualifiedName}\n"
+          + $"Module: {(isMod ? mod.Name : "Not a mod")}\n"
+          + "Would you like to proceed without it?",
+          "Submodule Load Failure",
+          MessageBoxType.YesNo,
+          () => {
+            MessageBox.Info($"{ex}", "Exception Details");
+          });
+
+        if (choice == MessageBoxResult.Yes) // bye bye
+          return new RemovedSubModule();
+
+        throw;
+      }
+    }
+
+    private class RemovedSubModule : MBSubModuleBase {
+
+      protected override void OnSubModuleLoad()
+        => ModuleSubModulesField(Module.CurrentModule).Remove(this);
+
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void OnSubModuleLoadInterceptor(MBSubModuleBase subModule) {
+      void InvokeOnSubModuleLoad() {
+        var retry = false;
+        try {
+          MbSubModuleBaseOnSubModuleLoadMethod.Invoke(subModule, new object[0]);
+        }
+        catch (Exception ex) {
+          var type = subModule.GetType();
+          var asm = type.Assembly;
+          var isMod = PathHelpers.IsModuleAssembly(asm, out var mod);
+          var choice = MessageBox.Error("A problem occurred while loading a submodule.\n"
+            + $"Submodule: {type.AssemblyQualifiedName}\n"
+            + $"Module: {(isMod ? mod.Name : "Not a mod")}\n"
+            + "How would you like to proceed?",
+            "Submodule Load Failure",
+            MessageBoxType.CancelTryAgainContinue,
+            () => {
+              MessageBox.Info("Cancel will unload the submodule.\n"
+                + "Try Again will reload the submodule.\n"
+                + "Continue will ignore the exception.\n\n"
+                + $"{ex}", "Exception Details");
+            });
+          switch (choice) {
+            case MessageBoxResult.Cancel: {
+              // bye bye
+              ModuleSubModulesField().Remove(subModule);
+              break;
+            }
+            case MessageBoxResult.TryAgain: {
+              // why not
+              retry = true;
+              break;
+            }
+            case MessageBoxResult.Continue: {
+              // well ok
+              break;
+            }
+          }
+        }
+
+        if (retry)
+          SynchronizationContext.Current.Post(_ => InvokeOnSubModuleLoad(), null);
+      }
+
+      InvokeOnSubModuleLoad();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static IEnumerable<CodeInstruction> InitializeSubModulesTranspiler(IEnumerable<CodeInstruction> instr) {
+      foreach (var il in instr) {
+        if (il.operand as MethodInfo == MbSubModuleBaseOnSubModuleLoadMethod) {
+          il.operand = OnSubModuleLoadInterceptorMethod;
+          il.opcode = OpCodes.Call;
+        }
+        else if (il.operand as MethodInfo == ConstructorInfoInvokeMethod) {
+          il.operand = SubModuleCtorInterceptorMethod;
+          il.opcode = OpCodes.Call;
+        }
+
+        yield return il;
+      }
     }
 
   }
