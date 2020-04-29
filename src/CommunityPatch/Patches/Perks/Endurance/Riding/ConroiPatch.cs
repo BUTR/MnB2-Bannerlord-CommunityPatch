@@ -69,12 +69,18 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch._perk;
 
-      var extra = perk.PrimaryBonus * party.MemberRoster.Count(x => x.Character.IsHero && x.Character.HeroObject.GetPerkValue(perk));
+      var extra = perk.PrimaryBonus * (party?.MemberRoster
+        .Count(x
+          => x.Character != null
+          && x.Character.IsHero
+          && x.Character.HeroObject != null
+          && x.Character.HeroObject.GetPerkValue(perk)
+        ) ?? 1f);
       if (extra <= 0)
         return;
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
-      var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
+      var baseLine = explanation?.Lines?.Find(x => x?.Name == "Base");
       if (baseLine != null)
         explanation.Lines.Remove(baseLine);
 
