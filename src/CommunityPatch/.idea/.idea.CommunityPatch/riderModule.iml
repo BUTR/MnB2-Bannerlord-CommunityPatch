@@ -5,6 +5,8 @@
     <content url="file://$MODULE_DIR$/../../../../SubModule.xml" />
     <content url="file://$MODULE_DIR$/../.." />
     <content url="file://$MODULE_DIR$/../../../../tools/Antijank" />
+    <content url="file://$MODULE_DIR$/../../../../tools/Antijank.Debugger" />
+    <content url="file://$MODULE_DIR$/../../../../tools/AntijankProfiler/cmake-build-release/AntijankProfiler.dll" />
     <content url="file://$MODULE_DIR$/../../../../tools/BannerlordModuleManagement" />
     <content url="file://$MODULE_DIR$/../../../../tools/GeneratePatchTargetHashes" />
     <content url="file://$MODULE_DIR$/../../../../tools/LocateSteamApp" />
