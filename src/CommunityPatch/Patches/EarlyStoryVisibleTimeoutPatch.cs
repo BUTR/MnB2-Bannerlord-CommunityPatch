@@ -24,16 +24,21 @@ namespace CommunityPatch.Patches {
       (byte) OpCodes.Ret.Value, // 0x2a
     };
 
-    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase, StoryMode, Version=1.0.0.0, Culture=neutral");
+    private const string StoryModeAsmSpecifierSuffix = ", StoryMode, Version=1.0.0.0, Culture=neutral";
+
+    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase" + StoryModeAsmSpecifierSuffix);
 
     private static readonly List<MethodInfo> FirstPhaseQuestRemainingTimeHiddenGetters =
       FirstPhaseType.Assembly.GetTypes()
         .Where(type => type.Namespace == "StoryMode.Behaviors.Quests.FirstPhase" && type.IsSubclassOf(typeof(QuestBase)))
-        .Select(type => AccessTools.PropertyGetter(type, "IsRemainingTimeHidden")).ToList();
+        .Append(Type.GetType("StoryMode.Behaviors.Quests.MeetWithArzagosQuestBehavior+MeetWithArzagosQuest" + StoryModeAsmSpecifierSuffix))
+        .Append(Type.GetType("StoryMode.Behaviors.Quests.SupportKingdomQuestBehavior+SupportKingdomQuest" + StoryModeAsmSpecifierSuffix))
+        .Select(type => AccessTools.PropertyGetter(type, "IsRemainingTimeHidden"))
+        .ToList();
 
     private static readonly MethodInfo RemainingTimeHiddenGetterPostfixHandle = AccessTools.Method(typeof(EarlyStoryVisibleTimeoutPatch), nameof(RemainingTimeHiddenGetterPostfix));
 
-    private static readonly Type FirstPhaseCampaignBehaviorType = Type.GetType("StoryMode.Behaviors.FirstPhaseCampaignBehavior, StoryMode, Version=1.0.0.0, Culture=neutral");
+    private static readonly Type FirstPhaseCampaignBehaviorType = Type.GetType("StoryMode.Behaviors.FirstPhaseCampaignBehavior" + StoryModeAsmSpecifierSuffix);
 
     private static readonly MethodInfo FirstPhaseInstanceGetter = AccessTools.PropertyGetter(FirstPhaseType, "Instance");
 
@@ -43,7 +48,7 @@ namespace CommunityPatch.Patches {
 
     private static CampaignTime GetFirstPhaseFirstPhaseStartTime(object instance) => (CampaignTime) FirstPhaseFirstPhaseStartTimeGetter.Invoke(instance, null);
 
-    private static readonly Type SecondPhaseType = Type.GetType("StoryMode.StoryModePhases.SecondPhase, StoryMode, Version=1.0.0.0, Culture=neutral");
+    private static readonly Type SecondPhaseType = Type.GetType("StoryMode.StoryModePhases.SecondPhase" + StoryModeAsmSpecifierSuffix);
 
     private static readonly MethodInfo SecondPhaseInstanceGetter = AccessTools.PropertyGetter(SecondPhaseType, "Instance");
 
@@ -71,7 +76,7 @@ namespace CommunityPatch.Patches {
       if (FirstPhaseTimeLimitInYearsField == null)
         return false;
 
-      Type CampaignStoryModeType = Type.GetType("StoryMode.CampaignStoryMode, StoryMode, Version=1.0.0.0, Culture=neutral", false);
+      Type CampaignStoryModeType = Type.GetType("StoryMode.CampaignStoryMode" + StoryModeAsmSpecifierSuffix, false);
       if (CampaignStoryModeType == null)
         return false;
 
