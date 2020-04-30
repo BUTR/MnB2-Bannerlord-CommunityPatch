@@ -179,9 +179,8 @@ namespace CommunityPatch.Patches {
       CampaignEvents.HourlyTickEvent.AddNonSerializedListener(onHourlyTickBoxed, onHourlyTickBoxed.Value);
     }
 
-    private static void RemainingTimeHiddenGetterPostfix(ref QuestBase __instance, ref bool __result) {
-      __result = (__instance.QuestDueTime == CampaignTime.Never);
-    }
+    private static void RemainingTimeHiddenGetterPostfix(ref QuestBase __instance, ref bool __result)
+      => __result = (__instance.QuestDueTime == CampaignTime.Never);
 
   }
 
