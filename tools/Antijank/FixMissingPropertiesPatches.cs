@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
@@ -69,6 +70,8 @@ namespace Antijank {
 
     private static readonly Dictionary<MemberInfo, bool> DontShowError = new Dictionary<MemberInfo, bool>();
 
+    private static readonly MethodInfo ItemObjDetermineItemCatMethod = AccessTools.Method(typeof(ItemObject), nameof(ItemObject.DetermineItemCategoryForItem));
+
     private static void GenericPostfix<TInstance, TResult>(MemberInfo member, TInstance inst, ref TResult result, DescDlg<TInstance> desc, FixDlg<TInstance, TResult> fix) {
       if (result != null)
         return;
@@ -96,8 +99,14 @@ namespace Antijank {
         DontShowError[member] = false;
     }
 
-    public static void ItemObjectGetItemCategoryPostfix(MethodBase __originalMethod, ItemObject __instance, ref ItemCategory __result)
-      => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, _ => DefaultItemCategories.Unassigned);
+    public static void ItemObjectGetItemCategoryPostfix(MethodBase __originalMethod, ItemObject __instance, ref ItemCategory __result) {
+      if (__result == null && new StackFrame(2, false).GetMethod() == ItemObjDetermineItemCatMethod)
+        return;
+
+      GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId,
+        item => Game.Current.BasicModels.ItemCategorySelector?.GetItemCategoryForItem(item)
+          ?? DefaultItemCategories.Unassigned);
+    }
 
     public static void CharacterObjectGetNamePostfix(MethodBase __originalMethod, ItemObject __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
