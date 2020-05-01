@@ -76,7 +76,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 
-      var extra = party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus;
+      var fiefCount = party.LeaderHero.Clan.Settlements.Count(s => !s.IsVillage);
+      var extra = fiefCount * perk.PrimaryBonus;
       if (extra < float.Epsilon)
         return;
 
@@ -85,7 +86,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (baseLine != null)
         explanation.Lines.Remove(baseLine);
 
-      explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
+      explainedNumber.Add(extra, perk.Name);
       __result = (int) explainedNumber.ResultNumber;
     }
 

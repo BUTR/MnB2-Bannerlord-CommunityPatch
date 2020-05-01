@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -76,16 +77,19 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 
-      var extra = party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus;
-      if (extra > 0) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
-        var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
-        if (baseLine != null)
-          explanation.Lines.Remove(baseLine);
+      var fiefCount = party.LeaderHero.Clan.Settlements.Count(s => !s.IsVillage);
+      var extra = fiefCount * perk.PrimaryBonus;
 
-        explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
-        __result = (int) explainedNumber.ResultNumber;
-      }
+      if (extra < float.Epsilon)
+        return;
+
+      var explainedNumber = new ExplainedNumber(__result, explanation);
+      var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
+      if (baseLine != null)
+        explanation.Lines.Remove(baseLine);
+
+      explainedNumber.Add(extra, perk.Name);
+      __result = (int) explainedNumber.ResultNumber;
     }
 
   }
