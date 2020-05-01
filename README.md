@@ -88,6 +88,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Ambush Specialist
     * Phalanx
     * Hammer and Anvil
+    * Trusted Commander
 * Policies
   * Land Grants For Veterans
 * Feats
