@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
+using static System.Reflection.Emit.OpCodes;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
@@ -16,13 +17,13 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(Mission).GetMethod("GetAttackCollisionResults", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(Mission).GetMethod("GetAttackCollisionResults", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo OverloadedTargetMethodInfo = typeof(Mission).GetMethod("GetAttackCollisionResults", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo OverloadedTargetMethodInfo = typeof(Mission).GetMethod("GetAttackCollisionResults", Public | Static | DeclaredOnly);
 
-    private static readonly MethodInfo TranspilerPatchMethodInfo = typeof(TramplerPatch).GetMethod(nameof(Transpiler), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TranspilerPatchMethodInfo = typeof(TramplerPatch).GetMethod(nameof(Transpiler), NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo PostfixPatchMethodInfo = typeof(TramplerPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PostfixPatchMethodInfo = typeof(TramplerPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -69,22 +70,22 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     private static readonly MethodInfo GetCharacterMethod = typeof(Agent)
-      .GetMethod("get_Character", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      .GetMethod("get_Character", Public | Instance | DeclaredOnly);
 
     private static bool IsAttackerAgentAssignedAndAgentRiderNotNull(List<CodeInstruction> instructions, int start)
       => start + 4 < instructions.Count
-        && instructions[start].opcode == OpCodes.Ldarg_1
-        && instructions[start + 1].opcode == OpCodes.Callvirt
+        && instructions[start].opcode == Ldarg_1
+        && instructions[start + 1].opcode == Callvirt
         && instructions[start + 1].operand is MethodInfo mi && mi == GetCharacterMethod
-        && instructions[start + 2].opcode == OpCodes.Stloc_S
-        && instructions[start + 3].opcode == OpCodes.Ldloc_S
-        && instructions[start + 4].opcode == OpCodes.Brfalse_S;
+        && instructions[start + 2].opcode == Stloc_S
+        && instructions[start + 3].opcode == Ldloc_S
+        && instructions[start + 4].opcode == Brfalse_S;
 
     private static BasicCharacterObject UpdateCorrectCharacterForHorseChargeDamage(Agent agent, ref AttackCollisionData acd, BasicCharacterObject character)
       => acd.IsHorseCharge && agent.RiderAgent != null ? agent.RiderAgent.Character : character;
 
     private static readonly MethodInfo CorrectCharacterForHorseChargeDamageMethod = typeof(TramplerPatch)
-      .GetMethod("UpdateCorrectCharacterForHorseChargeDamage", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      .GetMethod("UpdateCorrectCharacterForHorseChargeDamage", NonPublic | Static | DeclaredOnly);
 
     private static readonly List<LocalVariableInfo> CharacterLocalVariableInfos = TargetMethodInfo
       .GetMethodBody()!.LocalVariables.Where(var => var.LocalType == typeof(BasicCharacterObject)).ToList();
@@ -99,17 +100,18 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
       var codes = instructions.ToList();
       for (var index = 0; index < codes.Count - 5; index++) {
-        if (IsAttackerAgentAssignedAndAgentRiderNotNull(codes, index)) {
-          var attackerCharacterLocalVariableIndex = CharacterLocalVariableInfos[1].LocalIndex;
-          codes.InsertRange(index + 5, new List<CodeInstruction> {
-            new CodeInstruction(OpCodes.Ldarg_1), // Load attackerAgent argument
-            new CodeInstruction(OpCodes.Ldarg_S, 5), // Load attackCollisionData argument
-            new CodeInstruction(OpCodes.Ldloc_S, attackerCharacterLocalVariableIndex), // Load attackerCharacter local variable
-            new CodeInstruction(OpCodes.Call, CorrectCharacterForHorseChargeDamageMethod), // Update attackerCharacter if the collision is a horse charge
-            new CodeInstruction(OpCodes.Stloc_S, attackerCharacterLocalVariableIndex) // Store value in attackerCharacter
-          });
-          return codes.AsEnumerable();
-        }
+        if (!IsAttackerAgentAssignedAndAgentRiderNotNull(codes, index))
+          continue;
+
+        var attackerCharacterLocalVariableIndex = CharacterLocalVariableInfos[1].LocalIndex;
+        codes.InsertRange(index + 5, new List<CodeInstruction> {
+          new CodeInstruction(Ldarg_1), // Load attackerAgent argument
+          new CodeInstruction(Ldarg_S, 5), // Load attackCollisionData argument
+          new CodeInstruction(Ldloc_S, attackerCharacterLocalVariableIndex), // Load attackerCharacter local variable
+          new CodeInstruction(Call, CorrectCharacterForHorseChargeDamageMethod), // Update attackerCharacter if the collision is a horse charge
+          new CodeInstruction(Stloc_S, attackerCharacterLocalVariableIndex) // Store value in attackerCharacter
+        });
+        return codes.AsEnumerable();
       }
 
       CommunityPatchSubModule.Error($"{nameof(TramplerPatch)}: Could not find the starting point to add new instructions in {TargetMethodInfo}." + Environment.NewLine);
