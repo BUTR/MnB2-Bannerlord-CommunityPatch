@@ -22,6 +22,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Crossbow Expert
     * Filled To Brim
     * Squires
+    * Trampler
     * Nomadic Traditions
     * Horse Grooming
   * Bow
