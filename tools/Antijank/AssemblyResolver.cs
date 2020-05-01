@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;

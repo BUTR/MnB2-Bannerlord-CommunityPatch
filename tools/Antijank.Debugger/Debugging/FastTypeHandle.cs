@@ -11,24 +11,23 @@ namespace Antijank.Debugging {
 
     public static T WithProcessModule<T>(Assembly asm, Func<ProcessModule, T> procModAction) {
       var asmPath = Path.GetFullPath(new Uri(asm.CodeBase).LocalPath);
-      using (var proc = Process.GetCurrentProcess()) {
-        foreach (ProcessModule procMod in proc.Modules) {
-          var procModPath = Path.GetFullPath(new Uri(procMod.FileName).LocalPath);
+      using var proc = Process.GetCurrentProcess();
+      foreach (ProcessModule procMod in proc.Modules) {
+        var procModPath = Path.GetFullPath(new Uri(procMod.FileName).LocalPath);
 
-          if (!asmPath.Equals(procModPath,
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-              ? StringComparison.OrdinalIgnoreCase
-              : StringComparison.Ordinal))
-            continue;
+        if (!asmPath.Equals(procModPath,
+          RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal))
+          continue;
 
-          return procModAction(procMod);
-        }
+        return procModAction(procMod);
       }
 
       return default!;
     }
 
-    public static Assembly GetAssembly(ProcessModule procMod) {
+    public static Assembly? GetAssembly(ProcessModule procMod) {
       var procModPath = Path.GetFullPath(new Uri(procMod.FileName).LocalPath);
 
       foreach (var asm in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -45,19 +44,18 @@ namespace Antijank.Debugging {
     }
 
     public static T WithProcessModule<T>(IntPtr address, Func<ProcessModule, T> procModAction) {
-      using (var proc = Process.GetCurrentProcess()) {
-        foreach (ProcessModule procMod in proc.Modules) {
-          if (procMod.BaseAddress != address)
-            continue;
+      using var proc = Process.GetCurrentProcess();
+      foreach (ProcessModule procMod in proc.Modules) {
+        if (procMod.BaseAddress != address)
+          continue;
 
-          return procModAction(procMod);
-        }
+        return procModAction(procMod);
       }
 
-      return default;
+      return default!;
     }
 
-    public static Assembly GetAssembly(IntPtr address)
+    public static Assembly? GetAssembly(IntPtr address)
       => WithProcessModule(address, GetAssembly);
 
     public static IntPtr GetBaseAddress(Assembly asm)
@@ -83,9 +81,9 @@ namespace Antijank.Debugging {
     }
 
     public Module? ResolveModule()
-      => GetAssembly(ModuleAddress).ManifestModule;
+      => GetAssembly(ModuleAddress)?.ManifestModule;
 
-    public Type ResolveType() {
+    public Type? ResolveType() {
       var mod = ResolveModule();
       if (mod == null)
         return null;
@@ -94,7 +92,7 @@ namespace Antijank.Debugging {
       return type;
     }
 
-    public MemberInfo ResolveMember() {
+    public MemberInfo? ResolveMember() {
       var mod = ResolveModule();
       if (mod == null)
         return null;
@@ -103,7 +101,7 @@ namespace Antijank.Debugging {
       return member;
     }
 
-    public string ResolveString() {
+    public string? ResolveString() {
       var mod = ResolveModule();
       if (mod == null)
         return null;

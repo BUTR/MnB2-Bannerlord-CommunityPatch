@@ -16,7 +16,7 @@ namespace Antijank {
     private static SynchronizationContext _syncCtx;
 
     private bool TestGenericMethod<T>() => typeof(T).IsPrimitive;
-    
+
     static CustomDebugManager() {
       TaleWorlds.Library.Debug.DebugManager = Instance;
 
@@ -30,10 +30,6 @@ namespace Antijank {
         var testMethod = thisType.GetMethod(nameof(TestGenericMethod), Public | NonPublic | Static | BindingFlags.Instance);
         if (testMethod == null)
           throw new NotImplementedException();
-
-        var mh =InProcClrRuntime!.GetMethodByHandle((ulong) testMethod.MethodHandle.Value.ToInt64());
-        
-        
       }, null);
     }
 

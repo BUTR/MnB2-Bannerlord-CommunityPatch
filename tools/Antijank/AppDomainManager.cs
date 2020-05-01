@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Antijank.Debugging;
 using TaleWorlds.TwoDimension.Standalone.Native.Windows;
 using Debugger = System.Diagnostics.Debugger;
 
@@ -23,9 +23,6 @@ namespace Antijank {
 
     [DllImport("kernel32")]
     internal static extern bool FreeConsole();
-
-    [DllImport("kernel32")]
-    internal static extern bool CloseHandle(IntPtr handle);
 
     [DllImport("kernel32")]
     internal static extern bool SetCurrentDirectory(string path);
@@ -188,7 +185,6 @@ namespace Antijank {
 
     public override HostExecutionContextManager HostExecutionContextManager
       => WarpManager.Instance;
-
   }
 
 }

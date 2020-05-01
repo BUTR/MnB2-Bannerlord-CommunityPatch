@@ -45,9 +45,8 @@ namespace Antijank {
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static bool DoNothing() {
-      return false;
-    }
+    public static bool DoNothing()
+      => false;
 
   }
 

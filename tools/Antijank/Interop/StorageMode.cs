@@ -1,9 +1,7 @@
 using System;
 
-
 namespace Antijank.Interop {
 
-  
   [Flags]
   public enum StorageMode : int {
 

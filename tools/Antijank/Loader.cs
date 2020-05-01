@@ -44,10 +44,11 @@ namespace Antijank {
         throw new NotImplementedException();
 
       var list = weightedModInfos
-        .OrderTopologicallyBy(mi => mi.Module
-          .GetDependedModuleIdsWithOptional(modInfos)
-          .Select(id => dict[id]))
-        .ThenBy(mi => GetLoadGroup(mi.Module))
+        .OrderTopologicallyBy(
+          mi => mi.Module
+            .GetDependedModuleIds(modInfos)
+            .Select(id => dict[id])
+        )
         .ThenBy(mi => mi.Weight) // user input
         .Select(mi => mi.Module)
         .ToList();
@@ -55,7 +56,7 @@ namespace Antijank {
       return list;
     }
 
-    private static int GetLoadGroup(ModuleInfo mi) {
+    public static int GetLoadGroup(ModuleInfo mi) {
       var prefixed = !char.IsLetter(mi.Alias[0]);
       var official = mi.IsOfficial;
       var root = mi.DependedModuleIds.Count == 0;
@@ -77,39 +78,89 @@ namespace Antijank {
       return !isMultiplayer && moduleInfo.IsSingleplayerModule;
     }
 
-    private static readonly Dictionary<string, List<string>> ModuleOptionalDependencyCache
-      = new Dictionary<string, List<string>>();
+    private static readonly Dictionary<string, IList<string>> ModuleLoadAfterCache
+      = new Dictionary<string, IList<string>>();
 
-    public static List<string> GetDependedModuleIdsWithOptional(this ModuleInfo mi, IEnumerable<ModuleInfo> existing) {
-      if (!mi.IsSelected)
-        return mi.DependedModuleIds;
+    private static readonly Dictionary<string, IList<string>> ModuleOptionalDependencyCache
+      = new Dictionary<string, IList<string>>();
 
+    public static List<string> GetDependedModuleIds(this ModuleInfo mi, IEnumerable<ModuleInfo> existing) {
+      IList<string> loadAfterIds = null;
       try {
-        if (!ModuleOptionalDependencyCache.TryGetValue(mi.Alias, out var optDepIds)) {
-          var xDoc = XDocument.Load(ModuleInfo.GetPath(mi.Alias));
-          optDepIds = xDoc.XPathSelectElements("/Module/OptionalDependedModules/OptionalDependedModule")
+        if (!ModuleLoadAfterCache.TryGetValue(mi.Alias, out loadAfterIds)) {
+          var xDoc = LoadSubModuleXmlCached(mi);
+          loadAfterIds = xDoc
+            .XPathSelectElements("/Module/LoadAfterModules/LoadAfterModule")
             .Select(elem => elem.Attribute("Id")?.Value)
-            .Where(str => !String.IsNullOrEmpty(str))
+            .Where(str => !string.IsNullOrEmpty(str))
             .ToList();
 
-          ModuleOptionalDependencyCache[mi.Alias] = optDepIds;
+          ModuleLoadAfterCache[mi.Alias] = loadAfterIds;
         }
 
-        if (optDepIds.Count == 0)
-          return mi.DependedModuleIds;
+        // must be after cache
+        loadAfterIds = loadAfterIds.Where(id => existing.Any(x => x.Id == id && x.IsSelected)).ToList();
+      }
+      catch {
+        // TODO: report error
+      }
 
+      loadAfterIds ??= Array.Empty<string>();
+
+      IList<string> optDepIds = null;
+
+      // the key difference
+      if (mi.IsSelected) {
+        try {
+          if (!ModuleOptionalDependencyCache.TryGetValue(mi.Alias, out optDepIds)) {
+            var xDoc = LoadSubModuleXmlCached(mi);
+            optDepIds = xDoc
+              .XPathSelectElements("/Module/OptionalDependedModules/OptionalDependedModule")
+              .Select(elem => elem.Attribute("Id")?.Value)
+              .Where(str => !string.IsNullOrEmpty(str))
+              .ToList();
+
+            ModuleOptionalDependencyCache[mi.Alias] = optDepIds;
+          }
+
+          // must be after cache
+          optDepIds = optDepIds.Where(id => existing.Any(x => x.Id == id && x.IsSelected)).ToList();
+        }
+        catch {
+          // TODO: report error
+        }
+      }
+
+      optDepIds ??= Array.Empty<string>();
+
+      try {
         var depModIds = mi.DependedModuleIds
-          .Concat(optDepIds
-            .Where(id => existing.Any(x => x.Id == id && x.IsSelected)))
+          .Concat(loadAfterIds)
+          .Concat(optDepIds)
+          .Distinct()
           .ToList();
 
         return depModIds;
       }
       catch {
-        // darn...
+        // TODO: report error
       }
 
       return mi.DependedModuleIds;
+    }
+
+    private static readonly Dictionary<string, XDocument> SubModuleXmlCache
+      = new Dictionary<string, XDocument>();
+
+    public static XDocument LoadSubModuleXmlCached(ModuleInfo mi) {
+      var alias = mi.Alias;
+      if (SubModuleXmlCache.TryGetValue(alias, out var xDoc))
+        return xDoc;
+
+      xDoc = XDocument.Load(ModuleInfo.GetPath(alias));
+      SubModuleXmlCache.Add(alias, xDoc);
+
+      return xDoc;
     }
 
     private static readonly Regex RxModsList = new Regex(@"_MODULES_\*(?:([^\*]+)(?:\*|\*_MODULES_))*(?<=\*_MODULES_)",
@@ -137,11 +188,15 @@ namespace Antijank {
       var dict = ModuleList.ToDictionary(mi => mi.Id);
 
       var list = ModuleList
+        .OrderBy(GetLoadGroup)
+        .ThenBy(mi => mi.Alias)
         .OrderTopologicallyBy(mi
-          => mi.GetDependedModuleIdsWithOptional(ModuleList)
+          => mi.GetDependedModuleIds(ModuleList)
             .Select(id => dict[id]))
         .ThenBy(GetLoadGroup)
+        .ThenBy(mi => mi.IsSelected ? 0 : 1)
         .ToList();
+
       return list;
     }
 
@@ -162,7 +217,7 @@ namespace Antijank {
 
       var sorted = copy
         .StableOrderTopologicallyBy(mod => mod.Info
-          .GetDependedModuleIdsWithOptional(ModuleList)
+          .GetDependedModuleIds(ModuleList)
           .Select(id => vmDict[id]))
         .ToList();
 
@@ -184,9 +239,19 @@ namespace Antijank {
       => list.Sort(Comparer<LauncherModuleVM>.Create((a, b)
         => {
         var indexA = sorted.FindIndex(x => x == a.Info.Id);
-        if (indexA == -1) indexA = Int32.MaxValue;
+        if (indexA == -1) indexA = int.MaxValue;
         var indexB = sorted.FindIndex(x => x == b.Info.Id);
-        if (indexB == -1) indexB = Int32.MaxValue;
+        if (indexB == -1) indexB = int.MaxValue;
+        return indexA.CompareTo(indexB);
+      }));
+
+    public static void IdentitySort(List<ModuleInfo> list, IReadOnlyList<string> sorted)
+      => list.Sort(Comparer<ModuleInfo>.Create((a, b)
+        => {
+        var indexA = sorted.FindIndex(x => x == a.Id);
+        if (indexA == -1) indexA = int.MaxValue;
+        var indexB = sorted.FindIndex(x => x == b.Id);
+        if (indexB == -1) indexB = int.MaxValue;
         return indexA.CompareTo(indexB);
       }));
 

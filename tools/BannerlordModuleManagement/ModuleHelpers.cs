@@ -30,7 +30,6 @@ namespace BannerlordModuleManagement {
       var data = isMultiplayer
         ? userData.MultiplayerData
         : userData.SingleplayerData;
-      
 
       var modInfos = ModuleInfo.GetModules()
         .Where(mod => IsVisible(isMultiplayer, mod))
@@ -67,7 +66,7 @@ namespace BannerlordModuleManagement {
 
       return list;
     }
-    
+
     private static int GetLoadGroup(ModuleInfo mi) {
       var prefixed = !char.IsLetter(mi.Alias[0]);
       var official = mi.IsOfficial;
@@ -82,7 +81,7 @@ namespace BannerlordModuleManagement {
               ? 3
               : 4;
     }
-    
+
     private static bool IsVisible(bool isMultiplayer, ModuleInfo moduleInfo) {
       if (isMultiplayer && moduleInfo.IsMultiplayerModule)
         return true;
@@ -192,10 +191,13 @@ namespace BannerlordModuleManagement {
       var dict = ModuleList.ToDictionary(mi => mi.Id);
 
       var list = ModuleList
+        .OrderBy(GetLoadGroup)
+        .ThenBy(mi => mi.Alias)
         .OrderTopologicallyBy(mi
           => mi.GetDependedModuleIdsWithOptional(ModuleList)
             .Select(id => dict[id]))
         .ThenBy(GetLoadGroup)
+        .ThenBy(mi => mi.IsSelected ? 0 : 1)
         .ToList();
       return list;
     }
