@@ -66,26 +66,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     }
 
     public override void Apply(Game game) {
-      // Dear TaleWorlds; Value should probably be publicly exposed, maybe by a method
-      // and maybe marked [Obsolete] if you want to avoid your developers doing dirty deeds
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-
-      // most of the properties of skills have private setters, yet Initialize is public
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        SkillEffect.PerkRole.Personal, 8f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        _perk.IncrementType
-      );
+      _perk.SetPrimary(SkillEffect.PerkRole.Personal, 8f);
 
       if (Applied) return;
 
