@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +17,13 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(Mission).GetMethod("GetAttackCollisionResults", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    
+
     private static readonly MethodInfo OverloadedTargetMethodInfo = typeof(Mission).GetMethod("GetAttackCollisionResults", BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+
     private static readonly MethodInfo TranspilerPatchMethodInfo = typeof(TramplerPatch).GetMethod(nameof(Transpiler), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+
     private static readonly MethodInfo PostfixPatchMethodInfo = typeof(TramplerPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
       yield return OverloadedTargetMethodInfo;
@@ -46,7 +45,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0xAA, 0xCF, 0x99, 0xCD, 0x4A, 0x4D, 0xB6, 0x2C
       },
     };
-    public override void Reset() {}
+
+    public override void Reset() {
+    }
 
     public override bool? IsApplicable(Game game)
       => TargetMethodInfo != null
@@ -58,6 +59,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         transpiler: new HarmonyMethod(TranspilerPatchMethodInfo));
 
@@ -65,10 +67,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         postfix: new HarmonyMethod(PostfixPatchMethodInfo));
       Applied = true;
     }
-    
+
     private static readonly MethodInfo GetCharacterMethod = typeof(Agent)
       .GetMethod("get_Character", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-    
+
     private static bool IsAttackerAgentAssignedAndAgentRiderNotNull(List<CodeInstruction> instructions, int start)
       => start + 4 < instructions.Count
         && instructions[start].opcode == OpCodes.Ldarg_1
@@ -80,28 +82,26 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static BasicCharacterObject UpdateCorrectCharacterForHorseChargeDamage(Agent agent, ref AttackCollisionData acd, BasicCharacterObject character)
       => acd.IsHorseCharge && agent.RiderAgent != null ? agent.RiderAgent.Character : character;
-    
+
     private static readonly MethodInfo CorrectCharacterForHorseChargeDamageMethod = typeof(TramplerPatch)
       .GetMethod("UpdateCorrectCharacterForHorseChargeDamage", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
-    
-    private static readonly List<LocalVariableInfo> characterLocalVariableInfos = TargetMethodInfo
-      .GetMethodBody().LocalVariables.Where(var => var.LocalType == typeof(BasicCharacterObject)).ToList();
-    
+
+    private static readonly List<LocalVariableInfo> CharacterLocalVariableInfos = TargetMethodInfo
+      .GetMethodBody()!.LocalVariables.Where(var => var.LocalType == typeof(BasicCharacterObject)).ToList();
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-
-      if (characterLocalVariableInfos.Count != 2) {
+      if (CharacterLocalVariableInfos.Count != 2) {
         CommunityPatchSubModule.Error($"{nameof(TramplerPatch)}: Expected two BasicCharacterObject  local variable instances in the original method."
           + $" The original code has been changed requiring an update of this patch." + Environment.NewLine);
         return instructions;
       }
-      
+
       var codes = instructions.ToList();
-      for (var index = 0; index<codes.Count - 5; index++)
-      {
+      for (var index = 0; index < codes.Count - 5; index++) {
         if (IsAttackerAgentAssignedAndAgentRiderNotNull(codes, index)) {
-          var attackerCharacterLocalVariableIndex = characterLocalVariableInfos[1].LocalIndex;
-          codes.InsertRange(index+5, new List<CodeInstruction> {
+          var attackerCharacterLocalVariableIndex = CharacterLocalVariableInfos[1].LocalIndex;
+          codes.InsertRange(index + 5, new List<CodeInstruction> {
             new CodeInstruction(OpCodes.Ldarg_1), // Load attackerAgent argument
             new CodeInstruction(OpCodes.Ldarg_S, 5), // Load attackCollisionData argument
             new CodeInstruction(OpCodes.Ldloc_S, attackerCharacterLocalVariableIndex), // Load attackerCharacter local variable
@@ -111,26 +111,29 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
           return codes.AsEnumerable();
         }
       }
-      
+
       CommunityPatchSubModule.Error($"{nameof(TramplerPatch)}: Could not find the starting point to add new instructions in {TargetMethodInfo}." + Environment.NewLine);
       return codes.AsEnumerable();
     }
-    
+
     private static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk)
       => (character as CharacterObject)?.GetPerkValue(perk) ?? false;
 
     private static int TramplerDamageModifier(int baseDamage) {
-      var tramplerDamage = baseDamage * (1 + (decimal) DefaultPerks.Riding.Trampler.PrimaryBonus);
-      return tramplerDamage - Math.Truncate(tramplerDamage) >= 0.5m ? (int) Math.Ceiling(tramplerDamage) : (int) Math.Floor(tramplerDamage);
+      var tramplerDamage = baseDamage * (1f + DefaultPerks.Riding.Trampler.PrimaryBonus);
+      return (int) Math.Round(tramplerDamage, MidpointRounding.AwayFromZero);
     }
-    
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(BasicCharacterObject attackerAgentCharacter, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
       if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(attackerAgentCharacter, DefaultPerks.Riding.Trampler))) {
         return;
       }
+
       combatLog.InflictedDamage = TramplerDamageModifier(combatLog.InflictedDamage);
       attackCollisionData.InflictedDamage = TramplerDamageModifier(attackCollisionData.InflictedDamage);
     }
+
   }
+
 }
