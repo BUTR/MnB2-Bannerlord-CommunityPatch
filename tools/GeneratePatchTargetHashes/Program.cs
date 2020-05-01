@@ -34,7 +34,7 @@ internal static class Program {
 
   private static Assembly? AssemblyResolver(object sender, ResolveEventArgs eventArgs) {
     var name = eventArgs.Name;
-    Console.WriteLine("Assembly Requested: " + name);
+    //Console.WriteLine("Assembly Requested: " + name);
 
     if (name == null)
       return null;
@@ -65,6 +65,7 @@ internal static class Program {
     if (loadAttempt != null)
       return loadAttempt;
 
+    Console.WriteLine("Assembly Requested: " + name);
     Console.WriteLine("Didn't load assembly.");
     if (Debugger.IsAttached)
       Debugger.Break();
@@ -74,7 +75,7 @@ internal static class Program {
 
   private static Assembly? TypeResolver(object? sender, ResolveEventArgs args) {
     var name = args.Name;
-    Console.WriteLine($"Type Requested: {name}");
+    //Console.WriteLine($"Type Requested: {name}");
     if (name?.StartsWith("Mono") ?? false)
       return null;
 
