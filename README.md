@@ -83,6 +83,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Companion Cavalry
     * Tactical Superiority
     * One Step Ahead
+    * Bait
     * Logistics
     * Ambush Specialist
     * Phalanx
