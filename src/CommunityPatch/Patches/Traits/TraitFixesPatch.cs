@@ -129,7 +129,7 @@ namespace CommunityPatch.Patches.Traits {
       string xpMsg;
       if (xpValue < 0) {
         // TODO: localize
-        xpMsg = $"You have lost {(xpValue * -1)} {trait.Name}."; //always shows positive number so you aren't losing negative values
+        xpMsg = $"You have lost {xpValue * -1} {trait.Name}."; //always shows positive number so you aren't losing negative values
         InformationManager.DisplayMessage(new InformationMessage(xpMsg, Colors.Red));
       }
       else if (xpValue > 0) {

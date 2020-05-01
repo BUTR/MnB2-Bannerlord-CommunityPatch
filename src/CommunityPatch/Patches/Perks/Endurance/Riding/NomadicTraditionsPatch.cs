@@ -54,7 +54,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     private static float GetPerkBaseRatio(float magicNumber) =>
-      (magicNumber * (1 + ActivePatch._perk.PrimaryBonus)) - magicNumber;
+      magicNumber * (1 + ActivePatch._perk.PrimaryBonus) - magicNumber;
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(DefaultPartySpeedCalculatingModel __instance, ref StatExplainer explanation, ref float __result, MobileParty mobileParty, ref int additionalTroopOnFootCount, ref int additionalTroopOnHorseCount) {

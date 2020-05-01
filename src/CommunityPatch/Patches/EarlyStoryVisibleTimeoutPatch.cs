@@ -82,11 +82,11 @@ namespace CommunityPatch.Patches {
       if (FirstPhaseTimeLimitInYearsField == null)
         return false;
 
-      Type CampaignStoryModeType = Type.GetType("StoryMode.CampaignStoryMode" + StoryModeAsmSpecifierSuffix, false);
-      if (CampaignStoryModeType == null)
+      var campaignStoryModeType = Type.GetType("StoryMode.CampaignStoryMode" + StoryModeAsmSpecifierSuffix, false);
+      if (campaignStoryModeType == null)
         return false;
 
-      if (!game.GameType.GetType().IsEquivalentTo(CampaignStoryModeType))
+      if (!game.GameType.GetType().IsEquivalentTo(campaignStoryModeType))
         return false;
 
       if (FirstPhaseQuestRemainingTimeHiddenGetters.Count == 0)
@@ -152,7 +152,7 @@ namespace CommunityPatch.Patches {
       if (quest.QuestDueTime == newDueTime)
         return;
 
-      bool prevIsRemainingTimeHidden = quest.IsRemainingTimeHidden;
+      var prevIsRemainingTimeHidden = quest.IsRemainingTimeHidden;
       quest.ChangeQuestDueTime(newDueTime);
 
       if (quest.IsRemainingTimeHidden && prevIsRemainingTimeHidden)
@@ -180,7 +180,7 @@ namespace CommunityPatch.Patches {
     }
 
     private static void RemainingTimeHiddenGetterPostfix(ref QuestBase __instance, ref bool __result)
-      => __result = (__instance.QuestDueTime == CampaignTime.Never);
+      => __result = __instance.QuestDueTime == CampaignTime.Never;
 
   }
 

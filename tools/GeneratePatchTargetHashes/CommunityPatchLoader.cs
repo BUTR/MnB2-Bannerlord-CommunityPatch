@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using CommunityPatch;
@@ -39,15 +40,56 @@ internal static class CommunityPatchLoader {
   public static string GetFormattedHexOfCilSignatureSha256(this MethodBase mb)
     => mb?.MakeCilSignatureSha256().GetFormattedCsHexArray();
 
+  [PublicAPI]
+  public static string GetFormattedHexOfCilSignatureSha256(byte[] bytes)
+    => bytes?.GetFormattedCsHexArray();
+
   public static void GenerateHashes() {
     foreach (var patch in CommunityPatchSubModule.Patches) {
-      var patchName = patch.GetType().Name;
+      var type = patch.GetType();
+      var patchName = type.Name;
       try {
         foreach (var mb in patch.GetMethodsChecked()) {
           var mbName = mb.Name;
 
+          MemberInfo match;
+          var hash = mb.MakeCilSignatureSha256();
+
+          var hashFields = type
+            .GetFields(Public | NonPublic | Static | FlattenHierarchy)
+            .Where(f => f.Name.Contains("Hash") && f.FieldType == typeof(byte[][]))
+            .ToList();
+
+          foreach (var field in hashFields) {
+            var hashes = (byte[][]) field.GetValue(field.IsStatic ? null : patch);
+            if (!hash.MatchesAnySha256(hashes))
+              continue;
+
+            match = field;
+            goto matched;
+          }
+
+          var hashStaticProps = type
+            .GetProperties(Public | NonPublic | Static | FlattenHierarchy)
+            .Where(f => f.Name.Contains("Hash") && f.PropertyType == typeof(byte[][]))
+            .ToList();
+
+          foreach (var prop in hashStaticProps) {
+            var hashes = (byte[][]) prop.GetValue(null);
+            if (!hash.MatchesAnySha256(hashes))
+              continue;
+
+            match = prop;
+            goto matched;
+          }
+
           Console.WriteLine($"{patchName} {mbName}:");
           Console.WriteLine(mb.GetFormattedHexOfCilSignatureSha256());
+
+          continue;
+
+          matched:
+          Console.WriteLine($"{patchName} {mbName}: {match.Name} already matched.");
         }
       }
       catch (Exception ex) {

@@ -212,9 +212,9 @@ namespace CommunityPatch {
       => GroupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
         var order = a.OrderIndex.CompareTo(b.OrderIndex);
         if (order == 0)
-          order = string.Compare((a.Id ?? ""), b.Id ?? "", StringComparison.OrdinalIgnoreCase);
+          order = string.Compare(a.Id ?? "", b.Id ?? "", StringComparison.OrdinalIgnoreCase);
         if (order == 0)
-          order = string.Compare((a.Name.ToString() ?? ""), b.Name.ToString() ?? "", StringComparison.OrdinalIgnoreCase);
+          order = string.Compare(a.Name.ToString() ?? "", b.Name.ToString() ?? "", StringComparison.OrdinalIgnoreCase);
         if (order == 0)
           order = a.GetHashCode().CompareTo(b.GetHashCode());
         return order;
