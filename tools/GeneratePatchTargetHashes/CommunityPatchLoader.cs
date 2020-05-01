@@ -41,12 +41,18 @@ internal static class CommunityPatchLoader {
 
   public static void GenerateHashes() {
     foreach (var patch in CommunityPatchSubModule.Patches) {
-      foreach (var mb in patch.GetMethodsChecked()) {
-        var patchName = patch.GetType().Name;
-        var mbName = mb.Name;
+      var patchName = patch.GetType().Name;
+      try {
+        foreach (var mb in patch.GetMethodsChecked()) {
+          var mbName = mb.Name;
 
-        Console.WriteLine($"{patchName} {mbName}:");
-        Console.WriteLine(mb.GetFormattedHexOfCilSignatureSha256());
+          Console.WriteLine($"{patchName} {mbName}:");
+          Console.WriteLine(mb.GetFormattedHexOfCilSignatureSha256());
+        }
+      }
+      catch (Exception ex) {
+        Console.WriteLine($"{patchName}: Failed due to exception.");
+        Console.WriteLine(ex.ToString());
       }
     }
   }

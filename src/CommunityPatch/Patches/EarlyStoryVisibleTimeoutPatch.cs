@@ -26,7 +26,7 @@ namespace CommunityPatch.Patches {
 
     private const string StoryModeAsmSpecifierSuffix = ", StoryMode, Version=1.0.0.0, Culture=neutral";
 
-    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase" + StoryModeAsmSpecifierSuffix);
+    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase" + StoryModeAsmSpecifierSuffix, true);
 
     private static readonly List<MethodInfo> FirstPhaseQuestRemainingTimeHiddenGetters =
       FirstPhaseType.Assembly.GetTypes()
