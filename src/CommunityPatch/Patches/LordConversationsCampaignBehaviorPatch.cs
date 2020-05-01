@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 using Harmony = HarmonyLib.Harmony;
 
@@ -19,12 +20,12 @@ namespace CommunityPatch.Patches {
       // ReSharper disable once PossibleNullReferenceException
       = Type.GetType("SandBox.LordConversationsCampaignBehavior, SandBox, Version=1.0.0.0, Culture=neutral")
         .GetMethod("conversation_player_want_to_end_service_as_mercenary_on_condition",
-          BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+          NonPublic | Public | Instance | Static | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo
       = typeof(LordConversationsCampaignBehaviorPatch)
         .GetMethod(nameof(Postfix),
-          BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+          NonPublic | Static | DeclaredOnly);
 
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;

@@ -5,6 +5,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
@@ -13,7 +14,7 @@ namespace CommunityPatch.Patches {
 
     public override bool Applied { get; protected set; }
 
-    protected static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    protected static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), Public | Instance | DeclaredOnly);
 
     private static readonly byte[][] Hashes = {
       new byte[] {
@@ -25,12 +26,12 @@ namespace CommunityPatch.Patches {
       }
     };
 
-    private static readonly FieldInfo MaxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+    private static readonly FieldInfo MaxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", Instance | NonPublic | DeclaredOnly);
 
-    private static readonly FieldInfo AmmoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+    private static readonly FieldInfo AmmoField = typeof(MissionWeapon).GetField("_dataValue", Instance | NonPublic | DeclaredOnly);
 
     private static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
-      .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+      .GetField("_weaponSlots", NonPublic | Instance);
 
     public override void Reset() {
     }

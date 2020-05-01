@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using CommunityPatch;
 using JetBrains.Annotations;
+using static System.Reflection.BindingFlags;
 
 internal static class CommunityPatchLoader {
 
@@ -30,7 +31,7 @@ internal static class CommunityPatchLoader {
   public static string GetFormattedHexOfCilSignatureSha256(string typeName, string methodName) {
     var type = Type.GetType(typeName);
     var method = type?.GetMethod(methodName,
-      BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+      DeclaredOnly | Public | NonPublic | Static | Instance);
     return method?.GetFormattedHexOfCilSignatureSha256();
   }
 

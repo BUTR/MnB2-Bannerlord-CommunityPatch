@@ -6,6 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Policies {
@@ -16,19 +17,19 @@ namespace CommunityPatch.Patches.Policies {
 
     private static readonly MethodInfo TargetMethodInfo1 =
       Type.GetType("TaleWorlds.CampaignSystem.SandBox.GameComponents.DefaultSettlementTaxModel, TaleWorlds.CampaignSystem")?
-        .GetMethod("CalculateDailyTaxInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+        .GetMethod("CalculateDailyTaxInternal", NonPublic | Instance | DeclaredOnly);
 
     private static readonly MethodInfo TargetMethodInfo2 =
-      typeof(DefaultSettlementMilitiaModel).GetMethod("CalculateMilitiaSpawnRate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      typeof(DefaultSettlementMilitiaModel).GetMethod("CalculateMilitiaSpawnRate", Public | Instance | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo1Prefix =
-      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Prefix1), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Prefix1), NonPublic | Static | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo1Postfix =
-      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix1), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix1), NonPublic | Static | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo2 =
-      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix2), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix2), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo1;
