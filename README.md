@@ -22,6 +22,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Crossbow Expert
     * Filled To Brim
     * Squires
+    * Trampler
     * Nomadic Traditions
     * Horse Grooming
   * Bow
@@ -83,6 +84,10 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Tactical Superiority
     * One Step Ahead
     * Bait
+    * Logistics
+    * Ambush Specialist
+    * Phalanx
+    * Hammer and Anvil
 * Policies
   * Land Grants For Veterans
 * Feats
