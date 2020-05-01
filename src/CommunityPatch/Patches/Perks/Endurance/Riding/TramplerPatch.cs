@@ -30,7 +30,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       yield return OverloadedTargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    private static readonly byte[][] TargetHashes = {
       new byte[] {
         // e1.2.1.227410
         0xC0, 0xBC, 0x9E, 0xDE, 0xAF, 0xAB, 0xFE, 0xE0,
@@ -38,6 +38,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0xE8, 0x48, 0xE4, 0x75, 0xF0, 0x58, 0xE8, 0xC5,
         0x86, 0x06, 0xC1, 0xE8, 0x6D, 0x42, 0x9A, 0xAA
       },
+    };
+
+    private static readonly byte[][] OverloadedTargetHashes = {
       new byte[] {
         // e1.2.1.227410
         0x3C, 0x34, 0x56, 0x68, 0xCE, 0xD5, 0x86, 0x1B,
@@ -54,9 +57,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       => TargetMethodInfo != null
         && OverloadedTargetMethodInfo != null
         && !AlreadyPatchedByOthers(Harmony.GetPatchInfo(TargetMethodInfo))
-        && TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes[0])
+        && TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(TargetHashes)
         && !AlreadyPatchedByOthers(Harmony.GetPatchInfo(OverloadedTargetMethodInfo))
-        && OverloadedTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes[1]);
+        && OverloadedTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(OverloadedTargetHashes);
 
     public override void Apply(Game game) {
       if (Applied) return;
