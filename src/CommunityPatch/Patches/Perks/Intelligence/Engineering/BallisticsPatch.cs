@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class BallisticsPatch : PatchBase<BallisticsPatch> {
+  public sealed class BallisticsPatch : PerkPatchBase<BallisticsPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -30,8 +30,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return BombardTargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
 
     private static readonly byte[][] BombardHashes = {
@@ -44,14 +42,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "LyVZYGkN");
+public BallisticsPatch() : base("LyVZYGkN") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
       if (TooltipTargetMethodInfo == null) return false;
       if (BombardTargetMethodInfo == null) return false;
 
@@ -67,7 +64,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimary(SkillEffect.PerkRole.PartyLeader, 30f);
+      Perk.SetPrimary(SkillEffect.PerkRole.PartyLeader, 30f);
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TooltipTargetMethodInfo, postfix: new HarmonyMethod(TooltipPatchMethodInfo));
@@ -84,7 +81,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       if (!IsCatapult(engineInProgress.SiegeEngine)) return;
 
       CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRate, out var bonusDamage);
-      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRate);
+      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch.Perk, bonusRate);
       SiegeTooltipHelper.UpdateRangedDamageToWallsTooltip(__result, bonusDamage);
       SiegeTooltipHelper.UpdateRangedEngineDamageTooltip(__result, bonusDamage);
     }
@@ -104,7 +101,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     private static void CalculateBonusDamageAndRates(
       SiegeEngineType siegeEngine,
       ISiegeEventSide siegeEventSide, out float bonusRateOnly, out float bonusDamageOnly) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var baseDamage = siegeEngine.Damage;
       var partyMemberDamage = new ExplainedNumber(baseDamage);
       var partyMemberRate = new ExplainedNumber(100f);

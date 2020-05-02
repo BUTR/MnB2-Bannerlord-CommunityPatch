@@ -15,7 +15,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class WallBreakerPatch : PatchBase<WallBreakerPatch> {
+  public sealed class WallBreakerPatch : PerkPatchBase<WallBreakerPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -32,8 +32,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TooltipTargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
 
     private static readonly byte[][] Hashes = {
@@ -46,14 +44,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "0wlWgIeL");
+public WallBreakerPatch() : base("0wlWgIeL") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
       if (TargetMethodInfo == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -68,7 +65,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(25f);
+      Perk.SetPrimaryBonus(25f);
 
       if (Applied) return;
 
@@ -100,14 +97,14 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       if (siegeEventSide == null) return;
 
       CalculateBonusDamageAndRates(engineInProgress.SiegeEngine, siegeEventSide, out var bonusRate, out var bonusDamage);
-      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusRate);
+      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch.Perk, bonusRate);
       SiegeTooltipHelper.UpdateRangedDamageToWallsTooltip(__result, bonusDamage);
     }
 
     private static void CalculateBonusDamageAndRates(
       SiegeEngineType siegeEngineType,
       ISiegeEventSide siegeEventSide, out float bonusRateOnly, out float bonusDamageOnly) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var baseDamage = siegeEngineType.Damage;
       var partyMemberDamage = new ExplainedNumber(baseDamage);
       var partyMemberRate = new ExplainedNumber(100f);

@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
-  public class OneStepAheadPatch : PatchBase<OneStepAheadPatch> {
+  public class OneStepAheadPatch : PerkPatchBase<OneStepAheadPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -22,8 +22,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.2.1.226961
@@ -34,11 +32,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "V6mvBGDV");
+public OneStepAheadPatch() : base("V6mvBGDV") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
       if (TargetMethodInfo == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -61,7 +58,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       if (Hero.MainHero.HeroState == Hero.CharacterStates.Prisoner) return;
       if (MobileParty.MainParty.MapEvent == null) return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       __result = Hero.MainHero.GetPerkValue(perk);
     }
 

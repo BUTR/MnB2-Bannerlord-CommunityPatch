@@ -12,6 +12,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(ExtraArrowsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
+    public ExtraArrowsPatch() : base("eQLORdgE") {}
+
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -22,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
     static bool CanApplyPerk(Hero hero, WeaponComponentData weaponComponentData) =>
       WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
-      hero.GetPerkValue(DefaultPerks.Athletics.ExtraArrows);
+      hero.GetPerkValue(ActivePatch.Perk);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) {

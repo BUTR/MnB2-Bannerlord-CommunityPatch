@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class RaidingPartyPatch : PatchBase<RaidingPartyPatch> {
+  public sealed class RaidingPartyPatch : PerkPatchBase<RaidingPartyPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,16 +24,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = RaidingHelper.Hashes;
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "pI0j13oK");
+public RaidingPartyPatch() : base("pI0j13oK") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus.IsDifferentFrom(.10f)) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus.IsDifferentFrom(.10f)) return false;
       if (TargetMethodInfo == null) return false;
       if (RaidingHelper.NextSettlementDamage == null) return false;
       if (RaidingHelper.IsFinishCalled == null) return false;
@@ -46,7 +43,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(10f);
+      Perk.SetPrimaryBonus(10f);
 
       if (Applied) return;
 
@@ -63,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     private static void ApplyPerkBonusToRaidHit(MapEvent __instance, float hitDamage) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var partyMemberHitDamage = new ExplainedNumber(hitDamage);
 
       foreach (var party in __instance.AttackerSide.Parties.Where(x => x.MobileParty != null))

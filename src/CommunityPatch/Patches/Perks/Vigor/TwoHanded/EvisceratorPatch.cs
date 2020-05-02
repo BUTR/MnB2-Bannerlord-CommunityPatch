@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class EvisceratorPatch : PatchBase<EvisceratorPatch> {
+  public sealed class EvisceratorPatch : PerkPatchBase<EvisceratorPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,8 +24,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -36,13 +34,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "C2CwsC91");
+public EvisceratorPatch() : base("C2CwsC91") {}
 
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -52,7 +49,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     public override void Apply(Game game) {
-      _perk.Modify(-30f, SkillEffect.EffectIncrementType.AddFactor);
+      Perk.Modify(-30f, SkillEffect.EffectIncrementType.AddFactor);
 
       if (Applied) return;
 
@@ -76,8 +73,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
       if (!AnyMoralChanges(moralChangeEnemy, moralChangeFriend)) return false;
 
-      if (affectorCharacter.GetPerkValue(ActivePatch._perk))
-        moralChangeFriend += moralChangeFriend * ActivePatch._perk.PrimaryBonus / -100;
+      if (affectorCharacter.GetPerkValue(ActivePatch.Perk))
+        moralChangeFriend += moralChangeFriend * ActivePatch.Perk.PrimaryBonus / -100;
 
       __instance.ApplyAoeMoraleEffect(
         affectedAgent.GetWorldPosition(),

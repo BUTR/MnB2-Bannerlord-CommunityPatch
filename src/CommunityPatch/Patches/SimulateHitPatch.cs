@@ -7,9 +7,9 @@ using TaleWorlds.Core;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
+namespace CommunityPatch.Patches {
 
-  public abstract class SimulateHitPatch<TPatch> : PatchBase<TPatch> where TPatch : PatchBase<TPatch> {
+  public abstract class SimulateHitPatch<TPatch> : PerkPatchBase<TPatch> where TPatch : PatchBase<TPatch> {
     
     public override bool Applied { get; protected set; }
 
@@ -24,11 +24,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         0x69, 0xBC, 0x13, 0xFF, 0x40, 0xD4, 0x49, 0x4C
       }
     };
-    
-    protected PerkObject Perk;
-    
-    public override void Reset()
-      => Perk = PerkObject.FindFirst(x => x.Name.GetID() == PerkId);
     
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -49,7 +44,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       if (strikerParty.LeaderHero?.GetPerkValue(perk) != true) return;
       totalDamage += (int) (totalDamage * perk.PrimaryBonus);
     }
-    
-    protected abstract string PerkId { get; }
+
+    protected SimulateHitPatch(string perkId) : base(perkId) {
+    }
+
   }
 }

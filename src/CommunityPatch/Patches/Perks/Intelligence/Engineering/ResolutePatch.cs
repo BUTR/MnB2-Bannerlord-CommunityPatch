@@ -12,7 +12,7 @@ using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
-  public class ResolutePatch : PatchBase<ResolutePatch> {
+  public class ResolutePatch : PerkPatchBase<ResolutePatch> {
     public override bool Applied { get; protected set; }
 
     private static readonly Type DefaultPartyMoraleModelType = typeof(DefaultPartyMoraleModel);
@@ -22,12 +22,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
     
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "aNEj0uIa");
+public ResolutePatch() : base("aNEj0uIa") {}
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x43, 0x16, 0x41, 0xFC, 0xDA, 0xF5, 0x69, 0xBE,
@@ -39,7 +36,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     
     public override bool? IsApplicable(Game game)
     {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
       
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -49,7 +46,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
     
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(50f);
+      Perk.SetPrimaryBonus(50f);
 
       if (Applied) return;
 
@@ -59,7 +56,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref float __result, ref DefaultPartyMoraleModel __instance, MobileParty mobileParty, StatExplainer explanation = null) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       
       if (mobileParty.SiegeEvent == null) return;
       var partyMemberBonus = GetPartyMemberBonus(mobileParty, perk);

@@ -5,7 +5,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 
-namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
+namespace CommunityPatch {
 
   public static class PlayerEncounterHelper {
     private static readonly Type PlayerEncounterType = typeof(PlayerEncounter);

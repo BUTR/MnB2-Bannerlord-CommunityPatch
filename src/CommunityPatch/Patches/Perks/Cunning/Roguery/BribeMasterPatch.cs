@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class BribeMasterPatch : PatchBase<BribeMasterPatch> {
+  public sealed class BribeMasterPatch : PerkPatchBase<BribeMasterPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -23,8 +23,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -35,11 +33,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "wb1nbOiq");
+public BribeMasterPatch() : base("wb1nbOiq") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -57,7 +54,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref int __result) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!Hero.MainHero.GetPerkValue(perk)) return;
 
       __result = (int) (__result * System.Math.Abs(perk.PrimaryBonus));

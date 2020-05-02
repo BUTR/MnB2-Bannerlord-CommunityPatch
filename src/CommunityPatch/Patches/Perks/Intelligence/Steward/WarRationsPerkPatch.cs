@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class WarRationsPatch : PatchBase<WarRationsPatch> {
+  public sealed class WarRationsPatch : PerkPatchBase<WarRationsPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -28,8 +28,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       set => CommunityPatchSubModule.Options.Set(nameof(QuartermasterIsClanWide), value);
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -40,8 +38,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "sLv7MMJf");
+public WarRationsPatch() : base("sLv7MMJf") {}
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -78,7 +75,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       )
         return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!qm.GetPerkValue(perk))
         return;
 

@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  public sealed class TramplerPatch : PatchBase<TramplerPatch> {
+  public sealed class TramplerPatch : PerkPatchBase<TramplerPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -50,8 +50,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       },
     };
 
-    public override void Reset() {
-    }
+public TramplerPatch() : base("GKlmIYik") {}
 
     public override bool? IsApplicable(Game game)
       => TargetMethodInfo != null
@@ -124,19 +123,19 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     private static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk)
       => (character as CharacterObject)?.GetPerkValue(perk) ?? false;
 
-    private static int TramplerDamageModifier(int baseDamage) {
-      var tramplerDamage = baseDamage * (1f + DefaultPerks.Riding.Trampler.PrimaryBonus);
+    private int TramplerDamageModifier(int baseDamage) {
+      var tramplerDamage = baseDamage * (1f + Perk.PrimaryBonus);
       return (int) Math.Round(tramplerDamage, MidpointRounding.AwayFromZero);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(BasicCharacterObject attackerAgentCharacter, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
-      if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(attackerAgentCharacter, DefaultPerks.Riding.Trampler))) {
+      if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(attackerAgentCharacter, ActivePatch.Perk))) {
         return;
       }
 
-      combatLog.InflictedDamage = TramplerDamageModifier(combatLog.InflictedDamage);
-      attackCollisionData.InflictedDamage = TramplerDamageModifier(attackCollisionData.InflictedDamage);
+      combatLog.InflictedDamage = ActivePatch.TramplerDamageModifier(combatLog.InflictedDamage);
+      attackCollisionData.InflictedDamage = ActivePatch.TramplerDamageModifier(attackCollisionData.InflictedDamage);
     }
 
   }

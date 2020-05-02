@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 
-namespace CommunityPatch.Patches.Perks.Intelligence.Engineering.Stubs {
+namespace CommunityPatch {
 
   public static class SiegeEngineConstructionExtraDataManager {
 

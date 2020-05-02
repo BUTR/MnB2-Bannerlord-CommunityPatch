@@ -18,13 +18,6 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(BowMountedArcherPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
-    private static PerkObject _mountedArcher;
-
-    public override void Reset() {
-      _mountedArcher = PerkObject.FindFirst(perk => perk.Name.GetID() == "eU0uANvZ");
-      base.Reset();
-    }
-
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -43,7 +36,7 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
       // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
       if (weapon.ItemUsage == "long_bow")
         WeaponComponentDataItemUsageMethod
-          .Invoke(weapon, new object[] {HeroHasPerk(character, _mountedArcher) ? "bow" : weapon.ItemUsage});
+          .Invoke(weapon, new object[] {HeroHasPerk(character, ActivePatch.Perk) ? "bow" : weapon.ItemUsage});
     }
 
     protected override bool AppliesToVersion(Game game)
@@ -67,13 +60,16 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
       for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
         if (weapon.ItemUsageIndex != MBItem.GetItemUsageIndex("long_bow")
-          || !HeroHasPerk(__instance.Character, _mountedArcher))
+          || !HeroHasPerk(__instance.Character, ActivePatch.Perk))
           continue;
 
         var updatedWeapon = weapon;
         updatedWeapon.ItemUsageIndex = MBItem.GetItemUsageIndex("bow");
         weaponStatsData[i] = updatedWeapon;
       }
+    }
+
+    public BowMountedArcherPatch() : base("eU0uANvZ") {
     }
 
   }

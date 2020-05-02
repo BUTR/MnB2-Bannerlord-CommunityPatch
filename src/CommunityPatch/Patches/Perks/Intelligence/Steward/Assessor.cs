@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class AssessorPatch : PatchBase<AssessorPatch> {
+  public sealed class AssessorPatch : PerkPatchBase<AssessorPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,8 +25,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -37,8 +35,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "xIL6vOgI");
+public AssessorPatch() : base("xIL6vOgI") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -52,7 +49,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     public override void Apply(Game game) {
-      _perk.Modify(0.1f, SkillEffect.EffectIncrementType.AddFactor);
+      Perk.Modify(0.1f, SkillEffect.EffectIncrementType.AddFactor);
 
       if (Applied) return;
 
@@ -64,7 +61,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(ref int __result, Town town, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(town?.Governor?.GetPerkValue(perk) ?? false))
         return;
 

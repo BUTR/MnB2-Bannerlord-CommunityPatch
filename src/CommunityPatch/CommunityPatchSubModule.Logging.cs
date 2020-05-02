@@ -59,6 +59,7 @@ namespace CommunityPatch {
       if (!msg.EndsWith("\n"))
         msg += Eol;
       Debugger.Log(3, nameof(CommunityPatch), msg);
+      Console.Error.WriteLine($"{nameof(CommunityPatch)}: ERROR: {msg}");
     }
 
     [PublicAPI]
@@ -68,8 +69,10 @@ namespace CommunityPatch {
 
     [PublicAPI]
     [Conditional("DEBUG")]
-    public static void Print(string msg)
-      => Debugger.Log(0, nameof(CommunityPatch), msg + Eol);
+    public static void Print(string msg) {
+      Debugger.Log(0, nameof(CommunityPatch), msg + Eol);
+      Console.Error.WriteLine($"{nameof(CommunityPatch)}: DEBUG: {msg}");
+    }
 
     internal static readonly LinkedList<Exception> RecordedFirstChanceExceptions
       = new LinkedList<Exception>();

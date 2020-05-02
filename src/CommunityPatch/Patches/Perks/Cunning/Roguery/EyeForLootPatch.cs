@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class EyeForLoot : PatchBase<EyeForLoot> {
+  public sealed class EyeForLoot : PerkPatchBase<EyeForLoot> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,16 +24,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = RaidingHelper.Hashes;
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "bRGnkt9B");
+public EyeForLoot() : base("bRGnkt9B") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus.IsDifferentFrom(.05f)) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus.IsDifferentFrom(.05f)) return false;
       if (TargetMethodInfo == null) return false;
       if (RaidingHelper.NextSettlementDamage == null) return false;
       if (RaidingHelper.IsFinishCalled == null) return false;
@@ -46,7 +43,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(5f);
+      Perk.SetPrimaryBonus(5f);
 
       if (Applied) return;
 
@@ -63,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     private static void ApplyPerkExtraRewardBonusToRaidHit(MapEvent __instance, float hitDamage) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var partyMemberHitDamage = new ExplainedNumber(hitDamage);
 
       foreach (var party in __instance.AttackerSide.Parties.Where(x => x.MobileParty != null))

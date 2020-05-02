@@ -522,13 +522,17 @@ namespace Antijank {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static IEnumerable<CodeInstruction> InitializeSubModulesTranspiler(IEnumerable<CodeInstruction> instr) {
       foreach (var il in instr) {
-        if (il.operand as MethodInfo == MbSubModuleBaseOnSubModuleLoadMethod) {
-          il.operand = OnSubModuleLoadInterceptorMethod;
+        var method = il.operand as MethodInfo;
+        if (il.opcode != OpCodes.Call)
+          continue;
+
+        if (method == ConstructorInfoInvokeMethod) {
           il.opcode = OpCodes.Call;
+          Console.WriteLine("Hooked SubModule constructor invocation.");
         }
-        else if (il.operand as MethodInfo == ConstructorInfoInvokeMethod) {
-          il.operand = SubModuleCtorInterceptorMethod;
-          il.opcode = OpCodes.Call;
+        else if (method == MbSubModuleBaseOnSubModuleLoadMethod) {
+          il.operand = OnSubModuleLoadInterceptorMethod;
+          Console.WriteLine("Hooked OnSubModuleLoad event.");
         }
 
         yield return il;

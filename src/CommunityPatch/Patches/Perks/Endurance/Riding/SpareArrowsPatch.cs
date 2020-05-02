@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
@@ -12,6 +13,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(SpareArrowsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
+    public SpareArrowsPatch() : base("Bj6la71T") {}
+
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -22,7 +25,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     static bool CanApplyPerk(Hero hero, WeaponComponentData weaponComponentData) =>
       WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
-      hero.GetPerkValue(DefaultPerks.Riding.SpareArrows);
+      hero.GetPerkValue(ActivePatch.Perk);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) {

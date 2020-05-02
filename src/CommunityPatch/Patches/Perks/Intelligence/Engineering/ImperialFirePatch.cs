@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public class ImperialFirePatch : PatchBase<ImperialFirePatch> {
+  public class ImperialFirePatch : PerkPatchBase<ImperialFirePatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -31,8 +31,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return AttackerTargetMethodInfo;
       yield return DefenderTargetMethodInfo;
     }
-
-    private PerkObject _perk;
 
     private static readonly byte[][] AttackerHashes = {
       new byte[] {
@@ -54,14 +52,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "UaZSa5mY");
+public ImperialFirePatch() : base("UaZSa5mY") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var attackerPatchInfo = Harmony.GetPatchInfo(AttackerTargetMethodInfo);
       if (AlreadyPatchedByOthers(attackerPatchInfo)) return false;
@@ -75,7 +72,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      _perk.Modify(1f, SkillEffect.EffectIncrementType.Add);
+      Perk.Modify(1f, SkillEffect.EffectIncrementType.Add);
 
       if (Applied) return;
 
@@ -94,7 +91,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     private static bool AnyPartyMemberHasThePerkActive(MobileParty party) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var partyMemberValue = new ExplainedNumber(0f);
       PerkHelper.AddPerkBonusForParty(perk, party, ref partyMemberValue);
 

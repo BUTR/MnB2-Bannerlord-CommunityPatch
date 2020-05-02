@@ -8,7 +8,7 @@ using static System.Reflection.BindingFlags;
 namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
   public class PhalanxPatch : SimulateHitPatch<PhalanxPatch> {
-    protected override string PerkId => "5vs3qlQ8";
+    public PhalanxPatch() : base("5vs3qlQ8") {}
 
     private static readonly MethodInfo PatchMethodInfo = typeof(PhalanxPatch).GetMethod(nameof(Postfix), Public | Static | DeclaredOnly);
 

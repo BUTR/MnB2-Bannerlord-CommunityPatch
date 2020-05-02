@@ -80,6 +80,24 @@
         <Compile Update="Patches\GroupMainMenuOptionsPatch.cs">
           <WouldDependOn>MenuCleanerPatch</WouldDependOn>
         </Compile>
+        <Compile Update="LootCollectorHelper.cs">
+          <WouldDependOn>LootCollectorHelper</WouldDependOn>
+        </Compile>
+        <Compile Update="RaidingHelper.cs">
+          <WouldDependOn>RaidingHelper</WouldDependOn>
+        </Compile>
+        <Compile Update="Patches\SimulateHitPatch.cs">
+          <WouldDependOn>SimulateHitPatch</WouldDependOn>
+        </Compile>
+        <Compile Update="SiegeEngineConstructionExtraDataManager.cs">
+          <WouldDependOn>SiegeEngineConstructionExtraDataManager</WouldDependOn>
+        </Compile>
+        <Compile Update="SiegeTooltipHelper.cs">
+          <WouldDependOn>SiegeTooltipHelper</WouldDependOn>
+        </Compile>
+        <Compile Update="PlayerEncounterHelper.cs">
+          <WouldDependOn>PlayerEncounterHelper</WouldDependOn>
+        </Compile>
     </ItemGroup>
 
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">

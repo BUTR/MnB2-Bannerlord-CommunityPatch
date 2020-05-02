@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public class ScavengerPatch : PatchBase<ScavengerPatch> {
+  public class ScavengerPatch : PerkPatchBase<ScavengerPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,8 +25,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -37,11 +35,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "cYjeJTb8");
+public ScavengerPatch() : base("cYjeJTb8") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -51,7 +48,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(25f);
+      Perk.SetPrimaryBonus(25f);
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, new HarmonyMethod(PatchMethodInfoPrefix));
@@ -72,7 +69,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var explainedNumber = new ExplainedNumber(1f);
 
       if (winnerParty.MobileParty != null)
-        PerkHelper.AddPerkBonusForParty(ActivePatch._perk, winnerParty.MobileParty, ref explainedNumber);
+        PerkHelper.AddPerkBonusForParty(ActivePatch.Perk, winnerParty.MobileParty, ref explainedNumber);
 
       return explainedNumber.ResultNumber - explainedNumber.BaseNumber;
     }

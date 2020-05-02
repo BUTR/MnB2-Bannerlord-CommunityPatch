@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class TaxCollectorPatch : PatchBase<TaxCollectorPatch> {
+  public sealed class TaxCollectorPatch : PerkPatchBase<TaxCollectorPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,8 +24,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -36,8 +34,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "UbxBYp60");
+public TaxCollectorPatch() : base("UbxBYp60") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -62,7 +59,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(ref int __result, Town town, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(town?.Governor?.GetPerkValue(perk) ?? false))
         return;
 

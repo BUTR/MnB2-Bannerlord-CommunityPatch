@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class EnhancedMinesPatch : PatchBase<EnhancedMinesPatch> {
+  public sealed class EnhancedMinesPatch : PerkPatchBase<EnhancedMinesPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,8 +24,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -36,13 +34,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "6oE7rB6q");
+public EnhancedMinesPatch() : base("6oE7rB6q") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null)
+      if (Perk == null)
         return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -54,7 +51,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     public override void Apply(Game game) {
-      _perk.Modify(0.5f, SkillEffect.EffectIncrementType.AddFactor);
+      Perk.Modify(0.5f, SkillEffect.EffectIncrementType.AddFactor);
 
       if (Applied) return;
 
@@ -65,7 +62,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     // ReSharper disable once t
     public static void Postfix(ref int __result, Village village, int marketIncome) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))
         return;
 

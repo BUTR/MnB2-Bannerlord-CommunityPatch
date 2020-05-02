@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using CommunityPatch.Patches.Perks.Intelligence.Engineering.Stubs;
 using HarmonyLib;
 using Helpers;
 using TaleWorlds.CampaignSystem;
@@ -16,7 +15,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public class GoodMaterialsPatch : PatchBase<GoodMaterialsPatch> {
+  public class GoodMaterialsPatch : PerkPatchBase<GoodMaterialsPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -50,12 +49,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return MaxHitPointsTargetMethodInfo;
     }
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "EJCrymMr");
+public GoodMaterialsPatch() : base("EJCrymMr") {}
 
-    private PerkObject _perk = null!;
-
-    private static readonly byte[][] AiHashes = {
+private static readonly byte[][] AiHashes = {
       new byte[] {
         // e1.1.0.225190
         0x27, 0x47, 0x64, 0x00, 0xA1, 0x01, 0x5C, 0x6B,
@@ -89,8 +85,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
       if (PlayerTargetMethodInfo == null) return false;
       if (MaxHitPointsTargetMethodInfo == null) return false;
       if (TooltipTargetMethodInfo == null) return false;
@@ -119,7 +115,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(20f);
+      Perk.SetPrimaryBonus(20f);
 
       if (Applied) return;
 
@@ -178,7 +174,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       if (siegeEventSide == null || engineInProgress == null) return;
 
       CalculateBonusFlatHpAndRateFromPerk(engineInProgress, siegeEventSide, out var bonusFlatHp, out var bonusHpRate);
-      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch._perk, bonusHpRate);
+      SiegeTooltipHelper.AddPerkTooltip(__result, ActivePatch.Perk, bonusHpRate);
       SiegeTooltipHelper.UpdateMaxHpTooltip(__result, bonusFlatHp);
     }
 
@@ -210,7 +206,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     private static void CalculateBonusFlatHpAndRateFromPerk(SiegeEvent.SiegeEngineConstructionProgress justDeployedEngine,
       ISiegeEventSide sideSiegeEvent, out float bonusFlatHp, out float bonusHpRate) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var partyMemberHealth = new ExplainedNumber(justDeployedEngine.SiegeEngine.MaxHitPoints);
       var partyMemberRate = new ExplainedNumber(100);
 

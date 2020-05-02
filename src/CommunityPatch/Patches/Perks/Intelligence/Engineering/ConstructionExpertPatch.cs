@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class ConstructionExpertPatch : PatchBase<ConstructionExpertPatch> {
+  public sealed class ConstructionExpertPatch : PerkPatchBase<ConstructionExpertPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -26,8 +26,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
       yield return WithoutBoostTargetMethodInfo;
     }
-
-    private PerkObject _perk;
 
     private static readonly byte[][] Hashes = {
       new byte[] {
@@ -49,14 +47,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "KBcNYbIC");
+public ConstructionExpertPatch() : base("KBcNYbIC") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -81,7 +78,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       => TryToApplyConstructionExpert(ref __result, town, explanation);
 
     private static void TryToApplyConstructionExpert(ref int productionPower, Town town, StatExplainer explanation = null) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       if (town.BuildingsInProgress.IsEmpty()) return;
 
@@ -99,7 +96,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       => HasGovernorWithConstructionExpert(town) && IsWallOrFortificationBuilding(building);
 
     private static bool HasGovernorWithConstructionExpert(Town town)
-      => town.Governor?.GetPerkValue(ActivePatch._perk) == true;
+      => town.Governor?.GetPerkValue(ActivePatch.Perk) == true;
 
     private static bool IsWallOrFortificationBuilding(Building building)
       => building.BuildingType == DefaultBuildingTypes.Wall || building.BuildingType == DefaultBuildingTypes.Fortifications;

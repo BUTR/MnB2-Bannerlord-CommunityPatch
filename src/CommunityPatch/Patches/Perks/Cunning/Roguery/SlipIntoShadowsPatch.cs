@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class SlipIntoShadowsPatch : PatchBase<SlipIntoShadowsPatch> {
+  public sealed class SlipIntoShadowsPatch : PerkPatchBase<SlipIntoShadowsPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -23,8 +23,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -35,11 +33,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "Eth2Z6qK");
+public SlipIntoShadowsPatch() : base("Eth2Z6qK") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
       if (TargetMethodInfo == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -58,7 +55,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref float __result) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var scout = Hero.MainHero.PartyBelongedTo.EffectiveScout;
       if (scout?.GetPerkValue(perk) != true) return;
 

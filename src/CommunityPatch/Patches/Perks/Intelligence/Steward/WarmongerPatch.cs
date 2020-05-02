@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class WarmongerPatch : PatchBase<WarmongerPatch> {
+  public sealed class WarmongerPatch : PerkPatchBase<WarmongerPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -23,8 +23,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -35,8 +33,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "ldk9Xvod");
+public WarmongerPatch() : base("ldk9Xvod") {}
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -58,7 +55,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(ref int __result, MobileParty armyLeaderParty) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(armyLeaderParty.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 

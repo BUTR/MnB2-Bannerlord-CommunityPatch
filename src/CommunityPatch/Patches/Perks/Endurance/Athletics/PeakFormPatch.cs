@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
-  public sealed class PeakFormPatch : PatchBase<PeakFormPatch> {
+  public sealed class PeakFormPatch : PerkPatchBase<PeakFormPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,8 +25,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -37,13 +35,12 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "fBgGbxaw");
+public PeakFormPatch() : base("fBgGbxaw") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null)
+      if (Perk == null)
         return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -54,14 +51,14 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       if (!hash.MatchesAnySha256(Hashes))
         return false;
 
-      if (_perk.PrimaryBonus != 0f)
+      if (Perk.PrimaryBonus != 0f)
         return null;
 
       return true;
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(10f);
+      Perk.SetPrimaryBonus(10f);
 
       if (Applied) return;
 
@@ -78,7 +75,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
       var explainedNumber = new ExplainedNumber(result, explanation);
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       PerkHelper.AddPerkBonusForCharacter(perk, character, ref explainedNumber);
 

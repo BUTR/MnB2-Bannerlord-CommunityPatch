@@ -32,7 +32,7 @@ internal static class Program {
     CommunityPatchLoader.GenerateHashes();
   }
 
-  private static Assembly? AssemblyResolver(object sender, ResolveEventArgs eventArgs) {
+  private static Assembly? AssemblyResolver(object? sender, ResolveEventArgs eventArgs) {
     var name = eventArgs.Name;
     //Console.WriteLine("Assembly Requested: " + name);
 

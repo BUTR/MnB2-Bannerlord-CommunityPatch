@@ -5,7 +5,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using static System.Reflection.BindingFlags;
 
-namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
+namespace CommunityPatch {
 
   public static class LootCollectorHelper {
 

@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class BuilderPatch : PatchBase<BuilderPatch> {
+  public sealed class BuilderPatch : PerkPatchBase<BuilderPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -27,8 +27,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
       yield return WithoutBoostTargetMethodInfo;
     }
-
-    private PerkObject _perk;
 
     private static readonly byte[][] Hashes = {
       new byte[] {
@@ -50,13 +48,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "dsNV3sgp");
+public BuilderPatch() : base("dsNV3sgp") {}
 
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -67,7 +64,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(.5f);
+      Perk.SetPrimaryBonus(.5f);
 
       if (Applied) return;
 
@@ -85,7 +82,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     private static void TryToApplyBuilderPerk(ref int productionPower, Town town, StatExplainer explanation = null) {
       if (!HasGovernorWithBuilderPerk(town)) return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var productionPowerBonus = new ExplainedNumber(productionPower, explanation);
       productionPowerBonus.AddFactor(perk.PrimaryBonus, perk.Name);
 
@@ -93,7 +90,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     private static bool HasGovernorWithBuilderPerk(Town town)
-      => town.Governor?.GetPerkValue(ActivePatch._perk) == true;
+      => town.Governor?.GetPerkValue(ActivePatch.Perk) == true;
 
   }
 

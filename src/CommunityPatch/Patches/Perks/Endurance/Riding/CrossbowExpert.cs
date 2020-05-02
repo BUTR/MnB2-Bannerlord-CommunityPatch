@@ -18,12 +18,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowExpert).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
-    private static PerkObject _crossbowExpert;
-
-    public override void Reset() {
-      _crossbowExpert = PerkObject.FindFirst(perk => perk.Name.GetID() == "T4fREm7U");
-      base.Reset();
-    }
+    public CrossbowExpert() : base("T4fREm7U") {}
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -41,7 +36,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
       if (weapon.WeaponClass == WeaponClass.Crossbow) // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
-        weapon.WeaponFlags = HeroHasPerk(character, _crossbowExpert) ? weapon.WeaponFlags & ~WeaponFlags.CantReloadOnHorseback : weapon.WeaponFlags;
+        weapon.WeaponFlags = HeroHasPerk(character, ActivePatch.Perk) ? weapon.WeaponFlags & ~WeaponFlags.CantReloadOnHorseback : weapon.WeaponFlags;
     }
 
     protected override bool AppliesToVersion(Game game)
@@ -65,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
         if (weapon.WeaponClass != (int) WeaponClass.Crossbow
-          || !HeroHasPerk(__instance.Character, _crossbowExpert))
+          || !HeroHasPerk(__instance.Character, ActivePatch.Perk))
           continue;
 
         var updatedWeapon = weapon;

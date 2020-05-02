@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class SlaveTraderPatch : PatchBase<SlaveTraderPatch> {
+  public sealed class SlaveTraderPatch : PerkPatchBase<SlaveTraderPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -22,8 +22,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -34,11 +32,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "jNbTBxEW");
+public SlaveTraderPatch() : base("jNbTBxEW") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -48,7 +45,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(.20f);
+      Perk.SetPrimaryBonus(.20f);
 
       if (Applied) return;
 
@@ -60,7 +57,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     public static void Postfix(ref int __result, Hero sellerHero = null) {
       if (sellerHero == null) return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!sellerHero.GetPerkValue(perk)) return;
 
       __result += (int) (__result * perk.PrimaryBonus);

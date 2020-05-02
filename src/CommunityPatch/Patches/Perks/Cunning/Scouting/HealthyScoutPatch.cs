@@ -14,7 +14,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
 
-  public sealed class HealthyScoutPatch : PatchBase<HealthyScoutPatch> {
+  public sealed class HealthyScoutPatch : PerkPatchBase<HealthyScoutPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -27,8 +27,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -39,8 +37,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "dDKOoD3e");
+public HealthyScoutPatch() : base("dDKOoD3e") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -54,8 +51,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
         return false;
 
       try {
-        if (!(_perk.PrimaryRole == SkillEffect.PerkRole.PartyMember
-          && _perk.PrimaryBonus == 0.15f))
+        if (!(Perk.PrimaryRole == SkillEffect.PerkRole.PartyMember
+          && Perk.PrimaryBonus == 0.15f))
           return null;
       }
       catch (Exception) {
@@ -66,7 +63,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimary(SkillEffect.PerkRole.Personal, 8f);
+      Perk.SetPrimary(SkillEffect.PerkRole.Personal, 8f);
 
       if (Applied) return;
 
@@ -83,7 +80,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
 
       var explainedNumber = new ExplainedNumber(result, explanation);
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       PerkHelper.AddPerkBonusForCharacter(perk, character, ref explainedNumber);
 

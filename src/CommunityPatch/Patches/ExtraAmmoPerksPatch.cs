@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  public abstract class ExtraAmmoPerksPatch<TPatch> : PatchBase<TPatch> where TPatch : ExtraAmmoPerksPatch<TPatch> {
+  public abstract class ExtraAmmoPerksPatch<TPatch> : PerkPatchBase<TPatch> where TPatch : ExtraAmmoPerksPatch<TPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -32,9 +32,6 @@ namespace CommunityPatch.Patches {
 
     private static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
       .GetField("_weaponSlots", NonPublic | Instance);
-
-    public override void Reset() {
-    }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -83,6 +80,9 @@ namespace CommunityPatch.Patches {
         MaxAmmoField.SetValue(boxed, newMaxAmmo);
         missionWeapons[i] = (MissionWeapon) boxed;
       }
+    }
+
+    protected ExtraAmmoPerksPatch(string perkId) : base(perkId) {
     }
 
   }

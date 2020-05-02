@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class ReconstructionPatch : PatchBase<ReconstructionPatch> {
+  public sealed class ReconstructionPatch : PerkPatchBase<ReconstructionPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -23,8 +23,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.0.10
@@ -35,11 +33,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "Fa01e9kY");
+public ReconstructionPatch() : base("Fa01e9kY") {}
 
     public override void Apply(Game game) {
-      _perk.Modify(2.0f, SkillEffect.EffectIncrementType.AddFactor);
+      Perk.Modify(2.0f, SkillEffect.EffectIncrementType.AddFactor);
 
       if (Applied) return;
 
@@ -60,7 +57,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Prefix(Settlement settlement, ref float percentage) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var governor = settlement.Town?.Governor;
       if (governor == null || !governor.GetPerkValue(perk))
         return;

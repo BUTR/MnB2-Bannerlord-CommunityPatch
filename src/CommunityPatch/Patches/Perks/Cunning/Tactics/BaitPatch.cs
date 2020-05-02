@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
-  public class BaitPatch : PatchBase<BaitPatch> {
+  public class BaitPatch : PerkPatchBase<BaitPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,15 +25,12 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = PlayerEncounterHelper.TargetHashes;
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "6MBoNlxj");
+public BaitPatch() : base("6MBoNlxj") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -43,7 +40,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
     }
 
     public override void Apply(Game game) {
-      _perk.Modify(30f, SkillEffect.EffectIncrementType.AddFactor);
+      Perk.Modify(30f, SkillEffect.EffectIncrementType.AddFactor);
 
       if (Applied) return;
 
@@ -106,7 +103,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       var finalRadius = new ExplainedNumber(baseRadius);
 
       if (party.MobileParty != null)
-        PerkHelper.AddPerkBonusForParty(ActivePatch._perk, party.MobileParty, ref finalRadius);
+        PerkHelper.AddPerkBonusForParty(ActivePatch.Perk, party.MobileParty, ref finalRadius);
 
       return finalRadius.ResultNumber;
     }

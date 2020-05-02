@@ -1,8 +1,16 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Localization;
 
 namespace CommunityPatch {
+
+  internal static class PerkObjectHelpers {
+
+    public static PerkObject Load(string id)
+      => PerkObject.FindFirst(x => x.Name.GetID() == id);
+
+  }
 
   internal static class PerkObjectExtensions {
 

@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
-  public sealed class CompanionCavalryPatch : PatchBase<CompanionCavalryPatch> {
+  public sealed class CompanionCavalryPatch : PerkPatchBase<CompanionCavalryPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,8 +24,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -36,11 +34,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "UqzavawD");
+public CompanionCavalryPatch() : base("UqzavawD") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -50,7 +47,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
     }
 
     public override void Apply(Game game) {
-      _perk.Modify(.10f, SkillEffect.EffectIncrementType.AddFactor);
+      Perk.Modify(.10f, SkillEffect.EffectIncrementType.AddFactor);
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
@@ -64,14 +61,14 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       var affectorLeaderCharacter = (CharacterObject) affectorAgent?.Team?.Leader?.Character;
 
       if (affectorCharacter == null) return;
-      if (affectorLeaderCharacter?.GetPerkValue(ActivePatch._perk) != true) return;
+      if (affectorLeaderCharacter?.GetPerkValue(ActivePatch.Perk) != true) return;
       if (!affectorAgent.HasMount) return;
       if (affectedAgent.Character == null) return;
       if (affectedAgent.Team == null) return;
       if (agentState != AgentState.Killed && agentState != AgentState.Unconscious) return;
 
       var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled(affectedAgent);
-      var moralChangeFriend = moralChangesTuple.Item1 * ActivePatch._perk.PrimaryBonus;
+      var moralChangeFriend = moralChangesTuple.Item1 * ActivePatch.Perk.PrimaryBonus;
 
       __instance.ApplyAoeMoraleEffect(
         affectedAgent.GetWorldPosition(),

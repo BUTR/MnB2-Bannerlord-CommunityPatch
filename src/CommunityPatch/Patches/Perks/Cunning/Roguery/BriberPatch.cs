@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class BriberPatch : PatchBase<BriberPatch> {
+  public sealed class BriberPatch : PerkPatchBase<BriberPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -39,8 +39,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return CaravansBribeTargetMethodInfo;
       yield return CaravansSurrenderTargetMethodInfo;
     }
-
-    private PerkObject _perk;
 
     private static readonly byte[][] VillagerBribeHashes = {
       new byte[] {
@@ -82,11 +80,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "5Trq1mQL");
+public BriberPatch() : base("5Trq1mQL") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var villagerBribePatchInfo = Harmony.GetPatchInfo(VillagerBribeTargetMethodInfo);
       if (AlreadyPatchedByOthers(villagerBribePatchInfo)) return false;
@@ -111,7 +108,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(15f);
+      Perk.SetPrimaryBonus(15f);
 
       if (Applied) return;
 
@@ -153,7 +150,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     private static bool Bribe(int randomIndex, float phaseOneAcceptablePowerRatio, float phaseTwoAcceptablePowerRatio) {
       var isLogicalSurrender = PartyBaseHelper.DoesSurrenderIsLogicalForParty(MobileParty.ConversationParty, MobileParty.MainParty, phaseOneAcceptablePowerRatio);
       var bribeSuccessChances = isLogicalSurrender ? 67 : 33;
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       if (MobileParty.MainParty.LeaderHero?.GetPerkValue(perk) == true)
         bribeSuccessChances += (int) perk.PrimaryBonus;

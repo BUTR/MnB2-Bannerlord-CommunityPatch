@@ -3,7 +3,7 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using static System.Reflection.BindingFlags;
 
-namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
+namespace CommunityPatch {
 
   public static class RaidingHelper {
 

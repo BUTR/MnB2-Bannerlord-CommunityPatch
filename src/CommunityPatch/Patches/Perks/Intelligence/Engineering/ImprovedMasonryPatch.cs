@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public class ImprovedMasonryPatch : PatchBase<ImprovedMasonryPatch> {
+  public class ImprovedMasonryPatch : PerkPatchBase<ImprovedMasonryPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,8 +25,6 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -37,14 +35,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "R60kenU3");
+public ImprovedMasonryPatch() : base("R60kenU3") {}
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -54,7 +51,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(30f);
+      Perk.SetPrimaryBonus(30f);
 
       if (Applied) return;
 
@@ -65,7 +62,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref float __result, Town town, StatExplainer explanation = null) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var totalHP = new ExplainedNumber(__result, explanation);
 
       PerkHelper.AddPerkBonusForTown(perk, town, ref totalHP);

@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  public sealed class ConroiPatch : PatchBase<ConroiPatch> {
+  public sealed class ConroiPatch : PerkPatchBase<ConroiPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -22,8 +22,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
-
-    private PerkObject _perk;
 
     private static readonly byte[][] Hashes = {
       new byte[] {
@@ -42,8 +40,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "k15fVuc4");
+    public ConroiPatch() : base("k15fVuc4") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -67,7 +65,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     // ReSharper disable once InconsistentNaming
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       var extra = perk.PrimaryBonus * (party?.MemberRoster
         .Count(x

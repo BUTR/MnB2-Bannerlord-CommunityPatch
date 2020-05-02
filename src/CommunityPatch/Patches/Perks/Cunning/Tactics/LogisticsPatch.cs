@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
@@ -12,6 +13,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(LogisticsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
+    public LogisticsPatch() : base("Ilh6hVTu") {}
+
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -21,11 +24,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Agent __instance) {
-      if (MyLeaderIsIntoLogistics(__instance))
-        ApplyPerkToAgent(__instance, CanApplyPerk, CalculateAmmoIncrease);
+      if (ActivePatch.MyLeaderIsIntoLogistics(__instance))
+        ApplyPerkToAgent(__instance, CanApplyPerk, ActivePatch.CalculateAmmoIncrease);
     }
 
-    private static bool MyLeaderIsIntoLogistics(Agent agent) {
+    private bool MyLeaderIsIntoLogistics(Agent agent) {
       var leader = (
         (agent.Origin as PartyGroupAgentOrigin)?.Party
         ?? (agent.Origin as SimpleAgentOrigin)?.Party
@@ -34,7 +37,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       if (leader == null || leader == agent.Character)
         return false;
 
-      return leader.GetPerkValue(DefaultPerks.Tactics.Logistics);
+      return leader.GetPerkValue(Perk);
     }
 
     private static bool CanApplyPerk(Agent agent, WeaponComponentData weaponComponentData) {
@@ -45,8 +48,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         weaponClass == ItemObject.ItemTypeEnum.Thrown;
     }
 
-    private static int CalculateAmmoIncrease(short maxAmmo)
-      => (int) (maxAmmo * DefaultPerks.Tactics.Logistics.PrimaryBonus);
+    private int CalculateAmmoIncrease(short maxAmmo)
+      => (int) (maxAmmo * Perk.PrimaryBonus);
 
   }
 

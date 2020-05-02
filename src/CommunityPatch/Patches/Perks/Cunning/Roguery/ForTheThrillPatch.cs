@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public class ForTheThrillPatch : PatchBase<ForTheThrillPatch> {
+  public class ForTheThrillPatch : PerkPatchBase<ForTheThrillPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,8 +24,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
     private static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
@@ -36,11 +34,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "WACam22Q");
+public ForTheThrillPatch() : base("WACam22Q") {}
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -50,7 +47,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     public override void Apply(Game game) {
-      _perk.SetPrimaryBonus(10f);
+      Perk.SetPrimaryBonus(10f);
 
       if (Applied) return;
 
@@ -70,7 +67,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     private static float CalculateMoralGain(IEnumerable<PartyBase> attackers) {
       var moraleGain = new ExplainedNumber(4f);
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       foreach (var attacker in attackers)
         PerkHelper.AddPerkBonusForParty(perk, attacker.MobileParty, ref moraleGain);
