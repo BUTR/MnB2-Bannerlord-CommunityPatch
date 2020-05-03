@@ -98,6 +98,9 @@
         <Compile Update="PlayerEncounterHelper.cs">
           <WouldDependOn>PlayerEncounterHelper</WouldDependOn>
         </Compile>
+        <Compile Update="Patches\BrokenClanLeadersPatch.cs">
+          <WouldDependOn>MapFactionLogicLoopPatch</WouldDependOn>
+        </Compile>
     </ItemGroup>
 
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">

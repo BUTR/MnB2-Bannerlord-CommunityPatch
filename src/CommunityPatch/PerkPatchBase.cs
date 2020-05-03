@@ -21,7 +21,7 @@ namespace CommunityPatch {
 
     [PublicAPI]
     public PerkObject Perk
-      => _perk ?? PerkObjectHelpers.Load(_perkId)
+      => (_perk ??= PerkObjectHelpers.Load(_perkId))
         ?? throw new KeyNotFoundException($"Can't find the {PerkName} ({_perkId}) perk.");
 
     public override void Reset()
