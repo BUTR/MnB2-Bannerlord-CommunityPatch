@@ -125,11 +125,11 @@ Bannerlord Mod.IO: https://bannerlord.mod.io/community-patch
 
 ## Building
 
-This repo should be placed under the Modules folder in your Bannerlord installation, and it will build out-of-the-box. Just open the \*.sln in Visual Studio and build normally.
+This repo should be placed in the folder `Modules\CommunityPatch` under your Bannerlord installation, and it will build out-of-the-box. Just open the \*.sln in an applicable IDE (JetBrains Rider, Visual Studio, etc) and build normally.
 
 The default location for Bannerlord is `C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord`.
 
-If your Bannerlord or local repo are in a different place, you can change the property MnB2BannerlordDir in Directory.Build.props to your bannerlord install. When editing the file be sure to use `&amp;` in place of an `&` if the path has one.
+If your Bannerlord or local repo are in a different place, you can change the property MnB2BannerlordDir in Directory.Build.props to your bannerlord install. When editing the file be sure to use `&amp;` in place of an `&` if the path has one. If you do move the repo, then installing the mod will require copying it to `Modules\CommunityPatch`. Take care that the folder name is correct else problems may occur.
 
 ## Credits
 ##### Contributors
