@@ -79,25 +79,35 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void SiegePostfix(ref int __result, MobileParty party)
-      => ApplyPerk(ref __result, party);
+    public static void SiegePostfix(ref int __result, MobileParty party) {
+      ref int troopSacrificeSize = ref __result;
+      if (troopSacrificeSize < 0) return;
+
+      var perk = ActivePatch._perk;
+      if (party.LeaderHero?.GetPerkValue(perk) != true) return;
+
+      troopSacrificeSize = (int) (troopSacrificeSize * perk.PrimaryBonus);
+    }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void SacrificePostfix(ref int __result, BattleSideEnum battleSide, MapEvent mapEvent) {
+      ref int troopSacrificeSize = ref __result;
+      if (troopSacrificeSize < 0) return;
+
       var side = battleSide == BattleSideEnum.Attacker ? mapEvent.AttackerSide : mapEvent.DefenderSide;
-      
-      foreach (var sideParty in side.Parties.Where(x => x.MobileParty != null))
-        ApplyPerk(ref __result, sideParty.MobileParty);
+      var perk = ActivePatch._perk;
+      int sideTotalMen = 0;
+      int menInElusiveParties = 0;
+      foreach (var sideParty in side.Parties) {
+        sideTotalMen += sideParty.NumberOfAllMembers;
+        if (sideParty.MobileParty?.LeaderHero?.GetPerkValue(perk) == true) {
+          menInElusiveParties += sideParty.NumberOfAllMembers;
+        }
+      }
+      float ratioMenInElusiveParties = (float) menInElusiveParties / (float) sideTotalMen;
+      troopSacrificeSize = (int) (troopSacrificeSize * ratioMenInElusiveParties * perk.PrimaryBonus);
     }
 
-    private static void ApplyPerk(ref int troopSacrificeSize, MobileParty party) {
-      if (troopSacrificeSize < 0) return;
-      
-      var perk = ActivePatch._perk;
-      if (party.LeaderHero?.GetPerkValue(perk) != true) return;
-      
-      troopSacrificeSize = (int)(troopSacrificeSize * perk.PrimaryBonus);
-    }
   }
 
 }
