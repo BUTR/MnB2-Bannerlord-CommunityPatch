@@ -108,8 +108,9 @@ namespace CommunityPatch.Patches {
       return true;
     }
 
-    public IEnumerable<MethodBase> GetMethodsChecked()
-      => FirstPhaseQuestRemainingTimeHiddenGetters;
+    public IEnumerable<MethodBase> GetMethodsChecked() {
+      yield break;
+    }
 
     private static int ExtractFirstPhaseTimeLimitInYears() {
       if (FirstPhaseTimeLimitInYearsField == null)
