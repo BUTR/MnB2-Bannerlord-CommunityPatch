@@ -15,6 +15,8 @@ namespace CommunityPatch.Patches.Feats {
 
     private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(BattanianForestAgilityPatch), nameof(Postfix));
 
+    private static readonly float MovingAtForestEffect = AccessTools.StaticFieldRefAccess<DefaultPartySpeedCalculatingModel, float>("MovingAtForestEffect");
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AgilityPatchShared.CalculateFinalSpeedMethodInfo;
     }
@@ -47,23 +49,23 @@ namespace CommunityPatch.Patches.Feats {
       ref float __result) {
       var faceTerrainType = Campaign.Current.MapSceneWrapper.GetFaceTerrainType(mobileParty.CurrentNavigationFace);
 
-      if (faceTerrainType == TerrainType.Forest &&
-        mobileParty.Leader != null &&
-        mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.BattanianForestAgility)) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
+      var feat = DefaultFeats.Cultural.BattanianForestAgility;
 
-        var movingAtForestEffectField = AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingAtForestEffect");
-        var movingAtForestEffect = (float) movingAtForestEffectField.GetValue(__instance);
+      if (faceTerrainType != TerrainType.Forest
+        || mobileParty.Leader == null
+        || !mobileParty.Leader.GetFeatValue(feat))
+        return;
 
-        var battanianAgilityBonus =
-          AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.BattanianForestAgility)
-          * Math.Abs(movingAtForestEffect)
-          * baseSpeed;
+      var explainedNumber = new ExplainedNumber(__result, explanation);
 
-        explainedNumber.Add(battanianAgilityBonus, DefaultFeats.Cultural.BattanianForestAgility.Name);
+      var battanianAgilityBonus =
+        AgilityPatchShared.GetEffectBonus(feat)
+        * Math.Abs(MovingAtForestEffect)
+        * baseSpeed;
 
-        __result = explainedNumber.ResultNumber;
-      }
+      explainedNumber.Add(battanianAgilityBonus, feat.Name);
+
+      __result = explainedNumber.ResultNumber;
     }
 
   }

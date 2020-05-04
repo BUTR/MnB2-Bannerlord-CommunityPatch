@@ -17,6 +17,10 @@ namespace CommunityPatch.Patches.Feats {
     private static readonly MethodInfo PatchMethodInfo =
       AccessTools.Method(typeof(SturgianSnowAgilityPatch), nameof(Postfix));
 
+    private static readonly TextObject SnowDescription = AccessTools.StaticFieldRefAccess<DefaultPartySpeedCalculatingModel, TextObject>("_snow");
+
+    private static readonly float MovingOnSnowEffect = (float) AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingOnSnowEffect").GetRawConstantValue();
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AgilityPatchShared.CalculateFinalSpeedMethodInfo;
     }
@@ -52,34 +56,31 @@ namespace CommunityPatch.Patches.Feats {
         Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, mobileParty.GetPosition());
 
       // SnowInfo.Density is between 0.0f and 1.0f
-      if (atmosphereModel.SnowInfo.Density > 0f) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
+      if (atmosphereModel.SnowInfo.Density < float.Epsilon)
+        return;
 
-        var movingOnSnowEffectField =
-          AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingOnSnowEffect");
-        var movingOnSnowEffect = (float) movingOnSnowEffectField.GetValue(__instance);
-        var snowDescriptionField = AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "_snow");
-        var snowDescription = (TextObject) snowDescriptionField.GetValue(__instance);
+      var explainedNumber = new ExplainedNumber(__result, explanation);
 
-        // if there is snow on the ground, apply the movement debuff as a factor of the density
-        var snowDensityDebuff =
-          movingOnSnowEffect
-          * atmosphereModel.SnowInfo.Density
-          * baseSpeed;
-        explainedNumber.Add(snowDensityDebuff, snowDescription);
+      // if there is snow on the ground, apply the movement debuff as a factor of the density
+      var snowDensityDebuff =
+        MovingOnSnowEffect
+        * atmosphereModel.SnowInfo.Density
+        * baseSpeed;
+      explainedNumber.Add(snowDensityDebuff, SnowDescription);
 
-        // Apply bonus to Sturgian party leaders
-        if (mobileParty.Leader != null &&
-          mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.SturgianSnowAgility)) {
-          var sturgianBonus =
-            AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.SturgianSnowAgility)
-            * Math.Abs(snowDensityDebuff);
+      // Apply bonus to Sturgian party leaders
+      var feat = DefaultFeats.Cultural.SturgianSnowAgility;
 
-          explainedNumber.Add(sturgianBonus, DefaultFeats.Cultural.SturgianSnowAgility.Name);
-        }
+      if (mobileParty.Leader != null &&
+        mobileParty.Leader.GetFeatValue(feat)) {
+        var sturgianBonus =
+          AgilityPatchShared.GetEffectBonus(feat)
+          * Math.Abs(snowDensityDebuff);
 
-        __result = explainedNumber.ResultNumber;
+        explainedNumber.Add(sturgianBonus, feat.Name);
       }
+
+      __result = explainedNumber.ResultNumber;
     }
 
   }

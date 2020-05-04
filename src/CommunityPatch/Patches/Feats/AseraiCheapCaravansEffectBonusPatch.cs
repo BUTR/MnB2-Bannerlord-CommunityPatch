@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
@@ -30,8 +31,8 @@ namespace CommunityPatch.Patches.Feats {
 
     public override bool? IsApplicable(Game game) {
       try {
-        if (TargetMethodInfo == null ||
-          !DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus.IsDifferentFrom(PatchedEffectBonusValue)) {
+        if (TargetMethodInfo == null
+          || !DefaultFeats.Cultural.AseraiCheapCaravans.EffectBonus.IsDifferentFrom(PatchedEffectBonusValue)) {
           return false;
         }
       }

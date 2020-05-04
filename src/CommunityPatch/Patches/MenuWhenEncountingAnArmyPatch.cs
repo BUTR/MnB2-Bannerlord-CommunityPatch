@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
-using Harmony = HarmonyLib.Harmony;
 
 namespace CommunityPatch.Patches {
 
@@ -53,6 +51,11 @@ namespace CommunityPatch.Patches {
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
+      if (EncounteredPartyField == null || MapEventStateField == null || StateHandledField == null || DefenderPartyField == null || MeetingDoneField == null) {
+        CommunityPatchSubModule.Error($"{nameof(MenuWhenEncounteringAnArmyPatch)}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
+        return false;
+      }
+
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
     }
@@ -67,23 +70,18 @@ namespace CommunityPatch.Patches {
 
     private static readonly FieldInfo MeetingDoneField = typeof(PlayerEncounter).GetField("_meetingDone", Instance | NonPublic);
 
-    
     private static bool Prefix(PlayerEncounter __instance) {
       if (!CommunityPatchSubModule.EnableMenuWhenEncouteringAnArmy)
         return true;
 
-      if (EncounteredPartyField == null || MapEventStateField == null || StateHandledField == null || DefenderPartyField == null || MeetingDoneField == null) {
-        CommunityPatchSubModule.Error($"{typeof(MenuWhenEncounteringAnArmyPatch).Name}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
-        return true;
-      }
-
       var attacker = (PartyBase) EncounteredPartyField.GetValue(__instance);
       if (attacker.IsSettlement)
-        foreach (var defender in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties) {
-          if (!defender.IsSettlement) {
-            attacker = defender;
-            break;
-          }
+        foreach (var defender in MobileParty.MainParty.MapEvent.DefenderSide.Parties) {
+          if (defender.IsSettlement)
+            continue;
+
+          attacker = defender;
+          break;
         }
 
       Campaign.Current.CurrentConversationContext = ConversationContext.PartyEncounter;
@@ -92,8 +90,13 @@ namespace CommunityPatch.Patches {
 
       var defenderParty = (PartyBase) DefenderPartyField.GetValue(__instance);
 
-      if (PlayerEncounter.PlayerIsAttacker && defenderParty.IsMobile && defenderParty.MobileParty.Army != null && defenderParty.MobileParty.Army.LeaderParty == defenderParty.MobileParty
-        && !defenderParty.MobileParty.Army.LeaderParty.AttachedParties.Contains(MobileParty.MainParty))
+      if (!PlayerEncounter.PlayerIsAttacker)
+        return false;
+
+      var defenderMobileParty = defenderParty.IsMobile ? defenderParty.MobileParty : null;
+      var defenderArmy = defenderMobileParty?.Army;
+      if (defenderArmy != null && defenderArmy.LeaderParty == defenderMobileParty
+        && !defenderArmy.LeaderParty.AttachedParties.Contains(MobileParty.MainParty))
         GameMenu.SwitchToMenu("army_encounter");
       else {
         MeetingDoneField.SetValue(__instance, true);

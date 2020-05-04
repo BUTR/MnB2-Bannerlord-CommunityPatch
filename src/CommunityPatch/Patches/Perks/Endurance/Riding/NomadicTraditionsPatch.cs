@@ -19,9 +19,15 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo CavalryRatioModifierMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetCavalryRatioModifier", NonPublic | Instance);
 
+    private static readonly Func<DefaultPartySpeedCalculatingModel, int, int, float> GetCavalryRatioModifier = CavalryRatioModifierMethodInfo.BuildInvoker<Func<DefaultPartySpeedCalculatingModel, int, int, float>>();
+
     private static readonly MethodInfo MountedFootmenRatioModifierMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("GetMountedFootmenRatioModifier", NonPublic | Instance);
 
+    private static readonly Func<DefaultPartySpeedCalculatingModel, int, int, float> GetMountedFootmenRatioModifier = MountedFootmenRatioModifierMethodInfo.BuildInvoker<Func<DefaultPartySpeedCalculatingModel, int, int, float>>();
+
     private static readonly MethodInfo BaseSpeedMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculateBaseSpeedForParty", Instance | NonPublic);
+
+    private static readonly Func<DefaultPartySpeedCalculatingModel, int, float> CalculateBaseSpeedForParty = MountedFootmenRatioModifierMethodInfo.BuildInvoker<Func<DefaultPartySpeedCalculatingModel, int, float>>();
 
     private static readonly MethodInfo PatchMethodInfo = typeof(NomadicTraditionsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
@@ -32,7 +38,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       yield return BaseSpeedMethodInfo;
     }
 
-public NomadicTraditionsPatch() : base("PB5iowxh") {}
+    public NomadicTraditionsPatch() : base("PB5iowxh") {
+    }
 
     public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(PureSpeedMethodInfo);
@@ -53,14 +60,12 @@ public NomadicTraditionsPatch() : base("PB5iowxh") {}
     private float CalculatePerkBaseRatio(float magicNumber)
       => magicNumber * (1 + Perk.PrimaryBonus) - magicNumber;
 
-    
     private static void Postfix(DefaultPartySpeedCalculatingModel __instance, ref StatExplainer explanation, ref float __result, MobileParty mobileParty, ref int additionalTroopOnFootCount, ref int additionalTroopOnHorseCount) {
       var hero = mobileParty.LeaderHero;
 
-
       var nomadicTraditionsPatch = ActivePatch;
       var perk = nomadicTraditionsPatch.Perk;
-      
+
       if (hero == null || !hero.GetPerkValue(perk))
         return;
 
@@ -81,15 +86,15 @@ public NomadicTraditionsPatch() : base("PB5iowxh") {}
 
       var mountedFootman = Math.Min(availableHorses, troopsOnFoot);
       var mountedFootmanRatio = totalTroops == 0 ? 0 : mountedFootman / totalTroops;
-      var mountedFootmanMagicNumber = (float) MountedFootmenRatioModifierMethodInfo.Invoke(__instance, new object[] {1, 1});
+      var mountedFootmanMagicNumber = GetMountedFootmenRatioModifier(__instance, 1, 1);
 
       var perkMountedFootmanRatio = nomadicTraditionsPatch.CalculatePerkBaseRatio(mountedFootmanMagicNumber) * mountedFootmanRatio;
 
       var cavalryRatio = totalTroops == 0 ? 0 : mountedTroops / totalTroops;
-      var cavalryMagicNumber = (float) CavalryRatioModifierMethodInfo.Invoke(__instance, new object[] {1, 1});
+      var cavalryMagicNumber = GetCavalryRatioModifier(__instance, 1, 1);
       var perkCavalryRatio = nomadicTraditionsPatch.CalculatePerkBaseRatio(cavalryMagicNumber) * cavalryRatio;
 
-      var baseSpeed = (float) BaseSpeedMethodInfo.Invoke(__instance, new object[] {totalTroops});
+      var baseSpeed = CalculateBaseSpeedForParty(__instance,totalTroops);
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
       var perkName = perk.Name;
