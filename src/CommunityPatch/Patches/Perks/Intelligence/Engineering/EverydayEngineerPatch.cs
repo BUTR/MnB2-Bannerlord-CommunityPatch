@@ -56,7 +56,7 @@ public EverydayEngineerPatch() : base("wwuuplH7") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref float __result, Building building) {
       if (!building.BuildingType.IsDefaultProject) return;
       if (building.Town == null) return;

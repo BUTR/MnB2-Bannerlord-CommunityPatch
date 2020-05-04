@@ -72,13 +72,13 @@ public HeavierSiegeEnginesPatch() : base("qXkWSgwA") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Prefix(ISiegeEventSide siegeEventSide, SiegeEngineType attackerEngineType, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
       CalculateBonusDamageAndRates(attackerEngineType, siegeEventSide, out _, out var bonusDamageOnly);
       damagedEngine.SetHitpoints(damagedEngine.Hitpoints - bonusDamageOnly);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;

@@ -55,12 +55,12 @@ public FoodRationingPatch() : base("l4UuWHba") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Prefix(ref StatExplainer tooltipStringBuilder)
       => tooltipStringBuilder ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref float __result, Town town, StatExplainer tooltipStringBuilder) {
       var perk = ActivePatch.Perk;
       if (!town.IsUnderSiege)

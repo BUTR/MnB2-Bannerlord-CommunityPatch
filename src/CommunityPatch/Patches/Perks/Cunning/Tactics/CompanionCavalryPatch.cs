@@ -55,7 +55,7 @@ public CompanionCavalryPatch() : base("UqzavawD") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
       var affectorLeaderCharacter = (CharacterObject) affectorAgent?.Team?.Leader?.Character;

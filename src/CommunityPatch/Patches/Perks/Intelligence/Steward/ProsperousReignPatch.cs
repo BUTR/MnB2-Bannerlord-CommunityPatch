@@ -56,12 +56,12 @@ public ProsperousReignPatch() : base("5MjmCaUx") {}
     }
 
     // ReSharper disable once UnusedParameter.Local
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Prefix(Village village, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref float __result, Village village, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
       if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))

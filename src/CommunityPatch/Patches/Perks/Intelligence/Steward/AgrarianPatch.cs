@@ -63,7 +63,7 @@ public AgrarianPatch() : base("XNc2NIGL") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref float __result, Village village) {
       var perk = ActivePatch.Perk;
       if (!(village.Bound?.Town?.Governor?.GetPerkValue(perk) ?? false))

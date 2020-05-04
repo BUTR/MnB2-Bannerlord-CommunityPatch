@@ -53,7 +53,7 @@ public SlaveTraderPatch() : base("jNbTBxEW") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref int __result, Hero sellerHero = null) {
       if (sellerHero == null) return;
 

@@ -47,7 +47,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(Village village, ItemObject item, ref float __result) {
       if (village.VillageState != Village.VillageStates.Normal || !item.IsMountable) {
         return;

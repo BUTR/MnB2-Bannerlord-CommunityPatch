@@ -55,7 +55,7 @@ public ScavengerPatch() : base("cYjeJTb8") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Prefix(ref object __instance, PartyBase partyToReceiveLoot, PartyBase winnerParty, float lootAmount) {
       var lootFactor = CalculateLootFactor(winnerParty);
       if (lootFactor.IsZero()) return;

@@ -52,7 +52,7 @@ public BribeMasterPatch() : base("wb1nbOiq") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref int __result) {
       var perk = ActivePatch.Perk;
       if (!Hero.MainHero.GetPerkValue(perk)) return;

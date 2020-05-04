@@ -58,7 +58,7 @@ public WarRationsPatch() : base("sLv7MMJf") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref float __result, MobileParty party, StatExplainer explainer) {
       var qm = party?.LeaderHero?.Clan?.GetEffectiveQuartermaster();
 

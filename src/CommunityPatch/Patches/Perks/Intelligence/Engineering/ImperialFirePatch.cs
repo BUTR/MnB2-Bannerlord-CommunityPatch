@@ -82,7 +82,7 @@ public ImperialFirePatch() : base("UaZSa5mY") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref IEnumerable<SiegeEngineType> __result) {
       if (Hero.MainHero == null) return;
       if (AnyPartyMemberHasThePerkActive(Hero.MainHero.PartyBelongedTo)) return;

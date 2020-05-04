@@ -68,7 +68,7 @@ public BannerlordPatch() : base("MMv0U5Yr") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
       if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))

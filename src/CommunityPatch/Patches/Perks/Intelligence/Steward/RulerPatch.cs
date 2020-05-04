@@ -54,7 +54,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void CompanionLimitPatched(Clan __instance, ref int __result) {
       if (__instance.Leader.GetPerkValue(ActivePatch.Perk))
         __result += Town.All.Count(t => t.Owner.Owner == __instance.Leader);

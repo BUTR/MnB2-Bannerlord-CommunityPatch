@@ -57,7 +57,7 @@ private static readonly byte[][] Hashes = {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref float __result, ref Agent __instance) {
       if (!__instance.IsHuman) return;
       if (!__instance.IsHero) return;

@@ -66,7 +66,7 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static bool Prefix(Clan clan) {
       if (clan == CampaignData.NeutralFaction)
         return false;

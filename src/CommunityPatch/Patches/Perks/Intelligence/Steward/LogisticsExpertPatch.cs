@@ -52,7 +52,6 @@ public LogisticsExpertPatch() : base("6JaeM2p2") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(ref float __result, MobileParty mobileParty, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
       if (!(mobileParty.Army?.LeaderParty?.LeaderHero?.GetPerkValue(perk) ?? false))

@@ -57,7 +57,7 @@ public TaxCollectorPatch() : base("UbxBYp60") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref int __result, Town town, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
       if (!(town?.Governor?.GetPerkValue(perk) ?? false))

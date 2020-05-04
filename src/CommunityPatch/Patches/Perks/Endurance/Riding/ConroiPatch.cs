@@ -63,7 +63,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
 

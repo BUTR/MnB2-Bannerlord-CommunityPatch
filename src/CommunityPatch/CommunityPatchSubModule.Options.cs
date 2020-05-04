@@ -128,7 +128,7 @@ namespace CommunityPatch {
       }
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     // ReSharper disable once FunctionRecursiveOnAllPaths
     private void CauseStackOverflow()
       => CauseStackOverflow();

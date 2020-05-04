@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using HarmonyLib;
 using TaleWorlds.Library;
@@ -212,13 +213,31 @@ namespace Antijank {
             var idSet = new HashSet<string>(ids);
 
             var dict = Loader.ModuleList.ToDictionary(mi => mi.Id);
+            var missingDeps = new HashSet<ModuleInfo>();
             var list = Loader.ModuleList
+              .Where(mod => {
+                var hasNoMissingDeps = mod.DependedModuleIds.All(id => dict.ContainsKey(id));
+                if (!hasNoMissingDeps)
+                  missingDeps.Add(mod);
+                return hasNoMissingDeps;
+              })
               .OrderTopologicallyBy(mod => mod
                 .GetDependedModuleIds(Loader.ModuleList)
                 .Select(id => dict[id]))
               .ThenBy(Loader.GetLoadGroup)
               .ThenBy(x => ids.Contains(x.Id) ? 0 : 1)
               .ToList();
+
+            if (missingDeps.Count > 0) {
+              var sb = new StringBuilder("Mods missing dependencies:\n");
+              foreach (var mod in missingDeps) {
+                mod.IsSelected = false;
+                list.Add(mod);
+                sb.Append(mod.Name).Append(": ").AppendLine(string.Join(", ", mod.DependedModuleIds.Where(id => !dict.ContainsKey(id))));
+              }
+
+              MessageBox.Warning(sb.ToString());
+            }
 
             Loader.ModuleList = list;
             var moduleVms = launcherVm.ModsData.Modules;
@@ -321,13 +340,31 @@ namespace Antijank {
 
           //Loader.IdentitySort(list, foundMods);
           var dict = Loader.ModuleList.ToDictionary(mi => mi.Id);
+          var missingDeps = new HashSet<ModuleInfo>();
           var list = Loader.ModuleList
+            .Where(mod => {
+              var hasNoMissingDeps = mod.DependedModuleIds.All(id => dict.ContainsKey(id));
+              if (!hasNoMissingDeps)
+                missingDeps.Add(mod);
+              return hasNoMissingDeps;
+            })
             .OrderTopologicallyBy(mod => mod
               .GetDependedModuleIds(Loader.ModuleList)
               .Select(id => dict[id]))
             .ThenBy(Loader.GetLoadGroup)
             .ThenBy(x => foundMods.Contains(x.Id) ? 0 : 1)
             .ToList();
+
+          if (missingDeps.Count > 0) {
+            var sb = new StringBuilder("Mods missing dependencies:\n");
+            foreach (var mod in missingDeps) {
+              mod.IsSelected = false;
+              list.Add(mod);
+              sb.Append(mod.Name).Append(": ").AppendLine(string.Join(", ", mod.DependedModuleIds.Where(id => !dict.ContainsKey(id))));
+            }
+
+            MessageBox.Warning(sb.ToString());
+          }
 
           Loader.ModuleList = list;
           var idSet = new HashSet<string>(foundMods);
@@ -523,15 +560,15 @@ namespace Antijank {
     private static IEnumerable<CodeInstruction> InitializeSubModulesTranspiler(IEnumerable<CodeInstruction> instr) {
       foreach (var il in instr) {
         var method = il.operand as MethodInfo;
-        if (il.opcode != OpCodes.Call)
-          continue;
 
         if (method == ConstructorInfoInvokeMethod) {
+          il.operand = SubModuleCtorInterceptorMethod;
           il.opcode = OpCodes.Call;
           Console.WriteLine("Hooked SubModule constructor invocation.");
         }
         else if (method == MbSubModuleBaseOnSubModuleLoadMethod) {
           il.operand = OnSubModuleLoadInterceptorMethod;
+          il.opcode = OpCodes.Call;
           Console.WriteLine("Hooked OnSubModuleLoad event.");
         }
 

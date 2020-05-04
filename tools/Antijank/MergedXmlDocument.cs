@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.XPath;
@@ -9,7 +10,29 @@ namespace Antijank {
 
   public sealed class MergedXmlDocument : XmlDocument {
 
-    private LinkedList<XmlDocument> _sources;
+    private readonly LinkedList<XmlDocument> _sources;
+
+    public IEnumerable<XmlDocument> SourcesLastToFirst {
+      get {
+        var node = _sources.Last;
+        while (node != null) {
+          yield return node.Value;
+
+          node = node.Previous;
+        }
+      }
+    }
+
+    public IEnumerable<XmlDocument> SourcesFirstToLast {
+      get {
+        var node = _sources.First;
+        while (node != null) {
+          yield return node.Value;
+
+          node = node.Next;
+        }
+      }
+    }
 
     public MergedXmlDocument(params XmlDocument[] sources)
       : this((IEnumerable<XmlDocument>) sources) {
@@ -37,8 +60,21 @@ namespace Antijank {
       return true;
     }
 
-    public override XmlNode Clone()
-      => throw new NotImplementedException();
+    public override XmlNode Clone() {
+      var doc = new XmlDocument();
+      var src = _sources.First;
+      doc.AppendChild(doc.ImportNode(src.Value.DocumentElement!, true));
+      var docElem = doc.DocumentElement;
+      for (;;) {
+        src = src.Next;
+        if (src == null) break;
+
+        foreach (XmlNode child in src.Value.DocumentElement!.ChildNodes)
+          docElem!.AppendChild(doc.ImportNode(child, true));
+      }
+
+      return doc;
+    }
 
     public override XmlCDataSection CreateCDataSection(string data)
       => throw new NotImplementedException();
@@ -97,31 +133,33 @@ namespace Antijank {
     public override XmlNodeList GetElementsByTagName(string name)
       => throw new NotImplementedException();
 
-    public override XmlNodeList GetElementsByTagName(string localName, string namespaceURI)
+    public override XmlNodeList GetElementsByTagName(string localName, string namespaceUri)
       => throw new NotImplementedException();
 
     public override XmlElement GetElementById(string elementId)
-      => throw new NotImplementedException();
+      => SourcesFirstToLast
+        .Select(x => x.GetElementById(elementId))
+        .FirstOrDefault(x => x != null);
 
     public override XmlNode ImportNode(XmlNode node, bool deep)
       => throw new NotImplementedException();
 
-    public override XmlAttribute CreateAttribute(string prefix, string localName, string namespaceURI)
+    public override XmlAttribute CreateAttribute(string prefix, string localName, string namespaceUri)
       => throw new NotImplementedException();
 
-    protected override XmlAttribute CreateDefaultAttribute(string prefix, string localName, string namespaceURI)
+    protected override XmlAttribute CreateDefaultAttribute(string prefix, string localName, string namespaceUri)
       => throw new NotImplementedException();
 
-    public override XmlElement CreateElement(string prefix, string localName, string namespaceURI)
+    public override XmlElement CreateElement(string prefix, string localName, string namespaceUri)
       => throw new NotImplementedException();
 
-    public override XmlNode CreateNode(XmlNodeType type, string prefix, string name, string namespaceURI)
+    public override XmlNode CreateNode(XmlNodeType type, string prefix, string name, string namespaceUri)
       => throw new NotImplementedException();
 
-    public override XmlNode CreateNode(string nodeTypeString, string name, string namespaceURI)
+    public override XmlNode CreateNode(string nodeTypeString, string name, string namespaceUri)
       => throw new NotImplementedException();
 
-    public override XmlNode CreateNode(XmlNodeType type, string name, string namespaceURI)
+    public override XmlNode CreateNode(XmlNodeType type, string name, string namespaceUri)
       => throw new NotImplementedException();
 
     public override XmlNode ReadNode(XmlReader reader)
@@ -164,38 +202,38 @@ namespace Antijank {
       => throw new NotImplementedException();
 
     public override string GetNamespaceOfPrefix(string prefix)
-      => throw new NotImplementedException();
+      => SourcesLastToFirst.Select(x => x.GetNamespaceOfPrefix(prefix)).FirstOrDefault(x => !string.IsNullOrEmpty(x)) ?? "";
 
-    public override string GetPrefixOfNamespace(string namespaceURI)
-      => throw new NotImplementedException();
+    public override string GetPrefixOfNamespace(string namespaceUri)
+      => SourcesLastToFirst.Select(x => x.GetPrefixOfNamespace(namespaceUri)).FirstOrDefault(x => !string.IsNullOrEmpty(x)) ?? "";
 
     public override string Name
-      => throw new NotImplementedException();
+      => SourcesLastToFirst.FirstOrDefault()?.Name ?? "";
 
     public override string Value {
-      get => throw new NotImplementedException();
+      get => SourcesLastToFirst.FirstOrDefault()?.Value ?? "";
       set => throw new NotImplementedException();
     }
 
     public override bool HasChildNodes
-      => throw new NotImplementedException();
+      => SourcesLastToFirst.Any(x => x.HasChildNodes);
 
     public override string NamespaceURI
-      => throw new NotImplementedException();
+      => SourcesLastToFirst.FirstOrDefault()?.NamespaceURI ?? "";
 
     public override string Prefix {
-      get => throw new NotImplementedException();
+      get => SourcesLastToFirst.FirstOrDefault()?.Prefix ?? "";
       set => throw new NotImplementedException();
     }
 
     public override string LocalName
-      => throw new NotImplementedException();
+      => SourcesLastToFirst.FirstOrDefault()?.LocalName ?? "";
 
     public override bool IsReadOnly
-      => throw new NotImplementedException();
+      => true;
 
     public override string InnerText {
-      get => throw new NotImplementedException();
+      get => string.Concat(SourcesFirstToLast.Select(x => x.InnerText));
       set => throw new NotImplementedException();
     }
 
@@ -203,7 +241,7 @@ namespace Antijank {
       => throw new NotImplementedException();
 
     public override string InnerXml {
-      get => throw new NotImplementedException();
+      get => string.Concat(SourcesFirstToLast.Select(x => x.InnerXml));
       set => throw new NotImplementedException();
     }
 
@@ -211,28 +249,28 @@ namespace Antijank {
       => throw new NotImplementedException();
 
     public override string BaseURI
-      => throw new NotImplementedException();
+      => SourcesLastToFirst.FirstOrDefault()?.BaseURI ?? "";
 
     public override XmlElement this[string name]
-      => throw new NotImplementedException();
+      => SourcesFirstToLast.Select(x => x[name]).FirstOrDefault(x => x != null);
 
-    public override XmlElement this[string localname, string ns]
-      => throw new NotImplementedException();
+    public override XmlElement this[string localName, string ns]
+      => SourcesFirstToLast.Select(x => x[localName, ns]).FirstOrDefault(x => x != null);
 
     public override XmlNode PreviousText
-      => throw new NotImplementedException();
+      => null;
 
     public override XmlAttributeCollection Attributes
       => throw new NotImplementedException();
 
     public override XmlDocument OwnerDocument
-      => throw new NotImplementedException();
+      => this;
 
     public override XmlNode FirstChild
-      => throw new NotImplementedException();
+      => DocumentElement;
 
     public override XmlNode LastChild
-      => throw new NotImplementedException();
+      => DocumentElement;
 
     public override XmlResolver XmlResolver {
       set => throw new NotImplementedException();
@@ -242,25 +280,27 @@ namespace Antijank {
       => throw new NotImplementedException();
 
     public override XmlNode ParentNode
-      => throw new NotImplementedException();
+      => null;
 
     public override XmlNodeList ChildNodes
-      => throw new NotImplementedException();
+      => new MergedXmlNodeList(new[] {DocumentElement});
 
     public override XmlNode PreviousSibling
-      => throw new NotImplementedException();
+      => null;
 
     public override XmlNode NextSibling
-      => throw new NotImplementedException();
+      => null;
 
     public override XmlDocumentType DocumentType
-      => throw new NotImplementedException();
+      => SourcesFirstToLast
+        .FirstOrDefault(x => x.DocumentType != null)
+        ?.DocumentType;
 
     public override string ToString()
       => throw new NotImplementedException();
 
     public override bool Equals(object obj)
-      => base.Equals(obj);
+      => ReferenceEquals(this, obj);
 
     public override int GetHashCode() {
       var hc = 0;
@@ -268,7 +308,7 @@ namespace Antijank {
       static uint RotateLeft(uint x, int y)
         => (x << y) | (x >> (32 - y));
 
-      foreach (var doc in _sources)
+      foreach (var doc in SourcesFirstToLast)
         hc = (int) RotateLeft((uint) hc, 1) ^ doc.GetHashCode();
       return hc;
     }

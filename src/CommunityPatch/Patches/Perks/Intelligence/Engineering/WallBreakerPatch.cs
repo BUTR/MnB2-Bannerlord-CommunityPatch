@@ -74,7 +74,7 @@ public WallBreakerPatch() : base("0wlWgIeL") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Prefix(BesiegerCamp __instance, SiegeEngineType attackerEngineType, int wallIndex) {
       var siegeEventSide = __instance.SiegeEvent?.GetSiegeEventSide(BattleSideEnum.Attacker);
       if (siegeEventSide == null) return;
@@ -91,7 +91,7 @@ public WallBreakerPatch() : base("0wlWgIeL") {}
       besiegedSettlement.SetWallSectionHitPointsRatioAtIndex(wallIndex, targetWallSectionFinalHp);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;

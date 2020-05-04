@@ -75,7 +75,7 @@ public BuilderPatch() : base("dsNV3sgp") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref int __result, Town town, StatExplainer explanation = null)
       => TryToApplyBuilderPerk(ref __result, town, explanation);
 

@@ -53,7 +53,7 @@ public WarmongerPatch() : base("ldk9Xvod") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref int __result, MobileParty armyLeaderParty) {
       var perk = ActivePatch.Perk;
       if (!(armyLeaderParty.LeaderHero?.GetPerkValue(perk) ?? false))

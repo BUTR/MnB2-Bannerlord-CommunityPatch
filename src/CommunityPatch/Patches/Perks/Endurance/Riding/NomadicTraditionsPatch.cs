@@ -53,7 +53,7 @@ public NomadicTraditionsPatch() : base("PB5iowxh") {}
     private float CalculatePerkBaseRatio(float magicNumber)
       => magicNumber * (1 + Perk.PrimaryBonus) - magicNumber;
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(DefaultPartySpeedCalculatingModel __instance, ref StatExplainer explanation, ref float __result, MobileParty mobileParty, ref int additionalTroopOnFootCount, ref int additionalTroopOnHorseCount) {
       var hero = mobileParty.LeaderHero;
 

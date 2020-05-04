@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -29,16 +30,25 @@ namespace Antijank {
         })
         .ToList();
 
+      var depSet = modInfos.Select(mi => mi.Id).ToHashSet();
+
       var weightedModInfos = modInfos
         .Select(mod => {
           var id = mod.Id;
+          var missingDepIds = mod.DependedModuleIds.Where(x => !depSet.Contains(x)).ToHashSet();
+          if (missingDepIds.Count > 0) {
+            MessageBox.Warning($"{mod.Name} is missing dependencies:\n{string.Join(Environment.NewLine, missingDepIds)}");
+            return default;
+          }
+
           var pref = data.ModDatas.FindIndex(md => md.Id == id);
           if (pref < 0) pref = int.MinValue;
           return new WeightedModuleInfo(mod, pref);
         })
+        .Where(mod => mod != default)
         .ToList();
 
-      var dict = weightedModInfos.ToDictionary(mi => mi.Module.Id);
+      var weightedDict = weightedModInfos.ToDictionary(mi => mi.Module.Id);
 
       if (!modInfos.Any(mi => mi.IsSelected))
         throw new NotImplementedException();
@@ -47,7 +57,7 @@ namespace Antijank {
         .OrderTopologicallyBy(
           mi => mi.Module
             .GetDependedModuleIds(modInfos)
-            .Select(id => dict[id])
+            .Select(id => weightedDict.TryGetValue(id, out var dep) ? dep : throw new KeyNotFoundException($"Can't find Dependency {id} for {mi.Module.Name}"))
         )
         .ThenBy(mi => mi.Weight) // user input
         .Select(mi => mi.Module)
@@ -185,17 +195,52 @@ namespace Antijank {
     public static IReadOnlyList<ModuleInfo> ModuleList { get; internal set; }
 
     public static List<ModuleInfo> DefaultSort() {
-      var dict = ModuleList.ToDictionary(mi => mi.Id);
+      var idConflicts = ModuleList.GroupBy(mi => mi.Id).Where(g => g.Count() > 1).ToList();
+      if (idConflicts.Count > 0) {
+        var sb = new StringBuilder("Conflicting Module Ids:\n\n");
+        foreach (var g in idConflicts) {
+          sb.AppendLine(g.Key);
+          foreach (var mi in g) {
+            sb.Append(" - ").AppendLine(mi.Name);
+          }
 
+          sb.AppendLine();
+        }
+
+        MessageBox.Error(sb.ToString());
+      }
+
+      var dict = ModuleList.ToDictionary(mi => mi.Id);
+      var missingDeps = new HashSet<ModuleInfo>();
       var list = ModuleList
+        .Where(mod => {
+          var hasNoMissingDeps = mod.DependedModuleIds.All(id => dict.ContainsKey(id));
+          if (!hasNoMissingDeps)
+            missingDeps.Add(mod);
+          return hasNoMissingDeps;
+        })
         .OrderBy(GetLoadGroup)
         .ThenBy(mi => mi.Alias)
         .OrderTopologicallyBy(mi
           => mi.GetDependedModuleIds(ModuleList)
-            .Select(id => dict[id]))
+            .Select(id => dict.TryGetValue(id, out var dep) ? dep : throw new KeyNotFoundException($"Can't find Dependency {id} for {mi.Name}")))
         .ThenBy(GetLoadGroup)
         .ThenBy(mi => mi.IsSelected ? 0 : 1)
         .ToList();
+
+      var missing = ModuleList.ToHashSet();
+      missing.ExceptWith(list);
+
+      if (missingDeps.Count > 0) {
+        var sb = new StringBuilder("Mods missing dependencies:\n");
+        foreach (var mod in missing) {
+          mod.IsSelected = false;
+          list.Add(mod);
+          sb.Append(mod.Name).Append(": ").AppendLine(string.Join(", ", mod.DependedModuleIds.Where(id => !dict.ContainsKey(id))));
+        }
+
+        MessageBox.Warning(sb.ToString());
+      }
 
       return list;
     }

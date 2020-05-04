@@ -48,7 +48,7 @@ public BaitPatch() : base("6MBoNlxj") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref PlayerEncounter __instance, ref List<MobileParty> partiesToJoinOurSide, ref List<MobileParty> partiesToJoinEnemySide) {
       var ourParty = PartyBase.MainParty;
       var encounterParty = PlayerEncounterHelper.GetEncounteredParty(__instance);

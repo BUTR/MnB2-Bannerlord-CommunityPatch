@@ -90,12 +90,12 @@ namespace CommunityPatch.Patches.Policies {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Prefix1(Town town, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix1(ref int __result, Town town, StatExplainer explanation) {
       var kingdom = town.Owner?.Settlement?.OwnerClan?.Kingdom;
       if (kingdom == null)
@@ -111,7 +111,7 @@ namespace CommunityPatch.Patches.Policies {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix2(
       Settlement settlement,
       ref float meleeEliteTroopRate,

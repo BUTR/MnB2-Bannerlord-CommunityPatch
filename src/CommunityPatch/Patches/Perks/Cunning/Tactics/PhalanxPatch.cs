@@ -18,7 +18,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref int __result, CharacterObject strikerTroop, CharacterObject strikedTroop, PartyBase strikerParty) {
       if (strikerTroop.IsInfantry && strikedTroop.IsMounted)
         ApplyPerk(ref __result, ActivePatch.Perk, strikerParty);

@@ -54,7 +54,7 @@ private static readonly byte[][] Hashes = {
       Applied = true;
     }
     
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref float __result, ref DefaultPartyMoraleModel __instance, MobileParty mobileParty, StatExplainer explanation = null) {
       var perk = ActivePatch.Perk;
       

@@ -56,7 +56,7 @@ public ForTheThrillPatch() : base("WACam22Q") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Prefix(ref MapEvent __instance) {
       var attackers = __instance.AttackerSide.Parties.Where(x => x.MobileParty != null).ToArray();
       var moraleGain = CalculateMoralGain(attackers);

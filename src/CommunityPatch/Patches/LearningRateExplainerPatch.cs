@@ -113,7 +113,7 @@ namespace CommunityPatch.Patches {
     }
 
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void CalculateLearning1Limit(Hero hero, SkillObject skill, ref StatExplainer explainer) {
       if (explainer == null)
         return;
@@ -125,7 +125,7 @@ namespace CommunityPatch.Patches {
     }
 
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void CalculateLearning2Limit(int attributeValue, int focusValue, TextObject attributeName, ref StatExplainer explainer) {
       if (explainer == null)
         return;

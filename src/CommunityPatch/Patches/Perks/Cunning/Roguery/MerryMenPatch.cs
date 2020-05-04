@@ -54,7 +54,7 @@ public MerryMenPatch() : base("ssljPTUr") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool PrefixBanditsJoin(ref bool __result)
       => ApplyPerkToMakeRecruitable(ref __result);
 

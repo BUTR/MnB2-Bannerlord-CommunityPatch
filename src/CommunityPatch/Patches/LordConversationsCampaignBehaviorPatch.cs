@@ -60,7 +60,7 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     static void Postfix(out bool __result)
       => __result = Hero.MainHero.MapFaction == Hero.OneToOneConversationHero.MapFaction
         && Hero.OneToOneConversationHero.Clan != Hero.MainHero.Clan

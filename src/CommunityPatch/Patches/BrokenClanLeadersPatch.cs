@@ -46,7 +46,7 @@ namespace CommunityPatch.Patches {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(Clan __instance, ref Hero __result) {
       if (__result == null)
         return;

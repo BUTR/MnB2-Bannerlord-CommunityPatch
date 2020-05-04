@@ -27,7 +27,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
       hero.GetPerkValue(ActivePatch.Perk);
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(Agent __instance) {
       if (HasMount(__instance))
         ApplyPerk(__instance, 3, CanApplyPerk);

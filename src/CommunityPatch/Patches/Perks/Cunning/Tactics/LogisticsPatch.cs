@@ -22,7 +22,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(Agent __instance) {
       if (ActivePatch.MyLeaderIsIntoLogistics(__instance))
         ApplyPerkToAgent(__instance, CanApplyPerk, ActivePatch.CalculateAmmoIncrease);

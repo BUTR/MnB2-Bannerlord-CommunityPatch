@@ -39,7 +39,7 @@ namespace CommunityPatch.Patches.Feats {
     public override void Reset() {
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(
       DefaultPartySpeedCalculatingModel __instance,
       ref MobileParty mobileParty,

@@ -58,7 +58,7 @@ namespace CommunityPatch.Patches.Feats {
     public override void Reset()
       => Applied = false;
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static bool Prefix(
       ref FeatObject feat,
       ref CharacterObject character,

@@ -55,7 +55,7 @@ public EscapeArtistPatch() : base("hJZDOSQ0") {}
     }
 
     // ReSharper disable once RedundantAssignment
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool Prefix(ref bool __result, CampaignTime eventBeginTime, float hoursToWait) {
       var perk = ActivePatch.Perk;
       var elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;

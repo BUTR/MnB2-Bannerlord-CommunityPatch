@@ -51,7 +51,7 @@ public OneStepAheadPatch() : base("V6mvBGDV") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref bool __result, ref object __instance) {
       if (__result) return;
       if (IsPartyActive(__instance)) return;

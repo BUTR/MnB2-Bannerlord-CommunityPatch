@@ -53,7 +53,7 @@ public NegotiatorPatch() : base("lH8ZMjEo") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref int __result) {
       var scout = Hero.MainHero?.PartyBelongedTo?.EffectiveScout;
       if (scout == null) return;

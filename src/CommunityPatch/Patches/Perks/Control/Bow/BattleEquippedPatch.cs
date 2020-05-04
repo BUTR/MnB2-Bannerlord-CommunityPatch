@@ -25,7 +25,7 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
       => WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
         hero.GetPerkValue(ActivePatch.Perk);
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(Agent __instance)
       => ApplyPerk(__instance, 6, CanApplyPerk);
 

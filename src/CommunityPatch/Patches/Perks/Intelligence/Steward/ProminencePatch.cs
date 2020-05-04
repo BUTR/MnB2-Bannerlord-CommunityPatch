@@ -67,7 +67,7 @@ public ProminencePatch() : base("71EyPbaE") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(Clan clan, ref ExplainedNumber influenceChange) {
       var perk = ActivePatch.Perk;
 

@@ -67,7 +67,7 @@ namespace CommunityPatch.Patches {
 
     private static readonly FieldInfo MeetingDoneField = typeof(PlayerEncounter).GetField("_meetingDone", Instance | NonPublic);
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static bool Prefix(PlayerEncounter __instance) {
       if (!CommunityPatchSubModule.EnableMenuWhenEncouteringAnArmy)
         return true;

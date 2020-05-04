@@ -77,7 +77,7 @@ namespace CommunityPatch.Patches {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool Prefix(Hero __instance, ref IFaction __result) {
       if (__instance.CharacterObject != null
         && (__instance.IsNotable
@@ -88,7 +88,7 @@ namespace CommunityPatch.Patches {
       return false;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool Prefix2(PartyBase __instance, ref IFaction __result) {
       var hero = __instance.Owner;
       if (hero == null)

@@ -27,7 +27,7 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
       => WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Thrown &&
         hero.GetPerkValue(ActivePatch.Perk);
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(Agent __instance)
       => ApplyPerk(__instance, 1, CanApplyPerk);
 

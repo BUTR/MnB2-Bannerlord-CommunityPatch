@@ -59,7 +59,7 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static bool GetColorFromComparisonPatched(int result, bool isCompared, out Color __result) {
       if (MobileParty.MainParty == null) {
         __result = Colors.Black;

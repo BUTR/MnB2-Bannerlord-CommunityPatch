@@ -92,7 +92,7 @@ public TramplerPatch() : base("GKlmIYik") {}
     private static readonly List<LocalVariableInfo> CharacterLocalVariableInfos = TargetMethodInfo
       .GetMethodBody()!.LocalVariables.Where(var => var.LocalType == typeof(BasicCharacterObject)).ToList();
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
       if (CharacterLocalVariableInfos.Count != 2) {
         CommunityPatchSubModule.Error($"{nameof(TramplerPatch)}: Expected two BasicCharacterObject  local variable instances in the original method."
@@ -128,7 +128,7 @@ public TramplerPatch() : base("GKlmIYik") {}
       return (int) Math.Round(tramplerDamage, MidpointRounding.AwayFromZero);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(BasicCharacterObject attackerAgentCharacter, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
       if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(attackerAgentCharacter, ActivePatch.Perk))) {
         return;

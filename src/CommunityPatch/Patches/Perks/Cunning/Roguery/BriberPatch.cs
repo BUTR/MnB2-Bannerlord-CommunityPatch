@@ -120,28 +120,28 @@ public BriberPatch() : base("5Trq1mQL") {}
     }
 
     // ReSharper disable once RedundantAssignment
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool PrefixVillageBribe(ref bool __result) {
       __result = Bribe(3, .05f, .4f);
       return false;
     }
 
     // ReSharper disable once RedundantAssignment
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool PrefixVillageSurrender(ref bool __result) {
       __result = Bribe(4, .05f, .1f);
       return false;
     }
 
     // ReSharper disable once RedundantAssignment
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool PrefixCaravansBribe(ref bool __result) {
       __result = Bribe(4, .1f, .6f);
       return false;
     }
 
     // ReSharper disable once RedundantAssignment
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static bool PrefixCaravansSurrender(ref bool __result) {
       __result = Bribe(7, .1f, .1f);
       return false;

@@ -53,7 +53,7 @@ public SlipIntoShadowsPatch() : base("Eth2Z6qK") {}
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref float __result) {
       var perk = ActivePatch.Perk;
       var scout = Hero.MainHero.PartyBelongedTo.EffectiveScout;

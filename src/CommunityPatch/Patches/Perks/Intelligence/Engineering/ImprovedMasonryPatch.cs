@@ -60,7 +60,7 @@ public ImprovedMasonryPatch() : base("R60kenU3") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref float __result, Town town, StatExplainer explanation = null) {
       var perk = ActivePatch.Perk;
       var totalHP = new ExplainedNumber(__result, explanation);

@@ -55,7 +55,7 @@ public ReconstructionPatch() : base("Fa01e9kY") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Prefix(Settlement settlement, ref float percentage) {
       var perk = ActivePatch.Perk;
       var governor = settlement.Town?.Governor;

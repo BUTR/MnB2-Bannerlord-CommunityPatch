@@ -18,7 +18,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void Postfix(ref int __result, PartyBase strikerParty) 
       => ApplyPerk(ref __result, ActivePatch.Perk, strikerParty);
   }

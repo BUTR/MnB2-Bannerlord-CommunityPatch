@@ -57,12 +57,12 @@ public NourishSettlementPatch() : base("KZHpJqtt") {}
 
     // ReSharper disable once InconsistentNaming
     // ReSharper disable once UnusedParameter.Local
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Prefix(Town fortification, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     private static void Postfix(ref float __result, Town fortification, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
       var hero = fortification.Settlement?.OwnerClan?.Leader;

@@ -128,7 +128,7 @@ private static readonly byte[][] AiHashes = {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void AiPostfix(ref SiegeEvent __instance, SiegeEvent.SiegeEnginesContainer siegeEngines, SiegeStrategyActionModel.SiegeAction siegeAction) {
       if (siegeAction != SiegeStrategyActionModel.SiegeAction.ConstructNewSiegeEngine) return;
 
@@ -140,7 +140,7 @@ private static readonly byte[][] AiHashes = {
       ApplyPerkToSiegeEngine(justDeployedEngine, sideSiegeEvent);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     // ReSharper disable once RedundantAssignment
     public static void PlayerPrefix(ref object __instance, out (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
@@ -155,7 +155,7 @@ private static readonly byte[][] AiHashes = {
       __state = (deployedSiegeEngineCount, reservedSiegeEngineCount);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void PlayerPostfix(ref object __instance, ref (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
       if (siegeEvent == null)
@@ -168,7 +168,7 @@ private static readonly byte[][] AiHashes = {
       ApplyPerkToSiegeEngine(justDeployedEngine, playerSideSiegeEvent);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress? engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null || engineInProgress == null) return;
@@ -178,7 +178,7 @@ private static readonly byte[][] AiHashes = {
       SiegeTooltipHelper.UpdateMaxHpTooltip(__result, bonusFlatHp);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    
     // ReSharper disable once RedundantAssignment
     public static void MaxHitPointsPostfix(ref float __result, ref SiegeEvent.SiegeEngineConstructionProgress __instance)
       => __result = SiegeEngineConstructionExtraDataManager.GetMaxHitPoints(__instance);
