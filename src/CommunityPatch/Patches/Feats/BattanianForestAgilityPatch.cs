@@ -19,10 +19,12 @@ namespace CommunityPatch.Patches.Feats {
       yield return AgilityPatchShared.CalculateFinalSpeedMethodInfo;
     }
 
+    public static byte[][] CalculateFinalSpeedHashes => AgilityPatchShared.CalculateFinalSpeedHashes;
+
     public override bool? IsApplicable(Game game) {
       // Currently ignores if method patched by others, expecting that there is a postfix already applied
       var hash = AgilityPatchShared.CalculateFinalSpeedMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(AgilityPatchShared.CalculateFinalSpeedHashes);
+      return hash.MatchesAnySha256(CalculateFinalSpeedHashes);
     }
 
     public override void Apply(Game game) {
@@ -37,7 +39,6 @@ namespace CommunityPatch.Patches.Feats {
     public override void Reset() {
     }
 
-    
     private static void Postfix(
       DefaultPartySpeedCalculatingModel __instance,
       ref MobileParty mobileParty,

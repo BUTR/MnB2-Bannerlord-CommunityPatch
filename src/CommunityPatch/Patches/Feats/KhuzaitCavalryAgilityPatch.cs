@@ -15,6 +15,8 @@ namespace CommunityPatch.Patches.Feats {
 
     private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(KhuzaitCavalryAgilityPatch), nameof(Postfix));
 
+    public static byte[][] CalculatePureSpeedHashes => AgilityPatchShared.CalculatePureSpeedHashes;
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AgilityPatchShared.CalculatePureSpeedMethodInfo;
     }
@@ -22,7 +24,7 @@ namespace CommunityPatch.Patches.Feats {
     public override bool? IsApplicable(Game game) {
       // Currently ignores if method patched by others, expecting that there is a postfix already applied
       var hash = AgilityPatchShared.CalculatePureSpeedMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(AgilityPatchShared.CalculatePureSpeedHashes);
+      return hash.MatchesAnySha256(CalculatePureSpeedHashes);
     }
 
     public override void Apply(Game game) {
@@ -37,7 +39,6 @@ namespace CommunityPatch.Patches.Feats {
     public override void Reset() {
     }
 
-    
     private static void Postfix(
       DefaultPartySpeedCalculatingModel __instance,
       ref MobileParty mobileParty,
