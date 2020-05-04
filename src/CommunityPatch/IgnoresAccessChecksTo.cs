@@ -44,6 +44,21 @@ using static System.Reflection.BindingFlags;
 [assembly: IgnoresAccessChecksTo("TaleWorlds.TwoDimension")]
 [assembly: IgnoresAccessChecksTo("TaleWorlds.TwoDimension.Standalone")]
 
+[assembly: IgnoresAccessChecksTo("TaleWorlds.MountAndBlade.GauntletUI")]
+[assembly: IgnoresAccessChecksTo("TaleWorlds.MountAndBlade.View")]
+
+[assembly: IgnoresAccessChecksTo("SandBox")]
+[assembly: IgnoresAccessChecksTo("SandBox.GauntletUI")]
+[assembly: IgnoresAccessChecksTo("SandBox.View")]
+[assembly: IgnoresAccessChecksTo("SandBox.ViewModelCollection")]
+
+[assembly: IgnoresAccessChecksTo("StoryMode")]
+[assembly: IgnoresAccessChecksTo("StoryMode.GauntletUI")]
+[assembly: IgnoresAccessChecksTo("StoryMode.View")]
+[assembly: IgnoresAccessChecksTo("StoryMode.ViewModelCollection")]
+
+[assembly: IgnoresAccessChecksTo("TaleWorlds.MountAndBlade.CustomBattle")]
+
 namespace System.Runtime.CompilerServices {
 
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]

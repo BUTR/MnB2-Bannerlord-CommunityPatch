@@ -115,7 +115,7 @@ namespace CommunityPatch.Patches.Traits {
       var traitDeveloper = campaign.PlayerTraitDeveloper;
 
       foreach (var trait in traits) {
-        //xpGate is the amount of xp needed to reach a certan level for a certain trait
+        //xpGate is the amount of xp needed to reach a certain level for a certain trait
         //xpValue is the amount of xp to assign. +100 to avoid accidental quest failure2 quickly removing trait
         var xpGate = model.GetTraitXpRequiredForTraitLevel(trait, traitLevelToAdd);
         var xpValue = xpGate + 100;
@@ -127,16 +127,22 @@ namespace CommunityPatch.Patches.Traits {
     //post fix to add on to the actions and access attributes
     public static void AddPlayerTraitXpPrefix(TraitObject trait, int xpValue, ActionNotes context, Hero referenceHero) {
       string xpMsg;
+      Color color;
       if (xpValue < 0) {
         // TODO: localize
         xpMsg = $"You have lost {xpValue * -1} {trait.Name}."; //always shows positive number so you aren't losing negative values
-        InformationManager.DisplayMessage(new InformationMessage(xpMsg, Colors.Red));
+        color = Colors.Red;
       }
       else if (xpValue > 0) {
         // TODO: localize
         xpMsg = $"You have gained {xpValue} {trait.Name}.";
-        InformationManager.DisplayMessage(new InformationMessage(xpMsg, Colors.Green));
+        color = Colors.Green;
       }
+      else {
+        return;
+      }
+
+      InformationManager.DisplayMessage(new InformationMessage(xpMsg, color));
     }
 
     //Fixes incorrect hostile action xp value to be negative instead of positive for failing the find the daughter quest
@@ -145,8 +151,8 @@ namespace CommunityPatch.Patches.Traits {
       foreach (var instr in instructions) {
         //System.Diagnostics.Debug.WriteLine($"opcode:{instr.opcode}  operand:{instr.operand} ");
         if (instr.opcode == OpCodes.Ldc_I4_S)
-          if (Convert.ToInt32(instr.operand) == 50)
-            instr.operand = -50;
+          if ((sbyte) instr.operand == 50)
+            instr.operand = (sbyte)-50;
 
         yield return instr;
       }
