@@ -182,8 +182,19 @@ namespace CommunityPatch {
       return hasher.Hash;
     }
 
+    public static Type GetThisParamType(this MethodBase method) {
+      if (method.IsStatic)
+        return null;
+
+      var type = method.DeclaringType;
+      if (type!.IsValueType)
+        type = type.MakeByRefType();
+      return type;
+    }
+
     public static TDelegate BuildInvoker<TDelegate>(this MethodBase m) where TDelegate : Delegate {
       var td = typeof(TDelegate);
+      Dynamic.AccessInternals(m);
       var dtMi = td.GetMethod("Invoke", Public | NonPublic | Static | Instance);
       var dtPs = dtMi!.GetParameters();
       var dt = Dynamic.CreateStaticClass();
@@ -201,8 +212,9 @@ namespace CommunityPatch {
         }
       }
       else {
-        if (dtPs[0].ParameterType != m.ReflectedType)
-          throw new NotImplementedException($"Unhandled this parameter difference: {dtPs[0].ParameterType.FullName} vs. {m.ReflectedType}");
+        var thisParamType = m.GetThisParamType();
+        if (dtPs[0].ParameterType != thisParamType)
+          throw new NotImplementedException($"Unhandled this parameter difference: {dtPs[0].ParameterType.FullName} vs. {thisParamType}");
 
         d.LoadArgument(0);
         for (var i = 0; i < ps.Length; i++) {
