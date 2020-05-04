@@ -107,7 +107,7 @@
         <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
         <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
         <PropertyGroup>
-            <SourceRevisionId>$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
+            <SourceRevisionId Condition="'$(DesignTimeBuild)' != 'true'">$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
         </PropertyGroup>
         <Message Importance="high" Text="Shortened SCI Version: $(SourceRevisionId)" />
     </Target>
