@@ -23,9 +23,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
 
-public ArmorcraftPatch() : base("zi4GGkEj") {}
+    public ArmorcraftPatch() : base("zi4GGkEj") {
+    }
 
-private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x8E, 0x0F, 0x93, 0x90, 0xFE, 0x14, 0x18, 0xE9,
@@ -57,7 +58,7 @@ private static readonly byte[][] Hashes = {
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Postfix(ref float __result, ref Agent __instance) {
       if (!__instance.IsHuman) return;
       if (!__instance.IsHero) return;

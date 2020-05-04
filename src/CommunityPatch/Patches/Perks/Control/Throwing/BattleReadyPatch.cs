@@ -13,12 +13,13 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(BattleReadyPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
-    public BattleReadyPatch() : base("ES6AN5pO") {}
+    public BattleReadyPatch() : base("ES6AN5pO") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
 
-      CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
+      CommunityPatchSubModule.Harmony.Patch(ExtraAmmoPerksPatch.TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
@@ -27,7 +28,6 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
       => WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Thrown &&
         hero.GetPerkValue(ActivePatch.Perk);
 
-    
     private static void Postfix(Agent __instance)
       => ApplyPerk(__instance, 2, CanApplyPerk);
 

@@ -30,7 +30,6 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
         yield return mb;
     }
 
-    
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
       // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
@@ -44,7 +43,6 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
 
     [UsedImplicitly]
     // workaround for https://github.com/pardeike/Harmony/issues/286
-    
     private static void CallWeaponEquippedPrefix(ref Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,

@@ -30,7 +30,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       yield return OverloadedTargetMethodInfo;
     }
 
-    private static readonly byte[][] TargetHashes = {
+    public static readonly byte[][] TargetHashes = {
       new byte[] {
         // e1.2.1.227410
         0xC0, 0xBC, 0x9E, 0xDE, 0xAF, 0xAB, 0xFE, 0xE0,
@@ -38,9 +38,16 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0xE8, 0x48, 0xE4, 0x75, 0xF0, 0x58, 0xE8, 0xC5,
         0x86, 0x06, 0xC1, 0xE8, 0x6D, 0x42, 0x9A, 0xAA
       },
+      new byte[] {
+        // e1.3.0.227640
+        0x70, 0x1B, 0x59, 0xFB, 0xB5, 0x40, 0x50, 0x56,
+        0xA3, 0x07, 0x20, 0x1C, 0x7F, 0xCB, 0x8F, 0xA4,
+        0x3A, 0xC5, 0x8A, 0x34, 0xD2, 0x4E, 0x5F, 0x6B,
+        0xFF, 0x69, 0x3B, 0x64, 0x5C, 0xEC, 0xEB, 0x9D
+      }
     };
 
-    private static readonly byte[][] OverloadedTargetHashes = {
+    public static readonly byte[][] OverloadedTargetHashes = {
       new byte[] {
         // e1.2.1.227410
         0x3C, 0x34, 0x56, 0x68, 0xCE, 0xD5, 0x86, 0x1B,
@@ -48,9 +55,17 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0xDF, 0x22, 0x86, 0xB0, 0xCA, 0xBF, 0xCB, 0xAF,
         0xAA, 0xCF, 0x99, 0xCD, 0x4A, 0x4D, 0xB6, 0x2C
       },
+      new byte[] {
+        // e1.3.0.227640
+        0x11, 0xB1, 0x3A, 0x8B, 0x32, 0xB9, 0x1D, 0xDA,
+        0xF0, 0x27, 0x7B, 0xAB, 0xB0, 0x59, 0x4E, 0x44,
+        0xF7, 0x3C, 0x00, 0xDB, 0x37, 0x65, 0x02, 0xCB,
+        0x83, 0xC7, 0x03, 0x7B, 0xDB, 0x17, 0x1A, 0xCF
+      }
     };
 
-public TramplerPatch() : base("GKlmIYik") {}
+    public TramplerPatch() : base("GKlmIYik") {
+    }
 
     public override bool? IsApplicable(Game game)
       => TargetMethodInfo != null
@@ -92,7 +107,6 @@ public TramplerPatch() : base("GKlmIYik") {}
     private static readonly List<LocalVariableInfo> CharacterLocalVariableInfos = TargetMethodInfo
       .GetMethodBody()!.LocalVariables.Where(var => var.LocalType == typeof(BasicCharacterObject)).ToList();
 
-    
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
       if (CharacterLocalVariableInfos.Count != 2) {
         CommunityPatchSubModule.Error($"{nameof(TramplerPatch)}: Expected two BasicCharacterObject  local variable instances in the original method."
@@ -128,7 +142,6 @@ public TramplerPatch() : base("GKlmIYik") {}
       return (int) Math.Round(tramplerDamage, MidpointRounding.AwayFromZero);
     }
 
-    
     private static void Postfix(BasicCharacterObject attackerAgentCharacter, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
       if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(attackerAgentCharacter, ActivePatch.Perk))) {
         return;

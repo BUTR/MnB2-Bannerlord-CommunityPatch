@@ -19,7 +19,8 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
       Applied = true;
     }
 
-public DisciplinarianPatch() : base("ER3ieXOb") {}
+    public DisciplinarianPatch() : base("ER3ieXOb") {
+    }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield break;

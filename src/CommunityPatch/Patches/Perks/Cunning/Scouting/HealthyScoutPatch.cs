@@ -27,7 +27,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x92, 0xC3, 0x48, 0x33, 0x3C, 0x1A, 0x39, 0x52,
@@ -37,7 +37,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       }
     };
 
-public HealthyScoutPatch() : base("dDKOoD3e") {}
+    public HealthyScoutPatch() : base("dDKOoD3e") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -74,7 +75,7 @@ public HealthyScoutPatch() : base("dDKOoD3e") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
       var result = __result;
 

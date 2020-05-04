@@ -25,9 +25,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = PlayerEncounterHelper.TargetHashes;
+    public static byte[][] Hashes => PlayerEncounterHelper.TargetHashes;
 
-public BaitPatch() : base("6MBoNlxj") {}
+    public BaitPatch() : base("6MBoNlxj") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -48,7 +49,6 @@ public BaitPatch() : base("6MBoNlxj") {}
       Applied = true;
     }
 
-    
     public static void Postfix(ref PlayerEncounter __instance, ref List<MobileParty> partiesToJoinOurSide, ref List<MobileParty> partiesToJoinEnemySide) {
       var ourParty = PartyBase.MainParty;
       var encounterParty = PlayerEncounterHelper.GetEncounteredParty(__instance);

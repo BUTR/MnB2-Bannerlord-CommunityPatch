@@ -32,9 +32,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TooltipTargetMethodInfo;
     }
 
-    private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
+    public static byte[][] TooltipHashes => SiegeTooltipHelper.TooltipHashes;
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xE1, 0xB4, 0xCD, 0xF0, 0x16, 0xF2, 0xF1, 0x9F,
@@ -44,7 +44,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-public WallBreakerPatch() : base("0wlWgIeL") {}
+    public WallBreakerPatch() : base("0wlWgIeL") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -74,7 +75,6 @@ public WallBreakerPatch() : base("0wlWgIeL") {}
       Applied = true;
     }
 
-    
     public static void Prefix(BesiegerCamp __instance, SiegeEngineType attackerEngineType, int wallIndex) {
       var siegeEventSide = __instance.SiegeEvent?.GetSiegeEventSide(BattleSideEnum.Attacker);
       if (siegeEventSide == null) return;
@@ -91,7 +91,6 @@ public WallBreakerPatch() : base("0wlWgIeL") {}
       besiegedSettlement.SetWallSectionHitPointsRatioAtIndex(wallIndex, targetWallSectionFinalHp);
     }
 
-    
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;

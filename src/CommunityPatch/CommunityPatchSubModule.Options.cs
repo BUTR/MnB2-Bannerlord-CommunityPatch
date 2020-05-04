@@ -128,7 +128,6 @@ namespace CommunityPatch {
       }
     }
 
-    
     // ReSharper disable once FunctionRecursiveOnAllPaths
     private void CauseStackOverflow()
       => CauseStackOverflow();

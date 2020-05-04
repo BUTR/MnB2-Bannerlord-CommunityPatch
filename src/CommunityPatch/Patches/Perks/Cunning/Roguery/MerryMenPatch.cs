@@ -25,7 +25,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return BanditsJoinTargetMethodInfo;
     }
 
-    private static readonly byte[][] BanditsJoinHashes = {
+    public static readonly byte[][] BanditsJoinHashes = {
       new byte[] {
         // e1.1.0.225190
         0xB1, 0x5A, 0x5C, 0xF7, 0x1A, 0x50, 0x55, 0xFF,
@@ -35,7 +35,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public MerryMenPatch() : base("ssljPTUr") {}
+    public MerryMenPatch() : base("ssljPTUr") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -54,7 +55,6 @@ public MerryMenPatch() : base("ssljPTUr") {}
       Applied = true;
     }
 
-    
     public static bool PrefixBanditsJoin(ref bool __result)
       => ApplyPerkToMakeRecruitable(ref __result);
 

@@ -18,7 +18,7 @@ namespace CommunityPatch.Patches {
       // ReSharper disable once PossibleNullReferenceException
       = typeof(Hero).GetMethod("get_MapFaction",
         Public | NonPublic | Instance | Static | DeclaredOnly);
-    
+
     private static readonly MethodInfo TargetMethodInfo2
       // using assembly qualified name here
       // ReSharper disable once PossibleNullReferenceException
@@ -29,7 +29,7 @@ namespace CommunityPatch.Patches {
       = typeof(MapFactionLogicLoopPatch)
         .GetMethod(nameof(Prefix),
           Public | NonPublic | Static | DeclaredOnly);
-    
+
     private static readonly MethodInfo PatchMethodInfo2
       = typeof(MapFactionLogicLoopPatch)
         .GetMethod(nameof(Prefix2),
@@ -40,7 +40,14 @@ namespace CommunityPatch.Patches {
       yield return TargetMethodInfo2;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
+      new byte[] {
+        // e1.3.0.227640
+        0x5D, 0xF0, 0xDC, 0xC6, 0x76, 0xB8, 0x1A, 0x28,
+        0x55, 0xC3, 0x63, 0x81, 0x27, 0xD7, 0x53, 0x78,
+        0x7F, 0xD1, 0x05, 0x42, 0x2D, 0x90, 0xFD, 0x2D,
+        0xBB, 0x52, 0x62, 0xCC, 0x74, 0x76, 0x17, 0x8C
+      },
       new byte[] {
         // e1.2.0.225830
         0x92, 0x25, 0xA9, 0xE4, 0x53, 0x37, 0x22, 0xB0,
@@ -77,7 +84,6 @@ namespace CommunityPatch.Patches {
       Applied = true;
     }
 
-    
     public static bool Prefix(Hero __instance, ref IFaction __result) {
       if (__instance.CharacterObject != null
         && (__instance.IsNotable
@@ -88,7 +94,6 @@ namespace CommunityPatch.Patches {
       return false;
     }
 
-    
     public static bool Prefix2(PartyBase __instance, ref IFaction __result) {
       var hero = __instance.Owner;
       if (hero == null)

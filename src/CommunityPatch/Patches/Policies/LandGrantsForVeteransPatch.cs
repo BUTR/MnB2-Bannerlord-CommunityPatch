@@ -36,7 +36,7 @@ namespace CommunityPatch.Patches.Policies {
       yield return TargetMethodInfo2;
     }
 
-    private static readonly byte[][] Hashes1 = {
+    public static readonly byte[][] Hashes1 = {
       new byte[] {
         // CalculateDailyTaxInternal e1.0.10
         0x52, 0xFC, 0xCB, 0x7C, 0xF9, 0x90, 0xBB, 0xAD,
@@ -46,7 +46,7 @@ namespace CommunityPatch.Patches.Policies {
       }
     };
 
-    private static readonly byte[][] Hashes2 = {
+    public static readonly byte[][] Hashes2 = {
       new byte[] {
         // CalculateMilitiaSpawnRate e1.0.10
         0xE4, 0x38, 0xF5, 0x91, 0x73, 0x90, 0x52, 0x1E,
@@ -90,12 +90,12 @@ namespace CommunityPatch.Patches.Policies {
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Prefix1(Town town, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix1(ref int __result, Town town, StatExplainer explanation) {
       var kingdom = town.Owner?.Settlement?.OwnerClan?.Kingdom;
       if (kingdom == null)
@@ -111,7 +111,7 @@ namespace CommunityPatch.Patches.Policies {
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix2(
       Settlement settlement,
       ref float meleeEliteTroopRate,

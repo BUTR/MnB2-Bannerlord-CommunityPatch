@@ -18,7 +18,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowExpert).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
-    public CrossbowExpert() : base("T4fREm7U") {}
+    public CrossbowExpert() : base("T4fREm7U") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -31,7 +32,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         yield return mb;
     }
 
-    
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
@@ -44,7 +44,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     [UsedImplicitly]
     // workaround for https://github.com/pardeike/Harmony/issues/286
-    
     private static void CallWeaponEquippedPrefix(ref Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,

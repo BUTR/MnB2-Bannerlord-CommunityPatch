@@ -25,7 +25,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.0.11
         0x91, 0x8F, 0x69, 0x36, 0xA9, 0x4F, 0xE9, 0x5E,
@@ -35,7 +35,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-public FilledToBrimPatch() : base("jikaakdy") {}
+    public FilledToBrimPatch() : base("jikaakdy") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -58,12 +59,12 @@ public FilledToBrimPatch() : base("jikaakdy") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Prefix(ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix(ref int __result, MobileParty mobileParty, StatExplainer explanation, bool includeFollowers) {
       var perk = ActivePatch.Perk;
 

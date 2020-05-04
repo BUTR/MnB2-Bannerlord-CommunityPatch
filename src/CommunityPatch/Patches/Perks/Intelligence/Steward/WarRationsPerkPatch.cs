@@ -28,7 +28,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       set => CommunityPatchSubModule.Options.Set(nameof(QuartermasterIsClanWide), value);
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x03, 0xA6, 0xD1, 0x58, 0xEA, 0x4A, 0x70, 0xB5,
@@ -38,7 +38,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public WarRationsPatch() : base("sLv7MMJf") {}
+    public WarRationsPatch() : base("sLv7MMJf") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -58,7 +59,7 @@ public WarRationsPatch() : base("sLv7MMJf") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix(ref float __result, MobileParty party, StatExplainer explainer) {
       var qm = party?.LeaderHero?.Clan?.GetEffectiveQuartermaster();
 

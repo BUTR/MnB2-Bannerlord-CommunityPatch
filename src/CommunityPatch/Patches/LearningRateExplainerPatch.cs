@@ -44,7 +44,7 @@ namespace CommunityPatch.Patches {
       yield return CheckMethodInfo2;
     }
 
-    private static readonly byte[][] Hashes1 = {
+    public static readonly byte[][] Hashes1 = {
       new byte[] {
         // e1.1.0.224785
         0xAF, 0x91, 0x09, 0x47, 0xF6, 0x42, 0x8E, 0x17,
@@ -61,7 +61,7 @@ namespace CommunityPatch.Patches {
       }
     };
 
-    private static readonly byte[][] Hashes2 = {
+    public static readonly byte[][] Hashes2 = {
       new byte[] {
         // e1.1.0.224785
         0xF7, 0x86, 0xC5, 0x7B, 0x40, 0xAC, 0x33, 0x78,
@@ -113,7 +113,6 @@ namespace CommunityPatch.Patches {
     }
 
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-    
     private static void CalculateLearning1Limit(Hero hero, SkillObject skill, ref StatExplainer explainer) {
       if (explainer == null)
         return;
@@ -125,7 +124,6 @@ namespace CommunityPatch.Patches {
     }
 
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-    
     private static void CalculateLearning2Limit(int attributeValue, int focusValue, TextObject attributeName, ref StatExplainer explainer) {
       if (explainer == null)
         return;

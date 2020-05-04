@@ -5,11 +5,14 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
+  // appears to be fixed in 1.3?
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 3)]
   public sealed class ConstructionExpertPatch : PerkPatchBase<ConstructionExpertPatch> {
 
     public override bool Applied { get; protected set; }
@@ -27,7 +30,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return WithoutBoostTargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x51, 0xAD, 0x16, 0x28, 0x7C, 0x93, 0x7A, 0x2E,
@@ -37,7 +40,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    private static readonly byte[][] WithoutBoostHashes = {
+    public static readonly byte[][] WithoutBoostHashes = {
       new byte[] {
         // e1.1.0.225190
         0x8C, 0x3A, 0x1F, 0xC9, 0xAE, 0x69, 0x29, 0x4B,
@@ -47,7 +50,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-public ConstructionExpertPatch() : base("KBcNYbIC") {}
+    public ConstructionExpertPatch() : base("KBcNYbIC") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -73,7 +77,7 @@ public ConstructionExpertPatch() : base("KBcNYbIC") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Postfix(ref int __result, Town town, StatExplainer explanation = null)
       => TryToApplyConstructionExpert(ref __result, town, explanation);
 

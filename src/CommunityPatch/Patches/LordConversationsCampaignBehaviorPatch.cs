@@ -32,7 +32,7 @@ namespace CommunityPatch.Patches {
     }
 
     // fixed e1.0.6 ?
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.0.0
         0x1B, 0x33, 0x04, 0x96, 0x22, 0xAB, 0x44, 0x73,
@@ -60,7 +60,7 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     static void Postfix(out bool __result)
       => __result = Hero.MainHero.MapFaction == Hero.OneToOneConversationHero.MapFaction
         && Hero.OneToOneConversationHero.Clan != Hero.MainHero.Clan

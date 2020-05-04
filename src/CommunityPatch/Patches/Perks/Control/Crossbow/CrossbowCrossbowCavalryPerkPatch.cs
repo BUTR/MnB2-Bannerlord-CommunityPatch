@@ -31,7 +31,6 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
         yield return mb;
     }
 
-    
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
 
@@ -48,7 +47,6 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
 
     [UsedImplicitly]
     // workaround for https://github.com/pardeike/Harmony/issues/286
-    
     private static void CallWeaponEquippedPrefix(ref Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,

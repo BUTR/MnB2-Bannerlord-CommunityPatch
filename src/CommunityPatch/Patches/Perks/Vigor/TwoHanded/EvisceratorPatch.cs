@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xDC, 0x73, 0xE5, 0x9D, 0x02, 0x06, 0x68, 0x6B,
@@ -34,7 +34,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public EvisceratorPatch() : base("C2CwsC91") {}
+    public EvisceratorPatch() : base("C2CwsC91") {
+    }
 
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
@@ -58,7 +59,7 @@ public EvisceratorPatch() : base("C2CwsC91") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static bool Prefix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
 

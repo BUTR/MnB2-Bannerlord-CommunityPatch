@@ -23,7 +23,7 @@ namespace CommunityPatch.Patches {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x6C, 0x46, 0xC7, 0xAA, 0x16, 0x02, 0x77, 0xF2,
@@ -66,7 +66,7 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static bool Prefix(Clan clan) {
       if (clan == CampaignData.NeutralFaction)
         return false;

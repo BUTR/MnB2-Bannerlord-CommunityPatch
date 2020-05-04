@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225664
         0x41, 0xDD, 0x60, 0x12, 0x52, 0xAC, 0x6C, 0xA7,
@@ -48,7 +48,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public SwordsAsTributePatch() : base("7fHHThQr") {}
+    public SwordsAsTributePatch() : base("7fHHThQr") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -68,7 +69,7 @@ public SwordsAsTributePatch() : base("7fHHThQr") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
       var hero = party.LeaderHero;

@@ -19,13 +19,14 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(RulerPatch).GetMethod(nameof(CompanionLimitPatched), NonPublic | Static | DeclaredOnly);
 
-    public RulerPatch() : base("IcgVKFxZ") {}
+    public RulerPatch() : base("IcgVKFxZ") {
+    }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x18, 0xDB, 0x6B, 0x5B, 0xF9, 0x74, 0xDC, 0xA3,
@@ -54,12 +55,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    
     private static void CompanionLimitPatched(Clan __instance, ref int __result) {
       if (__instance.Leader.GetPerkValue(ActivePatch.Perk))
         __result += Town.All.Count(t => t.Owner.Owner == __instance.Leader);
     }
-
 
   }
 

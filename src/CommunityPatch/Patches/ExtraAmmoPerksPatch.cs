@@ -7,16 +7,15 @@ using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
+using static CommunityPatch.Patches.ExtraAmmoPerksPatch;
 
 namespace CommunityPatch.Patches {
 
-  public abstract class ExtraAmmoPerksPatch<TPatch> : PerkPatchBase<TPatch> where TPatch : ExtraAmmoPerksPatch<TPatch> {
+  public static class ExtraAmmoPerksPatch {
 
-    public override bool Applied { get; protected set; }
+    public static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), Public | Instance | DeclaredOnly);
 
-    protected static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), Public | Instance | DeclaredOnly);
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xE5, 0x73, 0x59, 0x27, 0xE5, 0xF6, 0x83, 0x53,
@@ -26,12 +25,20 @@ namespace CommunityPatch.Patches {
       }
     };
 
-    private static readonly FieldInfo MaxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", Instance | NonPublic | DeclaredOnly);
+    public static readonly FieldInfo MaxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", Instance | NonPublic | DeclaredOnly);
 
-    private static readonly FieldInfo AmmoField = typeof(MissionWeapon).GetField("_dataValue", Instance | NonPublic | DeclaredOnly);
+    public static readonly FieldInfo AmmoField = typeof(MissionWeapon).GetField("_dataValue", Instance | NonPublic | DeclaredOnly);
 
-    private static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
+    public static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
       .GetField("_weaponSlots", NonPublic | Instance);
+
+  }
+
+  public abstract class ExtraAmmoPerksPatch<TPatch> : PerkPatchBase<TPatch> where TPatch : ExtraAmmoPerksPatch<TPatch> {
+
+    public static byte[][] Hashes => ExtraAmmoPerksPatch.Hashes;
+
+    public override bool Applied { get; protected set; }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -43,7 +50,7 @@ namespace CommunityPatch.Patches {
         return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      return hash.MatchesAnySha256(ExtraAmmoPerksPatch.Hashes);
     }
 
     protected static bool HasMount(Agent agent) {
@@ -56,12 +63,12 @@ namespace CommunityPatch.Patches {
         return;
 
       var hero = charObj.HeroObject;
-      
-      ApplyPerkToAgent(agent, 
-        (_, weapon) => canApplyPerk(hero, weapon), 
+
+      ApplyPerkToAgent(agent,
+        (_, weapon) => canApplyPerk(hero, weapon),
         _ => ammoAmount);
     }
-    
+
     protected static void ApplyPerkToAgent(Agent agent, Func<Agent, WeaponComponentData, bool> canApplyPerk, Func<short, int> getAmmoIncrease) {
       var missionWeapons = (MissionWeapon[]) WeaponSlotsProperty.GetValue(agent.Equipment);
 

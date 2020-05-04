@@ -9,13 +9,17 @@ using System.Security.Cryptography;
 using System.Text;
 using HarmonyLib;
 using TaleWorlds.Library;
+using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch {
 
   internal static class MethodHelpers {
 
     private static readonly FieldInfo IlInstrOffsetField = typeof(Harmony).Assembly.GetType("HarmonyLib.ILInstruction")
-      .GetField("offset", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      .GetField("offset", Public | NonPublic | Instance | DeclaredOnly);
+
+    private static readonly CustomAttributeBuilder AggressiveInlining =
+      new CustomAttributeBuilder(typeof(MethodImplAttribute).GetConstructor(Public | Instance, null, new[] {typeof(MethodImplOptions)}, null)!, new object[] {MethodImplOptions.AggressiveInlining});
 
     public static byte[] MakeCilSignatureSha256(this MethodBase mb) {
 #if DEBUG_METHOD_SIGNATURE
@@ -180,7 +184,7 @@ namespace CommunityPatch {
 
     public static TDelegate BuildInvoker<TDelegate>(this MethodBase m) where TDelegate : Delegate {
       var td = typeof(TDelegate);
-      var dtMi = td.GetMethod("Invoke", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+      var dtMi = td.GetMethod("Invoke", Public | NonPublic | Static | Instance);
       var dtPs = dtMi!.GetParameters();
       var dt = Dynamic.CreateStaticClass();
       var mn = $"{m.Name}Invoker";
@@ -224,9 +228,9 @@ namespace CommunityPatch {
 
       d.Return();
       var mb = d.CreateMethod();
-      mb.SetCustomAttribute(new CustomAttributeBuilder(AccessTools.Constructor(typeof(MethodImplAttributes)), new object[] {MethodImplOptions.AggressiveInlining}));
+      mb.SetCustomAttribute(AggressiveInlining);
       var dti = dt.CreateTypeInfo();
-      var dmi = dti!.GetMethod(mn, BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public);
+      var dmi = dti!.GetMethod(mn, DeclaredOnly | Static | Public);
       return (TDelegate) dmi!.CreateDelegate(td);
     }
 

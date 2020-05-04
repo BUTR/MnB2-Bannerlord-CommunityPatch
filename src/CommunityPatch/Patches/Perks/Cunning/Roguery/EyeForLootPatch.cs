@@ -24,9 +24,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = RaidingHelper.Hashes;
+    public static byte[][] Hashes => RaidingHelper.Hashes;
 
-public EyeForLoot() : base("bRGnkt9B") {}
+    public EyeForLoot() : base("bRGnkt9B") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -51,7 +52,6 @@ public EyeForLoot() : base("bRGnkt9B") {}
       Applied = true;
     }
 
-    
     public static void Prefix(ref MapEvent __instance) {
       if (RaidingHelper.IsNotRaidingEvent(__instance)) return;
       if (RaidingHelper.IsTheRaidHitNotHappeningNow(__instance, out var damageAccumulated)) return;

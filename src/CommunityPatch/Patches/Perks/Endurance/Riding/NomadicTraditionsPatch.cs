@@ -27,7 +27,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo BaseSpeedMethodInfo = typeof(DefaultPartySpeedCalculatingModel).GetMethod("CalculateBaseSpeedForParty", Instance | NonPublic);
 
-    private static readonly Func<DefaultPartySpeedCalculatingModel, int, float> CalculateBaseSpeedForParty = MountedFootmenRatioModifierMethodInfo.BuildInvoker<Func<DefaultPartySpeedCalculatingModel, int, float>>();
+    private static readonly Func<DefaultPartySpeedCalculatingModel, int, float> CalculateBaseSpeedForParty = BaseSpeedMethodInfo.BuildInvoker<Func<DefaultPartySpeedCalculatingModel, int, float>>();
 
     private static readonly MethodInfo PatchMethodInfo = typeof(NomadicTraditionsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
@@ -94,7 +94,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       var cavalryMagicNumber = GetCavalryRatioModifier(__instance, 1, 1);
       var perkCavalryRatio = nomadicTraditionsPatch.CalculatePerkBaseRatio(cavalryMagicNumber) * cavalryRatio;
 
-      var baseSpeed = CalculateBaseSpeedForParty(__instance,totalTroops);
+      var baseSpeed = CalculateBaseSpeedForParty(__instance, totalTroops);
 
       var explainedNumber = new ExplainedNumber(__result, explanation);
       var perkName = perk.Name;

@@ -30,7 +30,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     public ResolutePatch() : base("aNEj0uIa") {
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x43, 0x16, 0x41, 0xFC, 0xDA, 0xF5, 0x69, 0xBE,

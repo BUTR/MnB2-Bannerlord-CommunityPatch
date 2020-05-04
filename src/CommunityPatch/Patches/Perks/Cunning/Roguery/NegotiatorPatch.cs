@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x7C, 0x2F, 0x71, 0x0A, 0x54, 0x2E, 0x4F, 0x9D,
@@ -34,7 +34,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public NegotiatorPatch() : base("lH8ZMjEo") {}
+    public NegotiatorPatch() : base("lH8ZMjEo") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -53,7 +54,6 @@ public NegotiatorPatch() : base("lH8ZMjEo") {}
       Applied = true;
     }
 
-    
     public static void Postfix(ref int __result) {
       var scout = Hero.MainHero?.PartyBelongedTo?.EffectiveScout;
       if (scout == null) return;

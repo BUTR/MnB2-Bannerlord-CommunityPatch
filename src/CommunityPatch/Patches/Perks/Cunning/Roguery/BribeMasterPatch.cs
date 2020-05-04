@@ -23,7 +23,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x7C, 0x2F, 0x71, 0x0A, 0x54, 0x2E, 0x4F, 0x9D,
@@ -33,7 +33,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public BribeMasterPatch() : base("wb1nbOiq") {}
+    public BribeMasterPatch() : base("wb1nbOiq") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -52,7 +53,6 @@ public BribeMasterPatch() : base("wb1nbOiq") {}
       Applied = true;
     }
 
-    
     public static void Postfix(ref int __result) {
       var perk = ActivePatch.Perk;
       if (!Hero.MainHero.GetPerkValue(perk)) return;

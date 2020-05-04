@@ -23,7 +23,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.2.1.227410
         0xD6, 0xD4, 0xA4, 0xA8, 0x19, 0xEF, 0xE1, 0x6F,
@@ -33,7 +33,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    public HorseGroomingPatch() : base("wtyLhmz5") {}
+    public HorseGroomingPatch() : base("wtyLhmz5") {
+    }
 
     public override bool? IsApplicable(Game game)
       => TargetMethodInfo != null
@@ -47,7 +48,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       Applied = true;
     }
 
-    
     private static void Postfix(Village village, ItemObject item, ref float __result) {
       if (village.VillageState != Village.VillageStates.Normal || !item.IsMountable) {
         return;

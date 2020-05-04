@@ -30,9 +30,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return BombardTargetMethodInfo;
     }
 
-    private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
+    public static byte[][] TooltipHashes => SiegeTooltipHelper.TooltipHashes;
 
-    private static readonly byte[][] BombardHashes = {
+    public static readonly byte[][] BombardHashes = {
       new byte[] {
         // e1.1.0.225190
         0x97, 0xF2, 0xEB, 0x6F, 0xD0, 0x02, 0x95, 0x39,
@@ -42,7 +42,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-public BallisticsPatch() : base("LyVZYGkN") {}
+    public BallisticsPatch() : base("LyVZYGkN") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -73,7 +74,7 @@ public BallisticsPatch() : base("LyVZYGkN") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;
@@ -87,7 +88,7 @@ public BallisticsPatch() : base("LyVZYGkN") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void BombardPrefix(ISiegeEventSide siegeEventSide, SiegeEngineType attackerEngineType, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
       if (!IsCatapult(attackerEngineType)) return;
 

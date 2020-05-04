@@ -25,7 +25,7 @@ namespace CommunityPatch.Patches {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x93, 0x92, 0xD6, 0xB0, 0x05, 0x07, 0xEF, 0xFA,
@@ -35,7 +35,8 @@ namespace CommunityPatch.Patches {
       }
     };
 
-public ProsperousReignPatch() : base("5MjmCaUx") {}
+    public ProsperousReignPatch() : base("5MjmCaUx") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -56,12 +57,12 @@ public ProsperousReignPatch() : base("5MjmCaUx") {}
     }
 
     // ReSharper disable once UnusedParameter.Local
-    
+
     private static void Prefix(Village village, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix(ref float __result, Village village, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
       if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))

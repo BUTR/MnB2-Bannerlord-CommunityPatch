@@ -16,7 +16,7 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
     public override void Apply(Game game) {
       if (Applied) return;
 
-      CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
+      CommunityPatchSubModule.Harmony.Patch(ExtraAmmoPerksPatch.TargetMethodInfo,
         postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
@@ -25,7 +25,6 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
       => WeaponComponentData.GetItemTypeFromWeaponClass(weaponComponentData.WeaponClass) == ItemObject.ItemTypeEnum.Arrows &&
         hero.GetPerkValue(ActivePatch.Perk);
 
-    
     private static void Postfix(Agent __instance)
       => ApplyPerk(__instance, 3, CanApplyPerk);
 

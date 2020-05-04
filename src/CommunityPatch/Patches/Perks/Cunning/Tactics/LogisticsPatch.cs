@@ -13,16 +13,16 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(LogisticsPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
-    public LogisticsPatch() : base("Ilh6hVTu") {}
+    public LogisticsPatch() : base("Ilh6hVTu") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
 
-      CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
+      CommunityPatchSubModule.Harmony.Patch(ExtraAmmoPerksPatch.TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
-    
     private static void Postfix(Agent __instance) {
       if (ActivePatch.MyLeaderIsIntoLogistics(__instance))
         ApplyPerkToAgent(__instance, CanApplyPerk, ActivePatch.CalculateAmmoIncrease);

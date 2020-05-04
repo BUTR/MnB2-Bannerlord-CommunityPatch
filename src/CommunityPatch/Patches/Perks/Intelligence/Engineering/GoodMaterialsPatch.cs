@@ -49,9 +49,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return MaxHitPointsTargetMethodInfo;
     }
 
-public GoodMaterialsPatch() : base("EJCrymMr") {}
+    public GoodMaterialsPatch() : base("EJCrymMr") {
+    }
 
-private static readonly byte[][] AiHashes = {
+    public static readonly byte[][] AiHashes = {
       new byte[] {
         // e1.1.0.225190
         0x27, 0x47, 0x64, 0x00, 0xA1, 0x01, 0x5C, 0x6B,
@@ -61,7 +62,7 @@ private static readonly byte[][] AiHashes = {
       }
     };
 
-    private static readonly byte[][] PlayerHashes = {
+    public static readonly byte[][] PlayerHashes = {
       new byte[] {
         // e1.1.0.225190
         0x6A, 0x17, 0x74, 0xF3, 0xA5, 0xF0, 0xCC, 0x28,
@@ -71,7 +72,7 @@ private static readonly byte[][] AiHashes = {
       }
     };
 
-    private static readonly byte[][] MaxHitPointsHashes = {
+    public static readonly byte[][] MaxHitPointsHashes = {
       new byte[] {
         // e1.1.0.225190
         0xA0, 0x5E, 0x45, 0x04, 0x48, 0xD6, 0xCF, 0xBB,
@@ -81,7 +82,7 @@ private static readonly byte[][] AiHashes = {
       }
     };
 
-    private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
+    public static byte[][] TooltipHashes => SiegeTooltipHelper.TooltipHashes;
 
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
@@ -128,7 +129,6 @@ private static readonly byte[][] AiHashes = {
       Applied = true;
     }
 
-    
     public static void AiPostfix(ref SiegeEvent __instance, SiegeEvent.SiegeEnginesContainer siegeEngines, SiegeStrategyActionModel.SiegeAction siegeAction) {
       if (siegeAction != SiegeStrategyActionModel.SiegeAction.ConstructNewSiegeEngine) return;
 
@@ -140,7 +140,6 @@ private static readonly byte[][] AiHashes = {
       ApplyPerkToSiegeEngine(justDeployedEngine, sideSiegeEvent);
     }
 
-    
     // ReSharper disable once RedundantAssignment
     public static void PlayerPrefix(ref object __instance, out (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
@@ -155,11 +154,11 @@ private static readonly byte[][] AiHashes = {
       __state = (deployedSiegeEngineCount, reservedSiegeEngineCount);
     }
 
-    
     public static void PlayerPostfix(ref object __instance, ref (int DeployedCount, int ReservedCount) __state) {
       var siegeEvent = GetSiegeEventFromVm(__instance);
       if (siegeEvent == null)
         return;
+
       var playerSideSiegeEvent = siegeEvent.GetSiegeEventSide(GetPlayerSideFromVm(__instance));
 
       if (!HasSiegeEngineJustBeenConstructed(playerSideSiegeEvent, __state.DeployedCount, __state.ReservedCount)) return;
@@ -168,7 +167,6 @@ private static readonly byte[][] AiHashes = {
       ApplyPerkToSiegeEngine(justDeployedEngine, playerSideSiegeEvent);
     }
 
-    
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress? engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null || engineInProgress == null) return;
@@ -178,7 +176,6 @@ private static readonly byte[][] AiHashes = {
       SiegeTooltipHelper.UpdateMaxHpTooltip(__result, bonusFlatHp);
     }
 
-    
     // ReSharper disable once RedundantAssignment
     public static void MaxHitPointsPostfix(ref float __result, ref SiegeEvent.SiegeEngineConstructionProgress __instance)
       => __result = SiegeEngineConstructionExtraDataManager.GetMaxHitPoints(__instance);

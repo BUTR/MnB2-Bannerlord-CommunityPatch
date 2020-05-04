@@ -10,12 +10,12 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches {
 
   public abstract class SimulateHitPatch<TPatch> : PerkPatchBase<TPatch> where TPatch : PatchBase<TPatch> {
-    
+
     public override bool Applied { get; protected set; }
 
     protected static readonly MethodInfo TargetMethodInfo = typeof(DefaultCombatSimulationModel).GetMethod(nameof(DefaultCombatSimulationModel.SimulateHit), Public | Instance | DeclaredOnly);
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x01, 0x52, 0x68, 0x11, 0x93, 0xB2, 0xA1, 0x81,
@@ -24,14 +24,14 @@ namespace CommunityPatch.Patches {
         0x69, 0xBC, 0x13, 0xFF, 0x40, 0xD4, 0x49, 0x4C
       }
     };
-    
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
-      
+
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
@@ -39,9 +39,10 @@ namespace CommunityPatch.Patches {
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
     }
-    
+
     protected static void ApplyPerk(ref int totalDamage, PerkObject perk, PartyBase strikerParty) {
       if (strikerParty.LeaderHero?.GetPerkValue(perk) != true) return;
+
       totalDamage += (int) (totalDamage * perk.PrimaryBonus);
     }
 
@@ -49,4 +50,5 @@ namespace CommunityPatch.Patches {
     }
 
   }
+
 }

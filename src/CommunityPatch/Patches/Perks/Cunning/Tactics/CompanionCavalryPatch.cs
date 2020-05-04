@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xDC, 0x73, 0xE5, 0x9D, 0x02, 0x06, 0x68, 0x6B,
@@ -34,7 +34,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       }
     };
 
-public CompanionCavalryPatch() : base("UqzavawD") {}
+    public CompanionCavalryPatch() : base("UqzavawD") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -55,7 +56,7 @@ public CompanionCavalryPatch() : base("UqzavawD") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Postfix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
       var affectorLeaderCharacter = (CharacterObject) affectorAgent?.Team?.Leader?.Character;

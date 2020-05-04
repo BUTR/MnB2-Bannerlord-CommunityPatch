@@ -23,7 +23,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x1B, 0x73, 0xA3, 0x7B, 0xB4, 0x88, 0x33, 0x47,
@@ -33,7 +33,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public WarmongerPatch() : base("ldk9Xvod") {}
+    public WarmongerPatch() : base("ldk9Xvod") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -53,7 +54,7 @@ public WarmongerPatch() : base("ldk9Xvod") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix(ref int __result, MobileParty armyLeaderParty) {
       var perk = ActivePatch.Perk;
       if (!(armyLeaderParty.LeaderHero?.GetPerkValue(perk) ?? false))

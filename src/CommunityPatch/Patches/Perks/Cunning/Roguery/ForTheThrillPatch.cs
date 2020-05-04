@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x67, 0x3C, 0x63, 0x7B, 0xD0, 0x08, 0x5F, 0x69,
@@ -34,7 +34,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public ForTheThrillPatch() : base("WACam22Q") {}
+    public ForTheThrillPatch() : base("WACam22Q") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -56,7 +57,7 @@ public ForTheThrillPatch() : base("WACam22Q") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Prefix(ref MapEvent __instance) {
       var attackers = __instance.AttackerSide.Parties.Where(x => x.MobileParty != null).ToArray();
       var moraleGain = CalculateMoralGain(attackers);

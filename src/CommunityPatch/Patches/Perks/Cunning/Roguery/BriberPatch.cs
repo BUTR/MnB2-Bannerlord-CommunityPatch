@@ -40,7 +40,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return CaravansSurrenderTargetMethodInfo;
     }
 
-    private static readonly byte[][] VillagerBribeHashes = {
+    public static readonly byte[][] VillagerBribeHashes = {
       new byte[] {
         // e1.1.0.225190
         0x34, 0xFC, 0xFA, 0xC6, 0x4B, 0x12, 0xCB, 0x84,
@@ -50,7 +50,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    private static readonly byte[][] VillagerSurrenderHashes = {
+    public static readonly byte[][] VillagerSurrenderHashes = {
       new byte[] {
         // e1.1.0.225190
         0x62, 0x63, 0xC2, 0x33, 0xD9, 0xEB, 0x09, 0xBA,
@@ -60,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    private static readonly byte[][] CaravansBribeHashes = {
+    public static readonly byte[][] CaravansBribeHashes = {
       new byte[] {
         // e1.1.0.225190
         0x09, 0x11, 0xA8, 0x72, 0x94, 0xC0, 0x05, 0x88,
@@ -70,7 +70,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    private static readonly byte[][] CaravansSurrenderHashes = {
+    public static readonly byte[][] CaravansSurrenderHashes = {
       new byte[] {
         // e1.1.0.225190
         0x07, 0xAC, 0x8C, 0x34, 0x03, 0x89, 0x95, 0xDD,
@@ -80,7 +80,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public BriberPatch() : base("5Trq1mQL") {}
+    public BriberPatch() : base("5Trq1mQL") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -120,28 +121,28 @@ public BriberPatch() : base("5Trq1mQL") {}
     }
 
     // ReSharper disable once RedundantAssignment
-    
+
     public static bool PrefixVillageBribe(ref bool __result) {
       __result = Bribe(3, .05f, .4f);
       return false;
     }
 
     // ReSharper disable once RedundantAssignment
-    
+
     public static bool PrefixVillageSurrender(ref bool __result) {
       __result = Bribe(4, .05f, .1f);
       return false;
     }
 
     // ReSharper disable once RedundantAssignment
-    
+
     public static bool PrefixCaravansBribe(ref bool __result) {
       __result = Bribe(4, .1f, .6f);
       return false;
     }
 
     // ReSharper disable once RedundantAssignment
-    
+
     public static bool PrefixCaravansSurrender(ref bool __result) {
       __result = Bribe(7, .1f, .1f);
       return false;

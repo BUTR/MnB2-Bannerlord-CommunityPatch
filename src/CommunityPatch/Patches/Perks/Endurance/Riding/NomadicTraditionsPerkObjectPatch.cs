@@ -19,7 +19,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       Applied = true;
     }
 
-public NomadicTraditionsPerkObjectPatch() : base("PB5iowxh") {}
+    public NomadicTraditionsPerkObjectPatch() : base("PB5iowxh") {
+    }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield break;

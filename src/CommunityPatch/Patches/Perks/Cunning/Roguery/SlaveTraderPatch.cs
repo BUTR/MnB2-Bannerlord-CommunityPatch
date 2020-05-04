@@ -22,7 +22,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xB4, 0xEA, 0x03, 0x63, 0x1F, 0x2B, 0xA6, 0x8C,
@@ -32,7 +32,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public SlaveTraderPatch() : base("jNbTBxEW") {}
+    public SlaveTraderPatch() : base("jNbTBxEW") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -53,7 +54,6 @@ public SlaveTraderPatch() : base("jNbTBxEW") {}
       Applied = true;
     }
 
-    
     public static void Postfix(ref int __result, Hero sellerHero = null) {
       if (sellerHero == null) return;
 

@@ -15,7 +15,7 @@ namespace CommunityPatch.Patches.Feats {
 
     private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(BattanianForestAgilityPatch), nameof(Postfix));
 
-    private static readonly float MovingAtForestEffect = AccessTools.StaticFieldRefAccess<DefaultPartySpeedCalculatingModel, float>("MovingAtForestEffect");
+    private static readonly float MovingAtForestEffect = (float) AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingAtForestEffect").GetRawConstantValue();
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AgilityPatchShared.CalculateFinalSpeedMethodInfo;

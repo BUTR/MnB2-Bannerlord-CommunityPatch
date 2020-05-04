@@ -8,6 +8,8 @@ using static System.Reflection.BindingFlags;
 
 internal static class CommunityPatchLoader {
 
+  private static readonly ApplicationVersionComparer VersionComparer = new ApplicationVersionComparer();
+
   public static string GetFormattedCsHexArray(this byte[] bytes) {
     var sb = new StringBuilder();
 
@@ -45,9 +47,17 @@ internal static class CommunityPatchLoader {
     => bytes?.GetFormattedCsHexArray();
 
   public static void GenerateHashes() {
+    var gameVersion = CommunityPatchSubModule.GameVersion;
     foreach (var patch in CommunityPatchSubModule.Patches) {
       var type = patch.GetType();
+      var obsolete = type.GetCustomAttribute<PatchObsoleteAttribute>();
       var patchName = type.Name;
+      if (obsolete != null)
+        if (VersionComparer.Compare(gameVersion, obsolete.Version) >= 0) {
+          Console.WriteLine($"{patchName}: obsoleted by version, {gameVersion} vs. {obsolete.Version}");
+          continue;
+        }
+
       try {
         foreach (var mb in patch.GetMethodsChecked()) {
           var mbName = mb.Name;

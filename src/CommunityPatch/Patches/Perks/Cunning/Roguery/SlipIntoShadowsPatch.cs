@@ -23,7 +23,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xAD, 0x2A, 0x34, 0x12, 0x4D, 0x03, 0xF5, 0x3D,
@@ -33,7 +33,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public SlipIntoShadowsPatch() : base("Eth2Z6qK") {}
+    public SlipIntoShadowsPatch() : base("Eth2Z6qK") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -53,7 +54,6 @@ public SlipIntoShadowsPatch() : base("Eth2Z6qK") {}
       Applied = true;
     }
 
-    
     public static void Postfix(ref float __result) {
       var perk = ActivePatch.Perk;
       var scout = Hero.MainHero.PartyBelongedTo.EffectiveScout;

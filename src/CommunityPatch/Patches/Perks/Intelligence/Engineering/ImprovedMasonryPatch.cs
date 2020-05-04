@@ -25,7 +25,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xD7, 0x43, 0xD4, 0x5F, 0xE4, 0xDD, 0xF1, 0x9B,
@@ -35,7 +35,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-public ImprovedMasonryPatch() : base("R60kenU3") {}
+    public ImprovedMasonryPatch() : base("R60kenU3") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -60,7 +61,7 @@ public ImprovedMasonryPatch() : base("R60kenU3") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Postfix(ref float __result, Town town, StatExplainer explanation = null) {
       var perk = ActivePatch.Perk;
       var totalHP = new ExplainedNumber(__result, explanation);

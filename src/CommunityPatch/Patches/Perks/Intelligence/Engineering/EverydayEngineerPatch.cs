@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xAA, 0x75, 0x66, 0xFC, 0x8F, 0x81, 0x1E, 0xB2,
@@ -34,7 +34,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-public EverydayEngineerPatch() : base("wwuuplH7") {}
+    public EverydayEngineerPatch() : base("wwuuplH7") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -56,7 +57,6 @@ public EverydayEngineerPatch() : base("wwuuplH7") {}
       Applied = true;
     }
 
-    
     public static void Postfix(ref float __result, Building building) {
       if (!building.BuildingType.IsDefaultProject) return;
       if (building.Town == null) return;

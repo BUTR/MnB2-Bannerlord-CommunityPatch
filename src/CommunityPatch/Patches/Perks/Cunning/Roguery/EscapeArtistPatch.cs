@@ -23,7 +23,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xC0, 0xD9, 0x79, 0x81, 0x79, 0xBE, 0x1B, 0x3B,
@@ -33,7 +33,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-public EscapeArtistPatch() : base("hJZDOSQ0") {}
+    public EscapeArtistPatch() : base("hJZDOSQ0") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -55,7 +56,7 @@ public EscapeArtistPatch() : base("hJZDOSQ0") {}
     }
 
     // ReSharper disable once RedundantAssignment
-    
+
     public static bool Prefix(ref bool __result, CampaignTime eventBeginTime, float hoursToWait) {
       var perk = ActivePatch.Perk;
       var elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;

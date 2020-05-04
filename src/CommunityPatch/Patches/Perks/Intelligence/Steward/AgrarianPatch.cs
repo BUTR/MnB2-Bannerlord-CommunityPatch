@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0xB6, 0x97, 0x7F, 0x48, 0x9D, 0x7D, 0x8D, 0x7F,
@@ -34,7 +34,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public AgrarianPatch() : base("XNc2NIGL") {}
+    public AgrarianPatch() : base("XNc2NIGL") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -63,7 +64,7 @@ public AgrarianPatch() : base("XNc2NIGL") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Postfix(ref float __result, Village village) {
       var perk = ActivePatch.Perk;
       if (!(village.Bound?.Town?.Governor?.GetPerkValue(perk) ?? false))

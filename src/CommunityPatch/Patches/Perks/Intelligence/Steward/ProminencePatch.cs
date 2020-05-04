@@ -22,7 +22,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0xDB, 0x69, 0x3E, 0x84, 0xBE, 0x6B, 0x4C, 0xA6,
@@ -46,7 +46,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public ProminencePatch() : base("71EyPbaE") {}
+    public ProminencePatch() : base("71EyPbaE") {
+    }
 
     public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -67,7 +68,7 @@ public ProminencePatch() : base("71EyPbaE") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Postfix(Clan clan, ref ExplainedNumber influenceChange) {
       var perk = ActivePatch.Perk;
 

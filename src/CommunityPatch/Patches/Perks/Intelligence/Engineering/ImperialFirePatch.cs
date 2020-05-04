@@ -32,7 +32,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return DefenderTargetMethodInfo;
     }
 
-    private static readonly byte[][] AttackerHashes = {
+    public static readonly byte[][] AttackerHashes = {
       new byte[] {
         // e1.1.0.225190
         0xAC, 0x2D, 0x81, 0xE5, 0xC9, 0xA7, 0x97, 0x09,
@@ -42,7 +42,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    private static readonly byte[][] DefenderHashes = {
+    public static readonly byte[][] DefenderHashes = {
       new byte[] {
         // e1.1.0.225190
         0x36, 0x8E, 0x5A, 0x15, 0x31, 0xDC, 0xB0, 0x6F,
@@ -52,7 +52,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-public ImperialFirePatch() : base("UaZSa5mY") {}
+    public ImperialFirePatch() : base("UaZSa5mY") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -82,7 +83,7 @@ public ImperialFirePatch() : base("UaZSa5mY") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     public static void Postfix(ref IEnumerable<SiegeEngineType> __result) {
       if (Hero.MainHero == null) return;
       if (AnyPartyMemberHasThePerkActive(Hero.MainHero.PartyBelongedTo)) return;

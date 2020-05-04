@@ -8,6 +8,7 @@ using HarmonyLib;
 using Mono.Cecil.Cil;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using static CommunityPatch.HarmonyHelpers;
@@ -15,6 +16,7 @@ using OpCodes = System.Reflection.Emit.OpCodes;
 
 namespace CommunityPatch.Patches {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 3)]
   public sealed class EarlyStoryVisibleTimeoutPatch : IPatch {
 
     private static readonly byte[] IsRemainingTimeHiddenGetterBodyIl = {
@@ -38,6 +40,7 @@ namespace CommunityPatch.Patches {
           if (getter.IsStatic) {
             throw new InvalidOperationException("an IsRemainingTimeHidden property was not an instance property, which we require.");
           }
+
           return getter;
         })
         .ToList();
@@ -52,7 +55,8 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo FirstPhaseFirstPhaseStartTimeGetter = AccessTools.PropertyGetter(FirstPhaseType, "FirstPhaseStartTime");
 
-    private static CampaignTime GetFirstPhaseFirstPhaseStartTime(object instance) => (CampaignTime) FirstPhaseFirstPhaseStartTimeGetter.Invoke(instance, null);
+    private static CampaignTime GetFirstPhaseFirstPhaseStartTime(object instance)
+      => (CampaignTime) FirstPhaseFirstPhaseStartTimeGetter.Invoke(instance, null);
 
     private static readonly Type SecondPhaseType = Type.GetType("StoryMode.StoryModePhases.SecondPhase" + StoryModeAsmSpecifierSuffix);
 
@@ -105,7 +109,8 @@ namespace CommunityPatch.Patches {
       return true;
     }
 
-    public IEnumerable<MethodBase> GetMethodsChecked() => FirstPhaseQuestRemainingTimeHiddenGetters;
+    public IEnumerable<MethodBase> GetMethodsChecked()
+      => FirstPhaseQuestRemainingTimeHiddenGetters;
 
     private static int ExtractFirstPhaseTimeLimitInYears() {
       if (FirstPhaseTimeLimitInYearsField == null)

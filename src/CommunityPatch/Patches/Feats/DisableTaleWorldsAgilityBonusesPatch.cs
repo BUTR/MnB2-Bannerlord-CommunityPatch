@@ -15,7 +15,7 @@ namespace CommunityPatch.Patches.Feats {
 
     private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(DisableTaleWorldsAgilityBonusesPatch), nameof(Prefix));
 
-    private static readonly byte[][] ValidHashes = {
+    public static readonly byte[][] ValidHashes = {
       new byte[] {
         // e1.3.0.226834
         0x29, 0x53, 0x91, 0xD0, 0xA9, 0xC2, 0x81, 0xA5,

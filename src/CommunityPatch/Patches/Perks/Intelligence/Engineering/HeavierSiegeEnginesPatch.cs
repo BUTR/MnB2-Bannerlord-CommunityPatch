@@ -30,9 +30,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TooltipTargetMethodInfo;
     }
 
-    private static readonly byte[][] TooltipHashes = SiegeTooltipHelper.TooltipHashes;
+    public static byte[][] TooltipHashes => SiegeTooltipHelper.TooltipHashes;
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x97, 0xF2, 0xEB, 0x6F, 0xD0, 0x02, 0x95, 0x39,
@@ -42,7 +42,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-public HeavierSiegeEnginesPatch() : base("qXkWSgwA") {}
+    public HeavierSiegeEnginesPatch() : base("qXkWSgwA") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -72,13 +73,11 @@ public HeavierSiegeEnginesPatch() : base("qXkWSgwA") {}
       Applied = true;
     }
 
-    
     public static void Prefix(ISiegeEventSide siegeEventSide, SiegeEngineType attackerEngineType, SiegeEvent.SiegeEngineConstructionProgress damagedEngine) {
       CalculateBonusDamageAndRates(attackerEngineType, siegeEventSide, out _, out var bonusDamageOnly);
       damagedEngine.SetHitpoints(damagedEngine.Hitpoints - bonusDamageOnly);
     }
 
-    
     public static void TooltipPostfix(ref List<TooltipProperty> __result, SiegeEvent.SiegeEngineConstructionProgress engineInProgress = null) {
       var siegeEventSide = SiegeTooltipHelper.GetConstructionSiegeEventSide(engineInProgress);
       if (siegeEventSide == null) return;

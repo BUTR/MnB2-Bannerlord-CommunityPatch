@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x83, 0xCF, 0x66, 0x4A, 0x31, 0x3B, 0xF7, 0x98,
@@ -34,7 +34,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public EnhancedMinesPatch() : base("6oE7rB6q") {}
+    public EnhancedMinesPatch() : base("6oE7rB6q") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator

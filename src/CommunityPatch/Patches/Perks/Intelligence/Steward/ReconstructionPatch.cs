@@ -23,7 +23,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.0.10
         0x28, 0xDC, 0x69, 0xF2, 0xC3, 0xC2, 0x19, 0xBD,
@@ -33,7 +33,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public ReconstructionPatch() : base("Fa01e9kY") {}
+    public ReconstructionPatch() : base("Fa01e9kY") {
+    }
 
     public override void Apply(Game game) {
       Perk.Modify(2.0f, SkillEffect.EffectIncrementType.AddFactor);
@@ -55,7 +56,7 @@ public ReconstructionPatch() : base("Fa01e9kY") {}
     }
 
     // ReSharper disable once InconsistentNaming
-    
+
     private static void Prefix(Settlement settlement, ref float percentage) {
       var perk = ActivePatch.Perk;
       var governor = settlement.Town?.Governor;

@@ -24,6 +24,16 @@ namespace CommunityPatch.Patches {
         .GetMethod(nameof(Postfix),
           Public | NonPublic | Static | DeclaredOnly);
 
+    public static readonly byte[][] Hashes = {
+      new byte[] {
+        // e1.3.0.227640
+        0x19, 0xA8, 0x52, 0x06, 0xF6, 0x89, 0xE3, 0xEB,
+        0xC5, 0x91, 0x32, 0x64, 0x2B, 0x61, 0xC0, 0xAF,
+        0xD5, 0x27, 0x7A, 0x91, 0x89, 0xF2, 0x16, 0x8D,
+        0xB7, 0x68, 0xB9, 0xC3, 0x4B, 0xA8, 0x4F, 0xE3
+      }
+    };
+
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
@@ -33,8 +43,8 @@ namespace CommunityPatch.Patches {
       if (AlreadyPatched(patchInfo))
         return false;
 
-      //var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      //return hash.MatchesAnySha256(Hashes);
+      return TargetMethodInfo.MakeCilSignatureSha256()
+        .MatchesAnySha256(Hashes);
       return true;
     }
 
@@ -46,7 +56,6 @@ namespace CommunityPatch.Patches {
       Applied = true;
     }
 
-    
     public static void Postfix(Clan __instance, ref Hero __result) {
       if (__result == null)
         return;

@@ -25,17 +25,25 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x6E, 0x32, 0xE7, 0x07, 0x5A, 0xEC, 0x54, 0x10,
         0x9D, 0x9E, 0x0E, 0x6F, 0xF2, 0x82, 0x53, 0xB1,
         0xE0, 0x6D, 0x90, 0x47, 0x0A, 0x88, 0x59, 0x8F,
         0x28, 0x63, 0x8F, 0x51, 0x94, 0x2A, 0x8C, 0x5F
+      },new byte[] {
+        // e1.3.0.227640
+        0xFA, 0x09, 0x52, 0x78, 0x52, 0xBF, 0x11, 0x77,
+        0x03, 0x29, 0xC5, 0x18, 0x80, 0xB9, 0x5A, 0x2C,
+        0xC3, 0xF4, 0x96, 0xB5, 0x5E, 0xEA, 0x5B, 0x7F,
+        0x9B, 0x49, 0x01, 0x9C, 0x73, 0x5C, 0xC4, 0x69
       }
+
     };
 
-public ScavengerPatch() : base("cYjeJTb8") {}
+    public ScavengerPatch() : base("cYjeJTb8") {
+    }
 
     public override bool? IsApplicable(Game game) {
       if (Perk == null) return false;
@@ -55,7 +63,6 @@ public ScavengerPatch() : base("cYjeJTb8") {}
       Applied = true;
     }
 
-    
     public static void Prefix(ref object __instance, PartyBase partyToReceiveLoot, PartyBase winnerParty, float lootAmount) {
       var lootFactor = CalculateLootFactor(winnerParty);
       if (lootFactor.IsZero()) return;

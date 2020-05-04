@@ -9,15 +9,15 @@ namespace CommunityPatch {
 
   public static class LootCollectorHelper {
 
-    private static readonly Type LootCollector = Type.GetType("TaleWorlds.CampaignSystem.LootCollector, TaleWorlds.CampaignSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+    private static readonly Type LootCollectorType = Type.GetType("TaleWorlds.CampaignSystem.LootCollector, TaleWorlds.CampaignSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 
-    public static readonly MethodInfo GiveShareOfLootToPartyMethod = LootCollector?.GetMethod("GiveShareOfLootToParty", NonPublic | Instance | DeclaredOnly);
+    public static readonly MethodInfo GiveShareOfLootToPartyMethod = LootCollectorType?.GetMethod("GiveShareOfLootToParty", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo LootCasualtiesMethod = LootCollector?.GetMethod("LootCasualties", NonPublic | Instance | DeclaredOnly);
+    private static readonly MethodInfo LootCasualtiesMethod = LootCollectorType?.GetMethod("LootCasualties", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo ConvertLootToGoldMethod = LootCollector?.GetMethod("ConvertLootToGold", NonPublic | Static | DeclaredOnly);
+    private static readonly MethodInfo ConvertLootToGoldMethod = LootCollectorType?.GetMethod("ConvertLootToGold", NonPublic | Static | DeclaredOnly);
 
-    private static readonly PropertyInfo CasualtiesInBattle = LootCollector?.GetProperty("CasualtiesInBattle", Public | Instance | DeclaredOnly);
+    private static readonly PropertyInfo CasualtiesInBattle = LootCollectorType?.GetProperty("CasualtiesInBattle", Public | Instance | DeclaredOnly);
 
     public static TroopRoster GetCasualtiesInBattle(object lootCollector)
       => GetPropertyValue<TroopRoster>(CasualtiesInBattle, lootCollector);

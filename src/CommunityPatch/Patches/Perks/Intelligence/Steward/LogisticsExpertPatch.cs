@@ -22,7 +22,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x58, 0xF5, 0x64, 0xA2, 0xE1, 0x17, 0x5C, 0x0C,
@@ -32,7 +32,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-public LogisticsExpertPatch() : base("6JaeM2p2") {}
+    public LogisticsExpertPatch() : base("6JaeM2p2") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
