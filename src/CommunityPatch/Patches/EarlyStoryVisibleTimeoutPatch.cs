@@ -16,7 +16,6 @@ using OpCodes = System.Reflection.Emit.OpCodes;
 
 namespace CommunityPatch.Patches {
 
-  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 3)]
   public sealed class EarlyStoryVisibleTimeoutPatch : IPatch {
 
     private static readonly byte[] IsRemainingTimeHiddenGetterBodyIl = {
