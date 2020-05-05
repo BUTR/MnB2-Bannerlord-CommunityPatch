@@ -161,6 +161,7 @@ namespace Antijank {
               MbObjectManagerPatch.Init();
             if (Options.EnableFixMissingProperties)
               FixMissingPropertiesPatches.Init();
+            MemoryCleanupPatch.Init();
             break;
           }
         }
@@ -185,6 +186,7 @@ namespace Antijank {
 
     public override HostExecutionContextManager HostExecutionContextManager
       => WarpManager.Instance;
+
   }
 
 }

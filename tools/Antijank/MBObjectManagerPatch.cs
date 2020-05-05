@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -13,7 +14,16 @@ namespace Antijank {
 
   public static class MbObjectManagerPatch {
 
+    private static int InitCount = 0;
+    
     static MbObjectManagerPatch() {
+      if (InitCount > 0) {
+        if (Debugger.IsAttached)
+          Debugger.Break();
+        throw new InvalidOperationException("Multiple static initializer runs!");
+      }
+
+      ++InitCount;
       Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "CreateDocumentFromXmlFile"),
         postfix: new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(CreateDocumentFromXmlFilePostfix)));
       Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "MergeTwoXmls"),

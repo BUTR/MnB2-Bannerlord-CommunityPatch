@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.GauntletUI;
@@ -22,11 +23,21 @@ namespace Antijank {
 
     private static readonly FieldInfo CustomWidgetTypeResourcesPathField = AccessTools.Field(CustomWidgetTypeType, "_resourcesPath");
 
-    static WidgetFactoryPatch()
-      => Context.Harmony.Patch(
+    private static int InitCount = 0;
+    
+    static WidgetFactoryPatch() {
+      if (InitCount > 0) {
+        if (Debugger.IsAttached)
+          Debugger.Break();
+        throw new InvalidOperationException("Multiple static initializer runs!");
+      }
+
+      ++InitCount;
+      Context.Harmony.Patch(
         AccessTools.Method(typeof(WidgetFactory), "Initialize"),
         new HarmonyMethod(typeof(WidgetFactoryPatch), nameof(InitializeReplacement))
       );
+    }
 
     public static void Init() {
       // runs static initializer

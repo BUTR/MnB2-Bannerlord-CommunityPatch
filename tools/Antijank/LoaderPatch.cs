@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -31,7 +32,16 @@ namespace Antijank {
 
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
+    private static int InitCount = 0;
+
     static LoaderPatch() {
+      if (InitCount > 0) {
+        if (Debugger.IsAttached)
+          Debugger.Break();
+        throw new InvalidOperationException("Multiple static initializer runs!");
+      }
+
+      ++InitCount;
       Context.Harmony.Patch(
         typeof(LauncherModsVM).GetMethod("LoadSubModules", Declared),
         new HarmonyMethod(typeof(LoaderPatch), nameof(LoadSubModulesPrefix)));

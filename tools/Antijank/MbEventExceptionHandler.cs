@@ -22,7 +22,16 @@ namespace Antijank {
 
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | Any;
 
-    static unsafe MbEventExceptionHandler() {
+    private static int InitCount = 0;
+    
+    static MbEventExceptionHandler() {
+      if (InitCount > 0) {
+        if (Debugger.IsAttached)
+          Debugger.Break();
+        throw new InvalidOperationException("Multiple static initializer runs!");
+      }
+
+      ++InitCount;
       Context.Harmony.Patch(
         typeof(MbEvent).GetMethod("InvokeList", Declared),
         new HarmonyMethod(typeof(MbEventExceptionHandler).GetMethod(nameof(InvokeListReplacementPatch), Declared)));

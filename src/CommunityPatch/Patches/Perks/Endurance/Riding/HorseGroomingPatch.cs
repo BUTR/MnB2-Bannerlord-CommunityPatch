@@ -49,17 +49,19 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     private static void Postfix(Village village, ItemObject item, ref float __result) {
-      if (village.VillageState != Village.VillageStates.Normal || !item.IsMountable) {
+      if (village?.VillageState != Village.VillageStates.Normal || !(item?.IsMountable ?? false))
         return;
-      }
 
-      if (village.Bound.Town.Owner?.Settlement.OwnerClan?.Leader.GetPerkValue(ActivePatch.Perk) ?? false) {
-        __result = village.VillageType.Productions
-          .Where(productionItemTuple => productionItemTuple.Item1 == item)
-          .Select(productionItemTuple => productionItemTuple.Item2)
-          .Aggregate(0, (float acc, float currentProductionValue)
-            => acc + currentProductionValue * (1 + ActivePatch.Perk.PrimaryBonus));
-      }
+      if (!(village.Bound?.Town?.Owner?.Settlement?.OwnerClan?.Leader?.GetPerkValue(ActivePatch.Perk) ?? false))
+        return;
+
+      var production = village.VillageType?.Productions
+        ?.Where(productionItemTuple => productionItemTuple.Item1 == item)
+        .Select(productionItemTuple => productionItemTuple.Item2)
+        .Aggregate(0, (float acc, float currentProductionValue)
+          => acc + currentProductionValue * (1 + ActivePatch.Perk.PrimaryBonus));
+
+      __result = production ?? __result;
     }
 
   }

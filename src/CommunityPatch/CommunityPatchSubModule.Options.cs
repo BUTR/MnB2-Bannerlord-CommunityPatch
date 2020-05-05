@@ -30,6 +30,12 @@ namespace CommunityPatch {
       set => Options.Set(nameof(DontGroupThirdPartyMenuOptions), value);
     }
 
+    internal static bool QuartermasterIsClanWide {
+      get => Options.Get<bool>(nameof(QuartermasterIsClanWide));
+      set => Options.Set(nameof(QuartermasterIsClanWide), value);
+      
+    }
+
     internal void ShowOptions() {
       // ReSharper disable once UseObjectOrCollectionInitializer
       var elements = new List<InquiryElement>();
@@ -55,6 +61,11 @@ namespace CommunityPatch {
       elements.Add(new InquiryElement(
         nameof(DontGroupThirdPartyMenuOptions),
         DontGroupThirdPartyMenuOptions ? "Group 3rd Party Menu Options" : "Don't Group 3rd Party Menu Options",
+        null));
+
+      elements.Add(new InquiryElement(
+        nameof(QuartermasterIsClanWide),
+        QuartermasterIsClanWide ? "Quartermaster Is Clan Wide" : "Quartermaster Is Party Specific",
         null));
 
       elements.Add(new InquiryElement(
@@ -115,6 +126,12 @@ namespace CommunityPatch {
         case nameof(DontGroupThirdPartyMenuOptions):
           DontGroupThirdPartyMenuOptions = !DontGroupThirdPartyMenuOptions;
           ShowMessage($"3rd Party Menu Options: {(DontGroupThirdPartyMenuOptions ? "Loose" : "Grouped")}.");
+          Options.Save();
+          break;
+
+        case nameof(QuartermasterIsClanWide):
+          QuartermasterIsClanWide = !QuartermasterIsClanWide;
+          ShowMessage($"Quartermaster Effects: {(QuartermasterIsClanWide ? "Clan-Wide" : "Party Only")}.");
           Options.Save();
           break;
 
