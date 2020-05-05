@@ -85,32 +85,31 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         explanation?.AddLine(perk.Name.ToString(), -flatReduction);
     }
 
-    private static float CalculatePerkReduction(Army army, PerkObject perk)
-    {
-      var partyMemberPower = new ExplainedNumber(1f);
-
-      foreach (var party in army.Parties)
-        PerkHelper.AddPerkBonusForParty(perk, party, ref partyMemberPower);
-
-      var partyMemberFactorBonus = perk.PrimaryBonus / 100f;
-      var additiveReduction = partyMemberPower.ResultNumber - partyMemberPower.BaseNumber;
-      var partyMemberCount = (int) (additiveReduction / partyMemberFactorBonus);
-
-      return CalculateMultiplicativeBonus(partyMemberFactorBonus, partyMemberCount);
+    private static float CalculatePerkReduction(Army army, PerkObject perk) {
+      var perkReductionBonus = perk.PrimaryBonus / 100f;
+      if (PartyHasPerk(army.LeaderParty, perk)) return perkReductionBonus;
+      return perkReductionBonus * CalculateMenWithPerkRatio(army, perk);
     }
 
-    private static float CalculateMultiplicativeBonus(float partyMemberBonus, int partyMemberCount) {
-      var finalRate = 0f;
-      var lastRate = 1f;
-      
-      for (var i = 0; i < partyMemberCount; i++) {
-        var nextRate = partyMemberBonus * lastRate;
-        finalRate += nextRate;
-        lastRate = nextRate;
+    private static float CalculateMenWithPerkRatio(Army army, PerkObject perk) {
+      var totalMenInArmy = 0;
+      var totalMenWithPerk = 0;
+
+      foreach (var party in army.Parties) {
+        var partySize = party.Party?.NumberOfAllMembers ?? 0;
+        totalMenInArmy += partySize;
+        if (PartyHasPerk(party, perk)) totalMenWithPerk += partySize;
       }
 
-      return finalRate;
+      return totalMenWithPerk / (float) totalMenInArmy;
+    }
+
+    private static bool PartyHasPerk(MobileParty party, PerkObject perk) {
+      if (party == null) return false;
+
+      var partyMemberPower = new ExplainedNumber(1f);
+      PerkHelper.AddPerkBonusForParty(perk, party, ref partyMemberPower);
+      return partyMemberPower.ResultNumber.IsDifferentFrom(partyMemberPower.BaseNumber);
     }
   }
-
 }
