@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
@@ -80,32 +79,31 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void SiegePostfix(ref int __result, MobileParty party) {
-      ref int troopSacrificeSize = ref __result;
+      ref var troopSacrificeSize = ref __result;
       if (troopSacrificeSize < 0) return;
 
       var perk = ActivePatch._perk;
       if (party.LeaderHero?.GetPerkValue(perk) != true) return;
 
-      troopSacrificeSize = (int) (troopSacrificeSize * perk.PrimaryBonus);
+      troopSacrificeSize -= (int) (troopSacrificeSize * perk.PrimaryBonus);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void SacrificePostfix(ref int __result, BattleSideEnum battleSide, MapEvent mapEvent) {
-      ref int troopSacrificeSize = ref __result;
+      ref var troopSacrificeSize = ref __result;
       if (troopSacrificeSize < 0) return;
 
       var side = battleSide == BattleSideEnum.Attacker ? mapEvent.AttackerSide : mapEvent.DefenderSide;
       var perk = ActivePatch._perk;
-      int sideTotalMen = 0;
-      int menInElusiveParties = 0;
+      var sideTotalMen = 0;
+      var menInElusiveParties = 0;
       foreach (var sideParty in side.Parties) {
         sideTotalMen += sideParty.NumberOfAllMembers;
-        if (sideParty.MobileParty?.LeaderHero?.GetPerkValue(perk) == true) {
+        if (sideParty.MobileParty?.LeaderHero?.GetPerkValue(perk) == true)
           menInElusiveParties += sideParty.NumberOfAllMembers;
-        }
       }
-      float ratioMenInElusiveParties = (float) menInElusiveParties / (float) sideTotalMen;
-      troopSacrificeSize = (int) (troopSacrificeSize * ratioMenInElusiveParties * perk.PrimaryBonus);
+      var ratioMenInElusiveParties = menInElusiveParties / (float) sideTotalMen;
+      troopSacrificeSize -= (int) (troopSacrificeSize * ratioMenInElusiveParties * perk.PrimaryBonus);
     }
 
   }
