@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -5,6 +6,8 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
@@ -17,7 +20,7 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo TargetMethodInfo =
       typeof(DefaultPartyMoraleModel).GetMethod("CalculateFoodVarietyMoraleBonus", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(MaxFoodVarietyPartyMoralePatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(MaxFoodVarietyPartyMoralePatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -40,8 +43,10 @@ namespace CommunityPatch.Patches {
       }
     };
 
-    public override void Reset() {
-    }
+    private static TextObject _foodBonusMoraleText;
+
+    public override void Reset()
+      => _foodBonusMoraleText = GameTexts.FindText("str_food_bonus_morale");
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -58,15 +63,17 @@ namespace CommunityPatch.Patches {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        postfix: new HarmonyMethod(PatchMethodInfo));
+        new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
     // ReSharper disable once InconsistentNaming
 
-    private static void Postfix(MobileParty party, ref ExplainedNumber result) {
-      if (party.ItemRoster.FoodVariety > 10)
-        result.Add(party.ItemRoster.FoodVariety - 4f, GameTexts.FindText("str_food_bonus_morale"));
+    private static bool Prefix(MobileParty party, ref ExplainedNumber result) {
+      var x = party.ItemRoster.FoodVariety;
+      var y = (float)Math.Round(1.37 * x - 1.11 * Math.Sqrt(x) - 2.11, MidpointRounding.AwayFromZero);
+      result.Add(y, _foodBonusMoraleText);
+      return false;
     }
 
   }

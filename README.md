@@ -14,14 +14,14 @@ JetBrains Toolbox manages all of their products and keeps them up to date, and u
 
 ### JetBrains Rider for C# / .NET
 
-[<img align="right" alt="JetBrains Rider" src="tools/rider.svg" width="100" />][3]
+[<img align="right" alt="JetBrains Rider" title="JetBrains Rider" src="tools/rider.svg" width="100" />][3]
 
 Our C# projects are designed to work best in JetBrains Rider.
 We also use ReSharper with Visual Studio, dotPeek, dotCover, dotMemory and dotTrace.
 
 #### JetBrains CLion for C / C++
 
-[<img align="right" alt="JetBrains CLion" src="tools/clion.svg" width="100" />][4]
+[<img align="right" alt="JetBrains CLion" title="JetBrains CLion" src="tools/clion.svg" width="100" />][4]
 
 Our C++ projects are designed to work best in JetBrains CLion.
 We also use ReSharper C++ with Visual Studio.
