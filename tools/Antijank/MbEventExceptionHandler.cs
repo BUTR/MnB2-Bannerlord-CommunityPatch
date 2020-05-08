@@ -374,35 +374,41 @@ namespace Antijank {
         if (eventHandlerRecList == null)
           return;
 
-        var actions = ((MulticastDelegate) r.ActionGetter(eventHandlerRecList)).GetInvocationList();
-        var actionInvokerCache = r.ActionInvokerCache;
-        foreach (var action in actions)
-          do {
+        do {
+          var actions = ((MulticastDelegate) r.ActionGetter(eventHandlerRecList)).GetInvocationList();
+          var actionInvokerCache = r.ActionInvokerCache;
+
+          foreach (var action in actions) {
             var attempt = 0;
             for (;;) {
               ++attempt;
+
               Func<object, object[], object> actionInvoker;
+              var actionMethod = action.Method;
+              // calli w/ sig: action.Method.MethodHandle.GetFunctionPointer() ?
               lock (actionInvokerCache) {
-                if (!actionInvokerCache.TryGetValue(action.Method, out actionInvoker)) {
-                  var handler = MethodInvoker.GetHandler(action.Method, true);
+                if (!actionInvokerCache.TryGetValue(actionMethod, out actionInvoker)) {
+                  var handler = MethodInvoker.GetHandler(actionMethod, true);
                   actionInvoker = (target, args2) => handler(target, args2);
-                  actionInvokerCache.Add(action.Method, actionInvoker);
+                  actionInvokerCache.Add(actionMethod, actionInvoker);
                 }
               }
 
+              var target = action.Target;
+
               try {
-                actionInvoker(action.Target, args);
+                actionInvoker(target, args);
               }
               catch (Exception ex) {
                 ex = CallStackHelpers.UnnestCommonExceptions(ex);
                 var owner = r.OwnerGetter(eventHandlerRecList);
-                if (RetryLots.TryGetValue(action.Method, out var retryLots)) {
+                if (RetryLots.TryGetValue(actionMethod, out var retryLots)) {
                   if (retryLots)
                     if (attempt % 100 != 0)
                       continue;
                 }
 
-                var answeredAlwaysIgnore = AlwaysIgnore.TryGetValue(action.Method, out var alwaysIgnore);
+                var answeredAlwaysIgnore = AlwaysIgnore.TryGetValue(actionMethod, out var alwaysIgnore);
                 if (answeredAlwaysIgnore) {
                   if (alwaysIgnore)
                     continue;
@@ -417,7 +423,7 @@ namespace Antijank {
                   $"Exception processing game event handler, attempt #{attempt}.\n" +
                   $"Possible Source Mod: {modInfo?.Name}\n" +
                   $"Possible Source Assembly: {modAsm?.GetName().Name}\n" +
-                  $"{action.Method?.FullDescription()}\n" +
+                  $"{actionMethod?.FullDescription()}\n" +
                   $"Owner: {owner ?? "(missing)"}\n" +
                   $"Exception: {ex.GetType().Name}: {ex.Message}",
                   type: MessageBoxType.AbortRetryIgnore,
@@ -426,7 +432,7 @@ namespace Antijank {
                     throw ex;
 
                   case MessageBoxResult.Retry: {
-                    RetryLots[action.Method] = MessageBox.Error(
+                    RetryLots[actionMethod] = MessageBox.Error(
                       "Remember this decision? Will retry 100 more times before asking again.",
                       type: MessageBoxType.YesNo) == MessageBoxResult.Yes;
                     continue;
@@ -436,7 +442,7 @@ namespace Antijank {
                     if (answeredAlwaysIgnore)
                       break;
 
-                    AlwaysIgnore[action.Method] = MessageBox.Error(
+                    AlwaysIgnore[actionMethod] = MessageBox.Error(
                       "Remember this decision? Will not ask again for this caller.",
                       type: MessageBoxType.YesNo) == MessageBoxResult.Yes;
                     break;
@@ -446,9 +452,10 @@ namespace Antijank {
 
               break;
             }
+          }
 
-            eventHandlerRecList = r.NextGetter(eventHandlerRecList);
-          } while (eventHandlerRecList != null);
+          eventHandlerRecList = r.NextGetter(eventHandlerRecList);
+        } while (eventHandlerRecList != null);
 
         // fin
       }
