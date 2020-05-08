@@ -121,8 +121,8 @@ namespace CommunityPatch {
 
         var dontMerge = new List<(InitialStateOption, Action, MethodInfo, Type, bool, ModuleInfo, MergablePropertyAttribute, string)>();
         collision.Items.RemoveAll(x => {
-          var disallowed = !x.Mergeable?.AllowMerge ?? false;
-
+          var disallowed = !x.Mergeable?.AllowMerge ?? true; // Changed to true to assume if AllowMerge method is null, it's not mergable.
+                                                             // Otherwise items were geting removed by the next AllowMerge test below and not added back.
           if (disallowed)
             dontMerge.Add(x);
 
@@ -157,7 +157,7 @@ namespace CommunityPatch {
         }
 
         // add mod names on the end of options other than the first one
-        foreach (var info in collision.Items.Skip(1)) {
+        foreach (var info in collision.Items /*.Skip(1)*/) { // It's better to not skip the first one, so it's clear what mod each redundantly named option belongs to
           InitOptNameSetter.Invoke(info.Item,
             new object[] {new TextObject($"{info.Name} ({info.Mod.Name})")});
         }
@@ -169,6 +169,7 @@ namespace CommunityPatch {
           .ToList();
 
       menu = collisionFreeMenu.ToArray();
+      menuLength = menu.Length;  // length needs to be updated in case collisionFreeMenu is shorter, otherwise the for loop below gets a null exception
 
       try {
         Array.Sort(menu, Comparer<InitialStateOption>
@@ -186,8 +187,8 @@ namespace CommunityPatch {
         if (!IsThirdPartyOption(item))
           continue;
 
-        if (menuLength <= MaxMenuLength)
-          break;
+        if (menuLength <= MaxMenuLength && !(item.Name.Length > 28)) // Always move items with name that's too wide due to collision renaming
+          continue;                                                  // onto submenu even if the menu is not at the MaxMenuLength
 
         GroupedOptionsMenus.Add(item);
         menu[i] = null;
