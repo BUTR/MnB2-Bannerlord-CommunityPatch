@@ -3,6 +3,29 @@
 # Mount & Blade II: Bannerlord Community Patch module
 This is going to be a mod that just fixes up some things in Mount &amp; Blade 2: Bannerlord before the Devs &amp; QA team can get to them. They have priorities and a process.
 
+### Supported by JetBrains Open Source Development Program
+
+[<img align="right" alt="JetBrains" src="tools/jetbrains.svg" width="200" />][1]
+
+We love [JetBrains][1]!
+
+We receive free licenses to JetBrains products via their [open source development program][2].
+JetBrains Toolbox manages all of their products and keeps them up to date, and updating is seamless.
+
+### JetBrains Rider for C# / .NET
+
+[<img align="right" alt="JetBrains Rider" src="tools/rider.svg" width="100" />][3]
+
+Our C# projects are designed to work best in JetBrains Rider.
+We also use ReSharper with Visual Studio, dotPeek, dotCover, dotMemory and dotTrace.
+
+#### JetBrains CLion for C / C++
+
+[<img align="right" alt="JetBrains CLion" src="tools/clion.svg" width="100" />][4]
+
+Our C++ projects are designed to work best in JetBrains CLion.
+We also use ReSharper C++ with Visual Studio.
+
 ### Current Fixes
 
 * Perks
@@ -145,3 +168,8 @@ If your Bannerlord or local repo are in a different place, you can change the pr
 
 ##### Others
 * Xaphedo for providing the banner art
+
+[1]: https://www.jetbrains.com/?from=Mount%20%26%20Blade%20II%3A%20Bannerlord%20Community%20Patch
+[2]: https://www.jetbrains.com/community/opensource/?from=Mount%20%26%20Blade%20II%3A%20Bannerlord%20Community%20Patch
+[3]: https://www.jetbrains.com/rider/?from=Mount%20%26%20Blade%20II%3A%20Bannerlord%20Community%20Patch
+[4]: https://www.jetbrains.com/clion/?from=Mount%20%26%20Blade%20II%3A%20Bannerlord%20Community%20Patch
