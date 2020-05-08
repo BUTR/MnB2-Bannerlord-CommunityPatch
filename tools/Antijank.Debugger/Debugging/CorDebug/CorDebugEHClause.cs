@@ -1,3 +1,4 @@
+#pragma warning disable 169
 namespace Antijank.Debugging {
 
   public struct CorDebugEHClause {

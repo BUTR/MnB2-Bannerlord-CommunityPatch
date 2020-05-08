@@ -1,9 +1,9 @@
-#pragma warning disable 1519
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security;
+#pragma warning disable 1591
 
 namespace BannerlordModuleManagement.Interop {
 

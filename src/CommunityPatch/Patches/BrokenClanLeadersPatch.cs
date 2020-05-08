@@ -45,7 +45,6 @@ namespace CommunityPatch.Patches {
 
       return TargetMethodInfo.MakeCilSignatureSha256()
         .MatchesAnySha256(Hashes);
-      return true;
     }
 
     public void Apply(Game game) {
