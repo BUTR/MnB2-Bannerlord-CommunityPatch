@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class BuilderPatch2 : PerkPatchBase<BuilderPatch> {
+  public sealed class BuilderPatch2 : PerkPatchBase<BuilderPatch2> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,7 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     private static readonly MethodInfo InternalTargetMethodInfo =
       typeof(DefaultBuildingConstructionModel).GetMethod("CalculateDailyConstructionPowerInternal", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(BuilderPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(BuilderPatch2).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -59,6 +59,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0xEE, 0xF2, 0x49, 0xC8, 0xF5, 0x60, 0x2A, 0xE1,
         0x0D, 0x8A, 0xF1, 0x4D, 0xC3, 0x69, 0xF2, 0x8F,
         0x91, 0x06, 0xB9, 0xF2, 0xBA, 0xC7, 0xCC, 0x08
+      },
+      new byte[] {
+        // e1.4.0.228531
+        0xA4, 0xA5, 0xE2, 0x69, 0xE8, 0xE6, 0xD1, 0x9E,
+        0x5C, 0x74, 0x45, 0xAB, 0x04, 0x24, 0x17, 0x9F,
+        0xB8, 0xEA, 0x2B, 0x8B, 0x0D, 0xF1, 0x42, 0xFA,
+        0x93, 0x96, 0x6E, 0x2F, 0xE8, 0x1D, 0xD2, 0xA9
       }
     };
 
@@ -75,7 +82,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       return TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes)
         && WithoutBoostTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(WithoutBoostHashes)
-        && InternalTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(WithoutBoostHashes);
+        && InternalTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(InternalHashes);
     }
 
     public override void Apply(Game game) {

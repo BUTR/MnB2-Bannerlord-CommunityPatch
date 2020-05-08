@@ -16,7 +16,7 @@ namespace Antijank.Debugging {
     void SetJMCStatus([In] int bIsJustMyCode, [In] uint cTokens, [In] ref uint pTokens);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    unsafe void ApplyChanges([In] uint cbMetadata, [In] ref byte* pbMetadata, [In] uint cbIL, [In] ref byte* pbIL);
+    unsafe void ApplyChanges([In] uint cbMetadata, [In] byte* pbMetadata, [In] uint cbIL, [In] byte* pbIL);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     void SetJITCompilerFlags([In] uint dwFlags);

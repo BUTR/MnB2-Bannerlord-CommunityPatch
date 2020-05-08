@@ -4,62 +4,43 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace Antijank.Debugging {
 
   public readonly struct FastTypeHandle {
 
-    public static T WithProcessModule<T>(Assembly asm, Func<ProcessModule, T> procModAction) {
-      var asmPath = Path.GetFullPath(new Uri(asm.CodeBase).LocalPath);
-      using var proc = Process.GetCurrentProcess();
-      foreach (ProcessModule procMod in proc.Modules) {
-        var procModPath = Path.GetFullPath(new Uri(procMod.FileName).LocalPath);
-
-        if (!asmPath.Equals(procModPath,
-          RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal))
-          continue;
-
-        return procModAction(procMod);
-      }
-
-      return default!;
-    }
-
-    public static Assembly? GetAssembly(ProcessModule procMod) {
-      var procModPath = Path.GetFullPath(new Uri(procMod.FileName).LocalPath);
+    public static Assembly? GetAssembly(IntPtr address) {
+      var addr = unchecked((ulong) address.ToInt64());
+      string? modName = null;
+      DebuggerContext.Current.Send(() => {
+        modName = DebuggerContext.GetModuleAtAddress(addr);
+      });
+      if (modName == null)
+        return null;
 
       foreach (var asm in AppDomain.CurrentDomain.GetAssemblies()) {
         var asmPath = Path.GetFullPath(new Uri(asm.CodeBase).LocalPath);
-
-        if (asmPath.Equals(procModPath,
-          RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal))
+        if (asmPath.Equals(modName, StringComparison.OrdinalIgnoreCase))
           return asm;
       }
 
       return null;
     }
 
-    public static T WithProcessModule<T>(IntPtr address, Func<ProcessModule, T> procModAction) {
-      using var proc = Process.GetCurrentProcess();
-      foreach (ProcessModule procMod in proc.Modules) {
-        if (procMod.BaseAddress != address)
-          continue;
-
-        return procModAction(procMod);
-      }
-
-      return default!;
+    public static IntPtr GetBaseAddressAndSize(Assembly asm, out UIntPtr size) {
+      var asmPath = Path.GetFullPath(new Uri(asm.CodeBase).LocalPath);
+      ulong address = 0;
+      uint s = 0;
+      DebuggerContext.Current.Send(() => {
+        address = DebuggerContext.FindModuleAddressAndSize(asmPath, out s);
+      });
+      size = (UIntPtr) s;
+      return (IntPtr) address;
     }
 
-    public static Assembly? GetAssembly(IntPtr address)
-      => WithProcessModule(address, GetAssembly);
-
     public static IntPtr GetBaseAddress(Assembly asm)
-      => WithProcessModule(asm, module => module.BaseAddress);
+      => GetBaseAddressAndSize(asm, out _);
 
     public readonly IntPtr ModuleAddress;
 

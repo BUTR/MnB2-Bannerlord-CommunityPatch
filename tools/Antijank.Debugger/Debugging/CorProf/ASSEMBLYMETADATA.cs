@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-
 using Antijank.Interop;
 
 namespace Antijank.Debugging {
@@ -8,7 +7,6 @@ namespace Antijank.Debugging {
   [ComConversionLoss]
   [Serializable]
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
-  
   public struct ASSEMBLYMETADATA {
 
     public ushort usMajorVersion;
@@ -24,6 +22,7 @@ namespace Antijank.Debugging {
 
     public uint cbLocale;
 
+    
     public unsafe uint* rProcessor;
 
     public uint ulProcessor;

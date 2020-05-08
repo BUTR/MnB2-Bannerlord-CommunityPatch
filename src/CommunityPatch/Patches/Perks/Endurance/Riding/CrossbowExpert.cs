@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
-using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Inventory;
 using TaleWorlds.Core;
@@ -34,9 +32,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
-      var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
-      if (weapon.WeaponClass == WeaponClass.Crossbow) // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
-        weapon.WeaponFlags = HeroHasPerk(character, ActivePatch.Perk) ? weapon.WeaponFlags & ~WeaponFlags.CantReloadOnHorseback : weapon.WeaponFlags;
+      var character = ItemMenuVmCharacterGetter(__instance);
+      // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
+      if (weapon.WeaponClass == WeaponClass.Crossbow && HeroHasPerk(character, ActivePatch.Perk))
+        weapon.WeaponFlags &= ~WeaponFlags.CantReloadOnHorseback;
     }
 
     protected override bool AppliesToVersion(Game game)
@@ -57,7 +56,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         return;
 
       for (var i = 0; i < weaponStatsData.Length; i++) {
-        var weapon = weaponStatsData[i];
+        ref var weapon = ref weaponStatsData[i];
         if (weapon.WeaponClass != (int) WeaponClass.Crossbow
           || !HeroHasPerk(__instance.Character, ActivePatch.Perk))
           continue;

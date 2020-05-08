@@ -11,10 +11,8 @@ IMetaDataInfo
 using System;
 using System.Runtime.InteropServices;
 
-
 namespace Antijank.Debugging {
 
-  
   [ComImport, Guid("211EF15B-5317-4438-B196-DEC87B887693"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   public interface IMetaDataAssemblyEmit {
 
@@ -22,9 +20,9 @@ namespace Antijank.Debugging {
       byte[] pbPublicKey, uint cbPublicKey, uint ulHashAlgId, [MarshalAs(UnmanagedType.LPWStr)] string szName, IntPtr pMetaData, int dwAssemblyFlags, out int pma);
 
     int DefineAssemblyRef([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]
-      byte[] pbPublicKeyOrToken, uint cbPublicKeyOrToken, [MarshalAs(UnmanagedType.LPWStr)] string szName, IntPtr pMetaData,
+      byte[] pbPublicKeyOrToken, uint cbPublicKeyOrToken, [MarshalAs(UnmanagedType.LPWStr)] string szName, in ASSEMBLYMETADATA pMetaData,
       [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
-      byte[] pbHashValue, uint cbHashValue, uint dwAssemblyRefFlags, out uint assemblyRefToken);
+      byte[] pbHashValue, uint cbHashValue, CorAssemblyFlags dwAssemblyRefFlags, out uint assemblyRefToken);
 
     int DefineFile([MarshalAs(UnmanagedType.LPWStr)] string szName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]
       byte[] pbHashValue, uint cbHashValue, uint dwFileFlags, out uint fileToken);

@@ -5,7 +5,7 @@ namespace Antijank.Debugging {
 
   [Flags]
   
-  public enum CorElementType {
+  public enum CorElementType : byte {
 
     ELEMENT_TYPE_PINNED = 0x45,
 

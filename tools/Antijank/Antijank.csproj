@@ -86,6 +86,9 @@
         <Compile Update="IgnoresAccessChecksTo.cs">
           <WouldDependOn>IgnoresAccessChecksTo</WouldDependOn>
         </Compile>
+        <Compile Update="Dynamic.cs">
+          <WouldDependOn>Dynamic</WouldDependOn>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>

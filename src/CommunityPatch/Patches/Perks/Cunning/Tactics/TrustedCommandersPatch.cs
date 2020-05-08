@@ -17,6 +17,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultArmyManagementCalculationModel).GetMethod("CalculateCohesionChange", Public | Instance | DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(TrustedCommandersPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -32,6 +33,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         0x4D, 0x06, 0x90, 0xA4, 0xE3, 0xF7, 0x0A, 0x85,
         0x00, 0xBB, 0x7A, 0x42, 0xD3, 0x82, 0x21, 0xFD,
         0x26, 0xA4, 0x9E, 0xB8, 0xA4, 0x22, 0xFB, 0xB9
+      },
+      new byte[] {
+        // e1.4.0.228531
+        0x5C, 0xA2, 0x63, 0x36, 0xD3, 0x12, 0xE2, 0xEA,
+        0x13, 0x84, 0x6C, 0x6D, 0x33, 0x80, 0x18, 0x5A,
+        0x53, 0x3D, 0xA0, 0x8A, 0x14, 0x65, 0xCC, 0x96,
+        0x56, 0xD4, 0x7C, 0x9D, 0x1A, 0xA4, 0xD7, 0xE9
       }
     };
 
@@ -66,8 +74,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         _perk.SecondaryRole, _perk.SecondaryBonus,
         _perk.IncrementType
       );
-      
+
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
@@ -80,7 +89,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       var finalCohesion = __result - flatReduction;
 
       __result = finalCohesion;
-      
+
       if (flatReduction.IsDifferentFrom(0f))
         explanation?.AddLine(perk.Name.ToString(), -flatReduction);
     }
@@ -88,6 +97,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
     private static float CalculatePerkReduction(Army army, PerkObject perk) {
       var perkReductionBonus = perk.PrimaryBonus / 100f;
       if (PartyHasPerk(army.LeaderParty, perk)) return perkReductionBonus;
+
       return perkReductionBonus * CalculateMenWithPerkRatio(army, perk);
     }
 
@@ -111,5 +121,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       PerkHelper.AddPerkBonusForParty(perk, party, ref partyMemberPower);
       return partyMemberPower.ResultNumber.IsDifferentFrom(partyMemberPower.BaseNumber);
     }
+
   }
+
 }

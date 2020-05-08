@@ -1,7 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
-
 
 namespace Antijank.Debugging {
 
@@ -9,32 +9,38 @@ namespace Antijank.Debugging {
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [SuppressUnmanagedCodeSecurity]
   [ComImport]
-  
   public interface ICorDebugFunction {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetModule([MarshalAs(UnmanagedType.Interface)] out ICorDebugModule ppModule);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("ppModule")]
+    ICorDebugModule GetModule();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetClass([MarshalAs(UnmanagedType.Interface)] out ICorDebugClass ppClass);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("ppClass")]
+    ICorDebugClass GetClass();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     void GetToken(out uint pMethodDef);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetILCode([MarshalAs(UnmanagedType.Interface)] out ICorDebugCode ppCode);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("ppCode")]
+    ICorDebugCode GetILCode();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetNativeCode([MarshalAs(UnmanagedType.Interface)] out ICorDebugCode ppCode);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("ppCode")]
+    ICorDebug GetNativeCode();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void CreateBreakpoint([MarshalAs(UnmanagedType.Interface)] out ICorDebugFunctionBreakpoint ppBreakpoint);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("ppBreakpoint")]
+    ICorDebugFunctionBreakpoint CreateBreakpoint();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetLocalVarSigToken(out uint pmdSig);
+    [return: ComAliasName("pmdSig")]
+    uint GetLocalVarSigToken();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetCurrentVersionNumber(out uint pnCurrentVersion);
+    [return: ComAliasName("pnCurrentVersion")]
+    uint GetCurrentVersionNumber();
 
   }
 

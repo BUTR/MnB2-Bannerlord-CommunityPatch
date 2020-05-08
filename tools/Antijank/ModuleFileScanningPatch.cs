@@ -9,8 +9,8 @@ namespace Antijank {
   public class ModuleFileScanningPatch {
 
     static ModuleFileScanningPatch()
-      => Context.Harmony.Patch(AccessTools.PropertyGetter(typeof(ModuleInfo), nameof(ModuleInfo.Load)),
-        postfix: new HarmonyMethod(typeof(FixMissingPropertiesPatches), nameof(ModuleInfoLoadFinalizer)));
+      => Context.Harmony.Patch(AccessTools.Method(typeof(ModuleInfo), nameof(ModuleInfo.Load)),
+        finalizer: new HarmonyMethod(typeof(ModuleFileScanningPatch), nameof(ModuleInfoLoadFinalizer)));
 
     public static void Init() {
       // run static initializer

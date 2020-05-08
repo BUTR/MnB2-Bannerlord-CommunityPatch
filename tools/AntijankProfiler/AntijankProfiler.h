@@ -7,31 +7,42 @@
 #include <memory>
 #include <unordered_set>
 #include <unordered_map>
-#include "pair_hash.h"
+#include "hashes.h"
 
 const GUID g_ClsIdAntijankProfiler = {0x204AEE3C, 0xCEE0, 0x43D7, {0xBF, 0xCA, 0x6B, 0x0A, 0xFB, 0x22, 0xF0, 0x9C}};
 
+class AntijankProfiler final : public ICorProfilerCallback9 {
+public:
+    struct injection_t {
+        mdTypeRef mdInjection;
+        mdMemberRef mdDispatch;
+        mdMemberRef mdPack[12];
+        mdTypeSpec mdGenVar[12];
+        mdMemberRef mdGenPack[12];
+        mdMethodSpec mdGenPackSpec[12];
+    };
 
-class AntijankProfiler final : public ICorProfilerCallback4 {
 private:
     LONG m_refCount;
 
-    typedef std::pair<std::wstring, mdToken> replacement_key_t;
+    typedef std::unordered_map<const std::wstring, const injection_t*, insensitive_wstring_hash, insensitive_wstring_compare> injections_t;
 
-    std::unordered_map<replacement_key_t, LPCBYTE, pair_hash> m_replacements;
+    injections_t m_injections;
 
-    std::unordered_map<std::wstring_view, std::unique_ptr<std::wstring>> m_replacement_module_names;
+    void Report(HRESULT hr) const;
 
-    template<int wszModuleSize>
-    bool GetMethodInfo(FunctionID functionId, ULONG &wszModuleLength, WCHAR (&wszModule)[wszModuleSize], mdToken &mdMethod) const;
+    static void Report(const IID &rIid);
 
 public:
 
-    struct ICorProfilerInfo3 *pInfo;
+    struct ICorProfilerInfo8 *pInfo;
 
     static AntijankProfiler *Instance();
 
     AntijankProfiler();
+
+    [[nodiscard]]
+    const injection_t * GetInjections(const std::wstring &wszModule) const;
 
     STDMETHODIMP InitializeForAttach(IUnknown *pCorProfilerInfoUnk, void *pvClientData, UINT cbClientData) final;
 
@@ -47,7 +58,7 @@ public:
 
     //
 
-    STDMETHODIMP ProfilerAttachComplete() final { return S_OK; };
+    STDMETHODIMP ProfilerAttachComplete() final;
 
     STDMETHODIMP ProfilerDetachSucceeded() final { return S_OK; }
 
@@ -59,23 +70,23 @@ public:
 
     STDMETHODIMP AppDomainShutdownFinished(AppDomainID appDomainId, HRESULT hrStatus) final { return S_OK; };
 
-    STDMETHODIMP AssemblyLoadStarted(AssemblyID assemblyId) final { return S_OK; };
+    STDMETHODIMP AssemblyLoadStarted(AssemblyID assemblyId) final;
 
-    STDMETHODIMP AssemblyLoadFinished(AssemblyID assemblyId, HRESULT hrStatus) final { return S_OK; };
+    STDMETHODIMP AssemblyLoadFinished(AssemblyID assemblyId, HRESULT hrStatus) final;
 
     STDMETHODIMP AssemblyUnloadStarted(AssemblyID assemblyId) final { return S_OK; };
 
     STDMETHODIMP AssemblyUnloadFinished(AssemblyID assemblyId, HRESULT hrStatus) final { return S_OK; };
 
-    STDMETHODIMP ModuleLoadStarted(ModuleID moduleId) final { return S_OK; };
+    STDMETHODIMP ModuleLoadStarted(ModuleID moduleId) final;
 
-    STDMETHODIMP ModuleLoadFinished(ModuleID moduleId, HRESULT hrStatus) final { return S_OK; };
+    STDMETHODIMP ModuleLoadFinished(ModuleID moduleId, HRESULT hrStatus) final;
 
     STDMETHODIMP ModuleUnloadStarted(ModuleID moduleId) final { return S_OK; };
 
     STDMETHODIMP ModuleUnloadFinished(ModuleID moduleId, HRESULT hrStatus) final { return S_OK; };
 
-    STDMETHODIMP ModuleAttachedToAssembly(ModuleID moduleId, AssemblyID assemblyId) final { return S_OK; };
+    STDMETHODIMP ModuleAttachedToAssembly(ModuleID moduleId, AssemblyID assemblyId) final;
 
     STDMETHODIMP ClassLoadStarted(ClassID classId) final { return S_OK; };
 
@@ -87,9 +98,9 @@ public:
 
     STDMETHODIMP FunctionUnloadStarted(FunctionID functionId) final { return S_OK; };
 
-    STDMETHODIMP JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock) final;;
+    STDMETHODIMP JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock) final;
 
-    STDMETHODIMP JITCompilationFinished(FunctionID functionId, HRESULT hrStatus, BOOL fIsSafeToBlock) final { return S_OK; };
+    STDMETHODIMP JITCompilationFinished(FunctionID functionId, HRESULT hrStatus, BOOL fIsSafeToBlock) final;
 
     STDMETHODIMP JITCachedFunctionSearchStarted(FunctionID functionId, BOOL *pbUseCachedFunction) final { return S_OK; };
 
@@ -97,7 +108,7 @@ public:
 
     STDMETHODIMP JITFunctionPitched(FunctionID functionId) final { return S_OK; };
 
-    STDMETHODIMP JITInlining(FunctionID callerId, FunctionID calleeId, BOOL *pfShouldInline) final { return S_OK; };
+    STDMETHODIMP JITInlining(FunctionID callerId, FunctionID calleeId, BOOL *pfShouldInline) final;
 
     STDMETHODIMP ThreadCreated(ThreadID threadId) final { return S_OK; };
 
@@ -212,5 +223,17 @@ public:
     STDMETHODIMP MovedReferences2(ULONG cMovedObjectIDRanges, ObjectID *oldObjectIDRangeStart, ObjectID *newObjectIDRangeStart, SIZE_T *cObjectIDRangeLength) final { return S_OK; }
 
     STDMETHODIMP SurvivingReferences2(ULONG cSurvivingObjectIDRanges, ObjectID *objectIDRangeStart, SIZE_T *cObjectIDRangeLength) final { return S_OK; }
+
+    STDMETHODIMP ConditionalWeakTableElementReferences(ULONG cRootRefs, ObjectID *keyRefIds, ObjectID *valueRefIds, GCHandleID *rootIds) final { return S_OK; }
+
+    STDMETHODIMP GetAssemblyReferences(LPCWSTR wszAssemblyPath, ICorProfilerAssemblyReferenceProvider *pAsmRefProvider) final;
+
+    STDMETHODIMP ModuleInMemorySymbolsUpdated(ModuleID moduleId) final { return S_OK; }
+
+    STDMETHODIMP DynamicMethodJITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock, LPCBYTE pILHeader, ULONG cbILHeader) final { return S_OK; }
+
+    STDMETHODIMP DynamicMethodJITCompilationFinished(FunctionID functionId, HRESULT hrStatus, BOOL fIsSafeToBlock) final { return S_OK; }
+
+    STDMETHODIMP DynamicMethodUnloaded(FunctionID functionId) final { return S_OK; }
 
 };

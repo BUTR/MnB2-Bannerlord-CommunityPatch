@@ -18,6 +18,9 @@ namespace CommunityPatch.Patches {
 
     internal static readonly FieldInfo ItemMenuVmCharacterField = typeof(ItemMenuVM).GetField("_character", BindingFlags.Instance | BindingFlags.NonPublic);
 
+    internal static readonly AccessTools.FieldRef<ItemMenuVM, BasicCharacterObject> ItemMenuVmCharacterGetter
+      = AccessTools.FieldRefAccess<ItemMenuVM, BasicCharacterObject>(ItemMenuVmCharacterField);
+
     internal static readonly MethodInfo WeaponComponentDataItemUsageMethod = typeof(WeaponComponentData)
       .GetMethod("set_ItemUsage", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
@@ -53,7 +56,8 @@ namespace CommunityPatch.Patches {
 
     internal static MethodInfo ItemMenuVmAddWeaponItemFlags => AgentWeaponEquippedPatch.ItemMenuVmAddWeaponItemFlags;
 
-    internal static FieldInfo ItemMenuVmCharacterField => AgentWeaponEquippedPatch.ItemMenuVmCharacterField;
+    internal static AccessTools.FieldRef<ItemMenuVM, BasicCharacterObject> ItemMenuVmCharacterGetter
+      => AgentWeaponEquippedPatch.ItemMenuVmCharacterGetter;
 
     internal static MethodInfo WeaponComponentDataItemUsageMethod => AgentWeaponEquippedPatch.WeaponComponentDataItemUsageMethod;
 
@@ -109,7 +113,19 @@ namespace CommunityPatch.Patches {
     protected static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk)
       => (character as CharacterObject)?.GetPerkValue(perk) ?? false;
 
+
+    protected static int LongBowUsageIndex => ActivePatch._LongBowUsageIndex;
+
+    protected static int BowUsageIndex => ActivePatch._BowUsageIndex;
+    
+    protected int _LongBowUsageIndex;
+
+    protected int _BowUsageIndex;
+    
     public override void Reset() {
+      _LongBowUsageIndex = MBItem.GetItemUsageIndex("long_bow");
+      _BowUsageIndex = MBItem.GetItemUsageIndex("bow");
+      base.Reset();
     }
 
     protected AgentWeaponEquippedPatch(string perkId) : base(perkId) {

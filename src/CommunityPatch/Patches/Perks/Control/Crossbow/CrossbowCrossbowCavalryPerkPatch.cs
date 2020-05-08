@@ -32,11 +32,10 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
     }
 
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
-      var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
+      var character = ItemMenuVmCharacterGetter(__instance);
 
       // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
-      if (weapon.WeaponClass == WeaponClass.Crossbow
-        && HeroHasPerk(character, ActivePatch.Perk))
+      if (weapon.WeaponClass == WeaponClass.Crossbow && HeroHasPerk(character, ActivePatch.Perk))
         weapon.WeaponFlags &= ~WeaponFlags.CantReloadOnHorseback;
     }
 

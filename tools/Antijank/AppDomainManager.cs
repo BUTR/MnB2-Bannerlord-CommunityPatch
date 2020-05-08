@@ -16,7 +16,7 @@ namespace Antijank {
 
   public class AppDomainManager : System.AppDomainManager {
 
-    private static readonly ConsoleTraceListener ConsoleTraceListener = new ConsoleTraceListener(true);
+    private static readonly ConsoleTraceListener ConsoleTraceListener = new ConsoleTraceListener();
 
     [DllImport("kernel32")]
     internal static extern bool AllocConsole();
@@ -151,8 +151,16 @@ namespace Antijank {
                 Console.WriteLine(ex);
               }
 
+            if (Options.EnableModuleFileScanningPatch)
+              try {
+                ModuleFileScanningPatch.Init();
+              }
+              catch (Exception ex) {
+                Console.WriteLine("WidgetFactoryPatch failed to initialize.");
+                Console.WriteLine(ex);
+              }
+
             //TickExceptionHandler.Init();
-            //MbEventExceptionHandler.Init();
             break;
           case "ManagedStarter": {
             if (Options.EnableWidgetFactoryInitializationPatch)
@@ -161,6 +169,8 @@ namespace Antijank {
               MbObjectManagerPatch.Init();
             if (Options.EnableFixMissingProperties)
               FixMissingPropertiesPatches.Init();
+            if (Options.EnableCapturingEventHandlers)
+              MbEventExceptionHandler.Init();
             MemoryCleanupPatch.Init();
             break;
           }

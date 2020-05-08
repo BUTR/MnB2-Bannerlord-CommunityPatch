@@ -1,7 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
-
 
 namespace Antijank.Debugging {
 
@@ -9,24 +9,27 @@ namespace Antijank.Debugging {
   [Guid("CC7BCAF4-8A68-11D2-983C-0000F808342D")]
   [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   [ComImport]
-  
   public interface ICorDebugCode {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void IsIL(out int pbIL);
+    [return: MarshalAs(UnmanagedType.Bool), ComAliasName("pbIL")]
+    bool IsIL();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetFunction([MarshalAs(UnmanagedType.Interface)] out ICorDebugFunction ppFunction);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("ppFunction")]
+    ICorDebugFunction GetFunction();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetAddress(out ulong pStart);
+    [return: ComAliasName("pStart")]
+    IntPtr GetAddress();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetSize(out uint pcBytes);
+    [return: ComAliasName("pcBytes")]
+    uint GetSize();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void CreateBreakpoint([In] uint offset,
-      [MarshalAs(UnmanagedType.Interface)] out ICorDebugFunctionBreakpoint ppBreakpoint);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("ppBreakpoint")]
+    ICorDebugFunctionBreakpoint CreateBreakpoint([In] uint offset);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     void GetCode([In] uint startOffset, [In] uint endOffset, [In] uint cBufferAlloc,
@@ -34,15 +37,16 @@ namespace Antijank.Debugging {
       ICorDebugCode buffer, out uint pcBufferSize);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetVersionNumber(out uint nVersion);
+    [return: ComAliasName("nVersion")]
+    uint GetVersionNumber();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetILToNativeMapping([In] uint cMap, out uint pcMap, [MarshalAs(UnmanagedType.Interface)] [Out]
-      ICorDebugCode map);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("map")]
+    ICorDebugCode GetILToNativeMapping([In] uint cMap, out uint pcMap);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    void GetEnCRemapSequencePoints([In] uint cMap, out uint pcMap, [MarshalAs(UnmanagedType.Interface)] [Out]
-      ICorDebugCode offsets);
+    [return: MarshalAs(UnmanagedType.Interface), ComAliasName("offsets")]
+    ICorDebugCode GetEnCRemapSequencePoints([In] uint cMap, out uint pcMap);
 
   }
 

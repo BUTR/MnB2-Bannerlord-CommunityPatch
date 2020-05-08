@@ -14,7 +14,7 @@ namespace Antijank.Debugging {
     );
 
     public static object CLRCreateInstance(in Guid clsId, in Guid rIId) {
-      var hr = MsCorEe.CLRCreateInstance(clsId, rIId, out var instance);
+      var hr = CLRCreateInstance(clsId, rIId, out var instance);
       if (hr != 0)
         Marshal.ThrowExceptionForHR(hr);
       return instance;

@@ -82,7 +82,7 @@ namespace Antijank.Debugging {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     [return: Description("pcBytes")]
-    void GetSize();
+    uint GetSize();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     [return: MarshalAs(UnmanagedType.Bool), Description("pInMemory")]

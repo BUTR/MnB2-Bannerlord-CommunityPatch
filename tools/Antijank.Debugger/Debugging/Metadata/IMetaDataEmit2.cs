@@ -8,18 +8,18 @@ namespace Antijank.Debugging {
   [Guid("F5DD9950-F693-42e6-830E-7B833E8146A9"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
   public interface IMetaDataEmit2 {
 
-    int DefineMethodSpec(uint tkParent, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]
-      byte[] pvSigBlob, uint cbSigBlob, uint pmi);
+    void DefineMethodSpec(uint tkParent, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]
+      byte[] pvSigBlob, uint cbSigBlob, out uint pmi);
 
-    int GetDeltaSaveSize(CorSaveSize fSave, uint pdwSaveSize);
+    void GetDeltaSaveSize(CorSaveSize fSave, out uint pdwSaveSize);
 
-    int SaveDelta([MarshalAs(UnmanagedType.LPWStr)] string szFile, uint dwSaveFlags);
+    void SaveDelta([MarshalAs(UnmanagedType.LPWStr)] string szFile, uint dwSaveFlags);
 
-    int SaveDeltaToStream([MarshalAs(UnmanagedType.Interface)] object pIStream, uint dwSaveFlags);
+    void SaveDeltaToStream([MarshalAs(UnmanagedType.Interface)] object pIStream, uint dwSaveFlags);
 
-    int SaveDeltaToMemory(IntPtr pbData, uint cbData);
+    void SaveDeltaToMemory(IntPtr pbData, uint cbData);
 
-    int DefineGenericParam(
+    void DefineGenericParam(
       uint tk,
       uint ulParamSeq,
       uint dwParamFlags,
@@ -29,7 +29,7 @@ namespace Antijank.Debugging {
       out uint pgp
     );
 
-    int SetGenericParamProps(
+    void SetGenericParamProps(
       uint gp,
       uint dwParamFlags,
       [MarshalAs(UnmanagedType.LPWStr)] string szName,
@@ -37,7 +37,7 @@ namespace Antijank.Debugging {
       [MarshalAs(UnmanagedType.LPArray)] uint[] rtkConstraints
     );
 
-    int ResetENCLog();
+    void ResetENCLog();
 
   }
 

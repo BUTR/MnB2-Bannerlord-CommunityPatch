@@ -31,11 +31,10 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
     }
 
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
-      var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
+      var character = ItemMenuVmCharacterGetter(__instance);
       // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
-      if (weapon.ItemUsage == "long_bow")
-        WeaponComponentDataItemUsageMethod
-          .Invoke(weapon, new object[] {HeroHasPerk(character, ActivePatch.Perk) ? "bow" : weapon.ItemUsage});
+      if (weapon.ItemUsage == "long_bow" && HeroHasPerk(character, ActivePatch.Perk))
+        WeaponComponentDataItemUsageMethod.Invoke(weapon, new object[] { "bow"});
     }
 
     protected override bool AppliesToVersion(Game game)
@@ -57,12 +56,12 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
 
       for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
-        if (weapon.ItemUsageIndex != MBItem.GetItemUsageIndex("long_bow")
+        if (weapon.ItemUsageIndex != LongBowUsageIndex
           || !HeroHasPerk(__instance.Character, ActivePatch.Perk))
           continue;
 
         var updatedWeapon = weapon;
-        updatedWeapon.ItemUsageIndex = MBItem.GetItemUsageIndex("bow");
+        updatedWeapon.ItemUsageIndex = BowUsageIndex;
         weaponStatsData[i] = updatedWeapon;
       }
     }

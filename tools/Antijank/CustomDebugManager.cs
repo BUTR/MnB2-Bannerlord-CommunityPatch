@@ -13,25 +13,10 @@ namespace Antijank {
 
     public static readonly CustomDebugManager Instance = new CustomDebugManager();
 
-    private static SynchronizationContext _syncCtx;
-
     private bool TestGenericMethod<T>() => typeof(T).IsPrimitive;
 
-    static CustomDebugManager() {
-      TaleWorlds.Library.Debug.DebugManager = Instance;
-
-      var syncCtx = new DebuggerContext();
-      _syncCtx = syncCtx;
-      syncCtx.Start();
-      SynchronizationContext.SetSynchronizationContext(syncCtx);
-
-      _syncCtx?.Send(_ => {
-        var thisType = typeof(CustomDebugManager);
-        var testMethod = thisType.GetMethod(nameof(TestGenericMethod), Public | NonPublic | Static | BindingFlags.Instance);
-        if (testMethod == null)
-          throw new NotImplementedException();
-      }, null);
-    }
+    static CustomDebugManager()
+      => TaleWorlds.Library.Debug.DebugManager = Instance;
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Init() {

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="M&amp;B II: BL" type="RunExe" factoryName=".NET Executable" activateToolWindowBeforeRun="false">
     <option name="EXE_PATH" value="$PROJECT_DIR$/../../../../bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.Launcher.exe" />
-    <option name="PROGRAM_PARAMETERS" value="/no-startup-dialog /diag /wfi /omxl /fmp /mfs" />
+    <option name="PROGRAM_PARAMETERS" value="/no-startup-dialog /diag /fce /wfi /omxl /fmp /mfs /ceh" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../../../bin/Win64_Shipping_Client" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <envs>

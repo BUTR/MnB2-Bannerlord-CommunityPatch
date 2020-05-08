@@ -1,4 +1,7 @@
 #include "AntijankProfilerClassFactory.h"
+#include <comdef.h>
+#include <iostream>
+#include <iomanip>
 
 STDMETHODIMP AntijankProfilerClassFactory::QueryInterface(REFIID riid, void **ppInterface) {
     if (IID_IUnknown == riid)
@@ -20,5 +23,11 @@ STDMETHODIMP AntijankProfilerClassFactory::CreateInstance(IUnknown *pUnkOuter, R
     auto *pProfilerCallback = new AntijankProfiler();
     if (pProfilerCallback == nullptr)
         return E_OUTOFMEMORY;
-    return pProfilerCallback->QueryInterface(riid, ppInterface);
+    HRESULT hr;
+    if (FAILED(hr = pProfilerCallback->QueryInterface(riid, ppInterface))) {
+        _com_error err(hr);
+        LPCTSTR errMsg = err.ErrorMessage();
+        std::wcout << L"HR 0x" << std::hex << std::setfill(L'0') << std::setw(8) << hr << L": " << errMsg << std::endl;
+    }
+    return hr;
 }

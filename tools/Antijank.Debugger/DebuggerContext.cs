@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -14,40 +15,98 @@ namespace Antijank {
 
   public class DebuggerContext : SynchronizationContext, IDisposable {
 
+    public new static DebuggerContext Current { get; }
+
+    static DebuggerContext() {
+      var syncCtx = new DebuggerContext();
+      Current = syncCtx;
+      syncCtx.Start();
+    }
+
+    public static void Init() {
+      // run static initializer
+    }
+
     private readonly Thread _thread;
 
-    private static readonly BlockingCollection<(SendOrPostCallback Callback, object State, ManualResetEvent? Event)>
-      ExecutionQueue = new BlockingCollection<(SendOrPostCallback, object, ManualResetEvent?)>
-        (new ConcurrentQueue<(SendOrPostCallback, object, ManualResetEvent?)>());
+    private readonly BlockingCollection<Action>
+      _executionQueue = new BlockingCollection<Action>
+        (new ConcurrentQueue<Action>());
 
     [DllImport("AntijankProfiler")]
     [return: MarshalAs(UnmanagedType.Interface)]
-    public static extern object GetCorProfilerInfo();
+    private static extern object GetCorProfilerInfo();
 
-    public DebuggerContext()
+#pragma warning disable 649
+    internal readonly ref struct InjectionMetadata {
+
+      public readonly int Injection;
+
+      public readonly int Dispatch;
+
+      public readonly int Pack1, Pack2, Pack3, Pack4, Pack5, Pack6, Pack7, Pack8, Pack9, Pack10, Pack11, Pack12;
+
+      public readonly int GenVar1, GenVar2, GenVar3, GenVar4, GenVar5, GenVar6, GenVar7, GenVar8, GenVar9, GenVar10, GenVar11, GenVar12;
+
+      public readonly int GenPack1, GenPack2, GenPack3, GenPack4, GenPack5, GenPack6, GenPack7, GenPack8, GenPack9, GenPack10, GenPack11, GenPack12;
+
+      public readonly int GenPackSpec1, GenPackSpec2, GenPackSpec3, GenPackSpec4, GenPackSpec5, GenPackSpec6, GenPackSpec7, GenPackSpec8, GenPackSpec9, GenPackSpec10, GenPackSpec11, GenPackSpec12;
+
+      public int GetPack(int i)
+        => i < 0 || i >= 12
+          ? throw new ArgumentOutOfRangeException(nameof(i))
+          : Unsafe.Add(ref Unsafe.AsRef(Pack1), i);
+
+      public int GetGenVar(int i)
+        => i < 0 || i >= 12
+          ? throw new ArgumentOutOfRangeException(nameof(i))
+          : Unsafe.Add(ref Unsafe.AsRef(GenVar1), i);
+
+      public int GetGenPack(int i)
+        => i < 0 || i >= 12
+          ? throw new ArgumentOutOfRangeException(nameof(i))
+          : Unsafe.Add(ref Unsafe.AsRef(GenPack1), i);
+
+      public int GetGenPackSpec(int i)
+        => i < 0 || i >= 12
+          ? throw new ArgumentOutOfRangeException(nameof(i))
+          : Unsafe.Add(ref Unsafe.AsRef(GenPackSpec1), i);
+
+    }
+#pragma warning restore 649
+
+    [DllImport("AntijankProfiler")]
+    internal static extern unsafe bool GetInjections(
+      [MarshalAs(UnmanagedType.LPWStr)] [In] string wszModule,
+      [Out] out InjectionMetadata* injections);
+
+    private DebuggerContext()
       => _thread = new Thread(DebuggerThreadAction) {
         Name = "Debugger Thread",
         IsBackground = true,
         Priority = ThreadPriority.Highest
       };
 
-    public void Start()
+    private void Start()
       => _thread.Start();
 
     [ThreadStatic]
-    private static CLRMetaHost? MetaHost;
+    public static CLRMetaHost? MetaHost;
 
     [ThreadStatic]
-    private static CLRMetaHostPolicy? MetaHostPolicy;
+    public static CLRMetaHostPolicy? MetaHostPolicy;
 
     [ThreadStatic]
-    private static CLRDebugging? Debugging;
+    public static CLRDebugging? Debugging;
 
     [ThreadStatic]
-    private static ICorDebugProcess? DebugProcess;
+    public static ICorDebugProcess? DebugProcess;
 
     [ThreadStatic]
-    private static ICorProfilerInfo? ProfilerInfo;
+    public static ICLRRuntimeInfo ClrRuntime;
+
+    [ThreadStatic]
+    public static ICorProfilerInfo? ProfilerInfo;
 
     public static int ThreadId;
 
@@ -56,6 +115,8 @@ namespace Antijank {
     public static bool TestEnC() => false;
 
     private unsafe void DebuggerThreadAction() {
+      SetSynchronizationContext(this);
+
       ThreadId = Thread.CurrentThread.ManagedThreadId;
 
       ProfilerInfo = GetCorProfilerInfo() as ICorProfilerInfo;
@@ -73,7 +134,7 @@ namespace Antijank {
         Debugging = MsCorEe.CLRCreateInstance<CLRDebugging>();
 
         var version = RuntimeEnvironment.GetSystemVersion();
-        var clrRt = MetaHost.GetRuntime(version, typeof(ICLRRuntimeInfo).GUID);
+        ClrRuntime = MetaHost.GetRuntime(version, typeof(ICLRRuntimeInfo).GUID);
 
         if (ProfilerInfo != null) {
           // ok
@@ -117,18 +178,7 @@ namespace Antijank {
 
         DebugProcess = (ICorDebugProcess) procObj;
 
-        var appDomEnum = DebugProcess.EnumerateAppDomains();
-
-        foreach (var appDom in DebugHelpers.GetEnumerable<ICorDebugAppDomain>(appDomEnum.Next)) {
-          var asmEnum = appDom.EnumerateAssemblies();
-          foreach (var asm in DebugHelpers.GetEnumerable<ICorDebugAssembly>(asmEnum.Next)) {
-            var modsEnum = asm.EnumerateModules();
-            foreach (var mod in DebugHelpers.GetEnumerable<ICorDebugModule>(modsEnum.Next)) {
-              // nothing right now
-            }
-          }
-        }
-
+        /*
         var sbName = new StringBuilder(4096);
         foreach (var appDom in DebugHelpers.GetEnumerable<ICorDebugAppDomain>(DebugProcess.EnumerateAppDomains().Next)) {
           var appDomId = appDom.GetID();
@@ -150,29 +200,137 @@ namespace Antijank {
             }
           }
         }
+        */
       }
 
-      foreach (var (callback, state, waiter) in ExecutionQueue.GetConsumingEnumerable()) {
-        callback(state);
-        waiter?.Set();
+      foreach (var callback in _executionQueue.GetConsumingEnumerable()) {
+        try {
+          callback();
+        }
+        catch (Exception ex) {
+          Trace.TraceError(ex.ToString());
+        }
       }
     }
 
+    public static ulong FindModuleAddressAndSize(string module, out uint size) {
+      var mod = FindModule(module);
+      if (mod == null) {
+        size = 0;
+        return 0;
+      }
+
+      var addr = mod.GetBaseAddress();
+      size = mod.GetSize();
+      //Console.WriteLine($"0x{addr:X16} {size,10}b: {modName}");
+      return addr;
+    }
+
+    public static ICorDebugModule? FindModule(string module) {
+      if (DebugProcess == null)
+        throw new InvalidOperationException();
+
+      var appDomEnum = DebugProcess.EnumerateAppDomains();
+
+      foreach (var appDom in DebugHelpers.GetEnumerable<ICorDebugAppDomain>(appDomEnum.Next)) {
+        var asmEnum = appDom.EnumerateAssemblies();
+        foreach (var asm in DebugHelpers.GetEnumerable<ICorDebugAssembly>(asmEnum.Next)) {
+          var modsEnum = asm.EnumerateModules();
+          foreach (var mod in DebugHelpers.GetEnumerable<ICorDebugModule>(modsEnum.Next)) {
+            var sb = new StringBuilder(512);
+            mod.GetName((uint) sb.Capacity, out var len, sb);
+            var modName = sb.ToString(0, (int) len - 1);
+            if (!module.Equals(modName, StringComparison.OrdinalIgnoreCase))
+              continue;
+
+            return mod;
+          }
+        }
+      }
+
+      return null;
+    }
+
+    public static string? GetModuleAtAddress(ulong address) {
+      if (DebugProcess == null)
+        throw new InvalidOperationException();
+
+      var appDomEnum = DebugProcess.EnumerateAppDomains();
+
+      foreach (var appDom in DebugHelpers.GetEnumerable<ICorDebugAppDomain>(appDomEnum.Next)) {
+        var asmEnum = appDom.EnumerateAssemblies();
+        foreach (var asm in DebugHelpers.GetEnumerable<ICorDebugAssembly>(asmEnum.Next)) {
+          var modsEnum = asm.EnumerateModules();
+          foreach (var mod in DebugHelpers.GetEnumerable<ICorDebugModule>(modsEnum.Next)) {
+            var addr = mod.GetBaseAddress();
+
+            if (addr != address)
+              continue;
+
+            var sb = new StringBuilder(512);
+            mod.GetName((uint) sb.Capacity, out var len, sb);
+            return sb.ToString(0, (int) len - 1);
+          }
+        }
+      }
+
+      return null;
+    }
+
     public override void Send(SendOrPostCallback d, object state) {
+      if (_thread == Thread.CurrentThread) {
+        d(state);
+        return;
+      }
+
       using var e = new ManualResetEvent(false);
-      ExecutionQueue.Add((d, state, e));
+
+      void SentAction() {
+        try {
+          d(state);
+        }
+        finally {
+          // ReSharper disable once AccessToDisposedClosure
+          e?.Set();
+        }
+      }
+
+      _executionQueue.Add(SentAction);
+      e.WaitOne();
+    }
+
+    public void Send(Action d) {
+      if (_thread == Thread.CurrentThread) {
+        d();
+        return;
+      }
+
+      using var e = new ManualResetEvent(false);
+
+      void SentAction() {
+        try {
+          d();
+        }
+        finally {
+          // ReSharper disable once AccessToDisposedClosure
+          e?.Set();
+        }
+      }
+
+      _executionQueue.Add(SentAction);
       e.WaitOne();
     }
 
     public override void Post(SendOrPostCallback d, object state)
-      => ExecutionQueue.Add((d, state, null));
+      => _executionQueue.Add(() => d(state));
+
+    public void Post(Action d)
+      => _executionQueue.Add(d);
 
     void IDisposable.Dispose() {
-      ExecutionQueue.CompleteAdding();
+      _executionQueue.CompleteAdding();
       _thread.Join();
-      foreach (var (_, _, waiter) in ExecutionQueue.GetConsumingEnumerable())
-        waiter?.Dispose();
-      ExecutionQueue.Dispose();
+      _executionQueue.Dispose();
     }
 
   }

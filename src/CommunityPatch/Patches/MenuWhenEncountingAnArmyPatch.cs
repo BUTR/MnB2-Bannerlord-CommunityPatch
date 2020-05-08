@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
@@ -91,15 +92,21 @@ namespace CommunityPatch.Patches {
           break;
         }
 
-      Campaign.Current.CurrentConversationContext = ConversationContext.PartyEncounter;
-      MapEventStateField.SetValue(__instance, PlayerEncounterState.Begin);
-      StateHandledField.SetValue(__instance, true);
+      if (attacker.MobileParty?.Army == null)
+        return true;
 
       var defenderParty = (PartyBase) DefenderPartyField.GetValue(__instance);
 
+      if (FactionManager.IsAtWarAgainstFaction(attacker.MapFaction, defenderParty.MapFaction))
+        return true;
+
+      Campaign.Current.CurrentConversationContext = ConversationContext.PartyEncounter;
+
+      MapEventStateField.SetValue(__instance, PlayerEncounterState.Begin);
+      StateHandledField.SetValue(__instance, true);
+
       if (!PlayerEncounter.PlayerIsAttacker)
         return false;
-
       var defenderMobileParty = defenderParty.IsMobile ? defenderParty.MobileParty : null;
       var defenderArmy = defenderMobileParty?.Army;
       if (defenderArmy != null && defenderArmy.LeaderParty == defenderMobileParty

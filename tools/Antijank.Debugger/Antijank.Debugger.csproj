@@ -32,6 +32,9 @@
         <Compile Update="PathHelpers.cs">
             <WouldDependOn>PathHelpers</WouldDependOn>
         </Compile>
+        <Compile Update="IgnoresAccessChecksTo.cs">
+          <WouldDependOn>IgnoresAccessChecksTo</WouldDependOn>
+        </Compile>
     </ItemGroup>
 
     <Target Name="FixDuplicateJetBrainsAnnotationsReferenceBefore" BeforeTargets="CoreCompile">

@@ -16,8 +16,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
   public sealed class BowExpertPatch : AgentWeaponEquippedPatch<BowExpertPatch> {
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(BowExpertPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
-
+    private static readonly MethodInfo PatchMethodInfo
+      = typeof(BowExpertPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
+    
     public BowExpertPatch() : base("cKTeea27") {
     }
 
@@ -34,10 +35,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
-      var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
-      if (weapon.ItemUsage == "long_bow") // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
-        WeaponComponentDataItemUsageMethod
-          .Invoke(weapon, new[] {HeroHasPerk(character, ActivePatch.Perk) ? "bow" : weapon.ItemUsage});
+      var character = (BasicCharacterObject) ItemMenuVmCharacterGetter(__instance);
+      // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
+      if (weapon.ItemUsage == "long_bow" && HeroHasPerk(character, ActivePatch.Perk))
+        WeaponComponentDataItemUsageMethod.Invoke(weapon, new object[] {"bow"});
     }
 
     protected override bool AppliesToVersion(Game game)
@@ -58,13 +59,13 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         return;
 
       for (var i = 0; i < weaponStatsData.Length; i++) {
-        var weapon = weaponStatsData[i];
-        if (weapon.ItemUsageIndex != MBItem.GetItemUsageIndex("long_bow")
+        ref var weapon = ref weaponStatsData[i];
+        if (weapon.ItemUsageIndex != LongBowUsageIndex
           || !HeroHasPerk(__instance.Character, ActivePatch.Perk))
           continue;
 
         var updatedWeapon = weapon;
-        updatedWeapon.ItemUsageIndex = MBItem.GetItemUsageIndex("bow");
+        updatedWeapon.ItemUsageIndex = BowUsageIndex;
         weaponStatsData[i] = updatedWeapon;
       }
     }

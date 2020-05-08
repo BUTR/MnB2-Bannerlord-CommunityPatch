@@ -32,6 +32,9 @@ namespace Antijank {
     public static bool EnableModuleFileScanningPatch
       = HasCommandLineArg("/mfs");
 
+    public static bool EnableCapturingEventHandlers
+      = HasCommandLineArg("/ceh");
+
   }
 
 }
