@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
-  public sealed class ProsperousReignPatch : PatchBase<ProsperousReignPatch> {
+  public sealed class ProsperousReignPatch : PerkPatchBase<ProsperousReignPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,9 +25,7 @@ namespace CommunityPatch.Patches {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x93, 0x92, 0xD6, 0xB0, 0x05, 0x07, 0xEF, 0xFA,
@@ -37,8 +35,8 @@ namespace CommunityPatch.Patches {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "5MjmCaUx");
+    public ProsperousReignPatch() : base("5MjmCaUx") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -59,14 +57,14 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once UnusedParameter.Local
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Prefix(Village village, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix(ref float __result, Village village, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))
         return;
 

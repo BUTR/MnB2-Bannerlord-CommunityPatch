@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
-  public sealed class PeakFormPatch : PatchBase<PeakFormPatch> {
+  public sealed class PeakFormPatch : PerkPatchBase<PeakFormPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,9 +25,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x92, 0xC3, 0x48, 0x33, 0x3C, 0x1A, 0x39, 0x52,
@@ -37,13 +35,13 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "fBgGbxaw");
+    public PeakFormPatch() : base("fBgGbxaw") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null)
+      if (Perk == null)
         return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -54,33 +52,14 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       if (!hash.MatchesAnySha256(Hashes))
         return false;
 
-      if (_perk.PrimaryBonus != 0f)
+      if (Perk.PrimaryBonus != 0f)
         return null;
 
       return true;
     }
 
     public override void Apply(Game game) {
-      // Dear TaleWorlds; Value should probably be publicly exposed, maybe by a method
-      // and maybe marked [Obsolete] if you want to avoid your developers doing dirty deeds
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-
-      // most of the properties of skills have private setters, yet Initialize is public
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, 10f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        _perk.IncrementType
-      );
+      Perk.SetPrimaryBonus(10f);
 
       if (Applied) return;
 
@@ -91,13 +70,13 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
       var result = __result;
 
       var explainedNumber = new ExplainedNumber(result, explanation);
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       PerkHelper.AddPerkBonusForCharacter(perk, character, ref explainedNumber);
 

@@ -15,14 +15,18 @@ namespace CommunityPatch.Patches.Feats {
 
     private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(BattanianForestAgilityPatch), nameof(Postfix));
 
+    private static readonly float MovingAtForestEffect = (float) AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingAtForestEffect").GetRawConstantValue();
+
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return AgilityPatchShared.CalculateFinalSpeedMethodInfo;
     }
 
+    public static byte[][] CalculateFinalSpeedHashes => AgilityPatchShared.CalculateFinalSpeedHashes;
+
     public override bool? IsApplicable(Game game) {
       // Currently ignores if method patched by others, expecting that there is a postfix already applied
       var hash = AgilityPatchShared.CalculateFinalSpeedMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(AgilityPatchShared.CalculateFinalSpeedHashes);
+      return hash.MatchesAnySha256(CalculateFinalSpeedHashes);
     }
 
     public override void Apply(Game game) {
@@ -37,7 +41,6 @@ namespace CommunityPatch.Patches.Feats {
     public override void Reset() {
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(
       DefaultPartySpeedCalculatingModel __instance,
       ref MobileParty mobileParty,
@@ -46,23 +49,23 @@ namespace CommunityPatch.Patches.Feats {
       ref float __result) {
       var faceTerrainType = Campaign.Current.MapSceneWrapper.GetFaceTerrainType(mobileParty.CurrentNavigationFace);
 
-      if (faceTerrainType == TerrainType.Forest &&
-        mobileParty.Leader != null &&
-        mobileParty.Leader.GetFeatValue(DefaultFeats.Cultural.BattanianForestAgility)) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
+      var feat = DefaultFeats.Cultural.BattanianForestAgility;
 
-        var movingAtForestEffectField = AccessTools.Field(typeof(DefaultPartySpeedCalculatingModel), "MovingAtForestEffect");
-        var movingAtForestEffect = (float) movingAtForestEffectField.GetValue(__instance);
+      if (faceTerrainType != TerrainType.Forest
+        || mobileParty.Leader == null
+        || !mobileParty.Leader.GetFeatValue(feat))
+        return;
 
-        var battanianAgilityBonus =
-          AgilityPatchShared.GetEffectBonus(DefaultFeats.Cultural.BattanianForestAgility)
-          * Math.Abs(movingAtForestEffect)
-          * baseSpeed;
+      var explainedNumber = new ExplainedNumber(__result, explanation);
 
-        explainedNumber.Add(battanianAgilityBonus, DefaultFeats.Cultural.BattanianForestAgility.Name);
+      var battanianAgilityBonus =
+        AgilityPatchShared.GetEffectBonus(feat)
+        * Math.Abs(MovingAtForestEffect)
+        * baseSpeed;
 
-        __result = explainedNumber.ResultNumber;
-      }
+      explainedNumber.Add(battanianAgilityBonus, feat.Name);
+
+      __result = explainedNumber.ResultNumber;
     }
 
   }

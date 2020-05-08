@@ -20,12 +20,10 @@ namespace CommunityPatch.Patches {
     public static readonly FieldInfo EscapeMenuItemVmOnExecute = typeof(EscapeMenuItemVM)
       .GetField("_onExecute", NonPublic | Instance | DeclaredOnly);
 
-    public static FieldInfo EscapeMenuItemVmIdentifier = typeof(EscapeMenuItemVM)
-      .GetField("_identifier", NonPublic | Instance | DeclaredOnly);
-
     private static readonly object GroupEscMenuOptsKey = new object();
 
     [UsedImplicitly]
+    [HarmonyPriority(int.MaxValue)]
     public static void Postfix(EscapeMenuVM __instance, ref MBBindingList<EscapeMenuItemVM> ____menuItems, IEnumerable<EscapeMenuItemVM> items, TextObject title = null) {
       if (CommunityPatchSubModule.DontGroupThirdPartyMenuOptions) {
         ____menuItems.Add(new EscapeMenuItemVM(new TextObject("{=CommunityPatchOptions}Community Patch Options"),
@@ -49,7 +47,7 @@ namespace CommunityPatch.Patches {
             || optAsmName.StartsWith("SandBox.")
             || optAsmName.StartsWith("SandBoxCore.")
             || optAsmName.StartsWith("StoryMode."))
-            if (PathHelpers.IsOfficialAssembly(actAsm))
+            if (actAsm.IsOfficialAssembly())
               continue;
         }
         catch {

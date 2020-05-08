@@ -22,6 +22,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Crossbow Expert
     * Filled To Brim
     * Squires
+    * Trampler
     * Nomadic Traditions
     * Horse Grooming
   * Bow
@@ -83,6 +84,12 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Tactical Superiority
     * One Step Ahead
     * Elusive
+    * Bait
+    * Logistics
+    * Ambush Specialist
+    * Phalanx
+    * Hammer and Anvil
+    * Trusted Commander
 * Policies
   * Land Grants For Veterans
 * Feats
@@ -120,11 +127,11 @@ Bannerlord Mod.IO: https://bannerlord.mod.io/community-patch
 
 ## Building
 
-This repo should be placed under the Modules folder in your Bannerlord installation, and it will build out-of-the-box. Just open the \*.sln in Visual Studio and build normally.
+This repo should be placed in the folder `Modules\CommunityPatch` under your Bannerlord installation, and it will build out-of-the-box. Just open the \*.sln in an applicable IDE (JetBrains Rider, Visual Studio, etc) and build normally.
 
 The default location for Bannerlord is `C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord`.
 
-If your Bannerlord or local repo are in a different place, you can change the property MnB2BannerlordDir in Directory.Build.props to your bannerlord install. When editing the file be sure to use `&amp;` in place of an `&` if the path has one.
+If your Bannerlord or local repo are in a different place, you can change the property MnB2BannerlordDir in Directory.Build.props to your bannerlord install. When editing the file be sure to use `&amp;` in place of an `&` if the path has one. If you do move the repo, then installing the mod will require copying it to `Modules\CommunityPatch`. Take care that the folder name is correct else problems may occur.
 
 ## Credits
 ##### Contributors
@@ -134,6 +141,7 @@ If your Bannerlord or local repo are in a different place, you can change the pr
 * [Tynakuh](https://www.nexusmods.com/users/51824126) ([Discord](https://discordapp.com/users/178209384852094976))
 * [wonkotron](https://www.nexusmods.com/users/87193583) ([Discord](https://discordapp.com/users/171467525660344320))
 * [iPherian](https://www.nexusmods.com/users/86335488)
+* [miguelcjalmeida](https://github.com/miguelcjalmeida)
 
 ##### Others
 * Xaphedo for providing the banner art

@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class WarRationsPatch : PatchBase<WarRationsPatch> {
+  public sealed class WarRationsPatch : PerkPatchBase<WarRationsPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -28,9 +28,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       set => CommunityPatchSubModule.Options.Set(nameof(QuartermasterIsClanWide), value);
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x03, 0xA6, 0xD1, 0x58, 0xEA, 0x4A, 0x70, 0xB5,
@@ -40,8 +38,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "sLv7MMJf");
+    public WarRationsPatch() : base("sLv7MMJf") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -61,7 +59,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix(ref float __result, MobileParty party, StatExplainer explainer) {
       var qm = party?.LeaderHero?.Clan?.GetEffectiveQuartermaster();
 
@@ -78,7 +76,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       )
         return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!qm.GetPerkValue(perk))
         return;
 

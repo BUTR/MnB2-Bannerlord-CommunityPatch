@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class MerryMenPatch : PatchBase<MerryMenPatch> {
+  public sealed class MerryMenPatch : PerkPatchBase<MerryMenPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,9 +25,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return BanditsJoinTargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] BanditsJoinHashes = {
+    public static readonly byte[][] BanditsJoinHashes = {
       new byte[] {
         // e1.1.0.225190
         0xB1, 0x5A, 0x5C, 0xF7, 0x1A, 0x50, 0x55, 0xFF,
@@ -37,11 +35,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.All.ToList().LastOrDefault(x => x.Name.GetID() == "ssljPTUr");
+    public MerryMenPatch() : base("ssljPTUr") {
+    }
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var banditsJoinPatchInfo = Harmony.GetPatchInfo(BanditsJoinTargetMethodInfo);
       if (AlreadyPatchedByOthers(banditsJoinPatchInfo)) return false;
@@ -57,12 +55,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool PrefixBanditsJoin(ref bool __result)
       => ApplyPerkToMakeRecruitable(ref __result);
 
     private static bool ApplyPerkToMakeRecruitable(ref bool intimidated) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (MobileParty.MainParty.LeaderHero?.GetPerkValue(perk) != true) return true;
 
       intimidated = PartyBaseHelper.DoesSurrenderIsLogicalForParty(

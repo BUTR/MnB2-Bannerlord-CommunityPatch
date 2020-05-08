@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-using TaleWorlds.ObjectSystem;
 
 namespace Antijank {
 
@@ -49,21 +49,6 @@ namespace Antijank {
       // run static initializer
     }
 
-    public static void MissingPropertyNotice(string msg, string caption, string continueMsg, ref bool? dontShow) {
-      Console.WriteLine(msg);
-
-      if (dontShow == true)
-        return;
-
-      MessageBox.Error(msg, caption);
-
-      if (dontShow != null)
-        return;
-
-      if (MessageBox.Info(continueMsg, "Remember Decision", MessageBoxType.YesNo) == MessageBoxResult.No)
-        dontShow = true;
-    }
-
     private delegate string DescDlg<in TInstance>(TInstance inst);
 
     private delegate TResult FixDlg<in TInstance, out TResult>(TInstance inst);
@@ -72,6 +57,7 @@ namespace Antijank {
 
     private static readonly MethodInfo ItemObjDetermineItemCatMethod = AccessTools.Method(typeof(ItemObject), nameof(ItemObject.DetermineItemCategoryForItem));
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void GenericPostfix<TInstance, TResult>(MemberInfo member, TInstance inst, ref TResult result, DescDlg<TInstance> desc, FixDlg<TInstance, TResult> fix) {
       if (result != null)
         return;
@@ -99,39 +85,49 @@ namespace Antijank {
         DontShowError[member] = false;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ItemObjectGetItemCategoryPostfix(MethodBase __originalMethod, ItemObject __instance, ref ItemCategory __result) {
       if (__result == null && new StackFrame(2, false).GetMethod() == ItemObjDetermineItemCatMethod)
         return;
 
       GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId,
-        item => Game.Current.BasicModels.ItemCategorySelector?.GetItemCategoryForItem(item)
+        item => Game.Current?.BasicModels?.ItemCategorySelector?.GetItemCategoryForItem(item)
           ?? DefaultItemCategories.Unassigned);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void CharacterObjectGetNamePostfix(MethodBase __originalMethod, ItemObject __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void BasicCultureObjectGetNamePostfix(MethodBase __originalMethod, BasicCultureObject __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void BuildingTypeGetNamePostfix(MethodBase __originalMethod, BuildingType __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ClanGetNamePostfix(MethodBase __originalMethod, Clan __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void IssueEffectGetNamePostfix(MethodBase __originalMethod, IssueEffect __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void KingdomGetNamePostfix(MethodBase __originalMethod, Kingdom __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void SettlementGetNamePostfix(MethodBase __originalMethod, Settlement __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ItemObjectGetNamePostfix(MethodBase __originalMethod, ItemObject __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ItemModifierGetNamePostfix(MethodBase __originalMethod, ItemModifier __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
 

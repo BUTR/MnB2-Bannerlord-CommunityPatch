@@ -5,17 +5,17 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
+using static CommunityPatch.Patches.ExtraAmmoPerksPatch;
 
 namespace CommunityPatch.Patches {
 
-  public abstract class ExtraAmmoPerksPatch<TPatch> : PatchBase<TPatch> where TPatch : ExtraAmmoPerksPatch<TPatch> {
+  public static class ExtraAmmoPerksPatch {
 
-    public override bool Applied { get; protected set; }
+    public static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), Public | Instance | DeclaredOnly);
 
-    protected static readonly MethodInfo TargetMethodInfo = typeof(Agent).GetMethod(nameof(Agent.InitializeMissionEquipment), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xE5, 0x73, 0x59, 0x27, 0xE5, 0xF6, 0x83, 0x53,
@@ -25,15 +25,20 @@ namespace CommunityPatch.Patches {
       }
     };
 
-    private static readonly FieldInfo MaxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+    public static readonly FieldInfo MaxAmmoField = typeof(MissionWeapon).GetField("_maxDataValue", Instance | NonPublic | DeclaredOnly);
 
-    private static readonly FieldInfo AmmoField = typeof(MissionWeapon).GetField("_dataValue", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+    public static readonly FieldInfo AmmoField = typeof(MissionWeapon).GetField("_dataValue", Instance | NonPublic | DeclaredOnly);
 
-    private static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
-      .GetField("_weaponSlots", BindingFlags.NonPublic | BindingFlags.Instance);
+    public static readonly FieldInfo WeaponSlotsProperty = typeof(MissionEquipment)
+      .GetField("_weaponSlots", NonPublic | Instance);
 
-    public override void Reset() {
-    }
+  }
+
+  public abstract class ExtraAmmoPerksPatch<TPatch> : PerkPatchBase<TPatch> where TPatch : ExtraAmmoPerksPatch<TPatch> {
+
+    public static byte[][] Hashes => ExtraAmmoPerksPatch.Hashes;
+
+    public override bool Applied { get; protected set; }
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
@@ -45,7 +50,7 @@ namespace CommunityPatch.Patches {
         return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      return hash.MatchesAnySha256(ExtraAmmoPerksPatch.Hashes);
     }
 
     protected static bool HasMount(Agent agent) {
@@ -58,6 +63,13 @@ namespace CommunityPatch.Patches {
         return;
 
       var hero = charObj.HeroObject;
+
+      ApplyPerkToAgent(agent,
+        (_, weapon) => canApplyPerk(hero, weapon),
+        _ => ammoAmount);
+    }
+
+    protected static void ApplyPerkToAgent(Agent agent, Func<Agent, WeaponComponentData, bool> canApplyPerk, Func<short, int> getAmmoIncrease) {
       var missionWeapons = (MissionWeapon[]) WeaponSlotsProperty.GetValue(agent.Equipment);
 
       for (var i = 0; i < missionWeapons.Length; i++) {
@@ -65,15 +77,19 @@ namespace CommunityPatch.Patches {
           continue;
 
         var weaponComponentData = missionWeapons[i].Weapons[0];
-        if (weaponComponentData == null || !canApplyPerk(hero, weaponComponentData))
+        if (weaponComponentData == null || !canApplyPerk(agent, weaponComponentData))
           continue;
 
-        var newMaxAmmo = (short) ((short) MaxAmmoField.GetValue(missionWeapons[i]) + ammoAmount);
+        var maxAmmo = (short) MaxAmmoField.GetValue(missionWeapons[i]);
+        var newMaxAmmo = (short) (maxAmmo + getAmmoIncrease(maxAmmo));
         object boxed = missionWeapons[i];
         AmmoField.SetValue(boxed, newMaxAmmo);
         MaxAmmoField.SetValue(boxed, newMaxAmmo);
         missionWeapons[i] = (MissionWeapon) boxed;
       }
+    }
+
+    protected ExtraAmmoPerksPatch(string perkId) : base(perkId) {
     }
 
   }

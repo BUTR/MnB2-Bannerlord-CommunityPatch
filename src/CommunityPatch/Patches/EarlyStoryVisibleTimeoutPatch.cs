@@ -26,7 +26,7 @@ namespace CommunityPatch.Patches {
 
     private const string StoryModeAsmSpecifierSuffix = ", StoryMode, Version=1.0.0.0, Culture=neutral";
 
-    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase" + StoryModeAsmSpecifierSuffix);
+    private static readonly Type FirstPhaseType = Type.GetType("StoryMode.StoryModePhases.FirstPhase" + StoryModeAsmSpecifierSuffix, true);
 
     private static readonly List<MethodInfo> FirstPhaseQuestRemainingTimeHiddenGetters =
       FirstPhaseType.Assembly.GetTypes()
@@ -38,6 +38,7 @@ namespace CommunityPatch.Patches {
           if (getter.IsStatic) {
             throw new InvalidOperationException("an IsRemainingTimeHidden property was not an instance property, which we require.");
           }
+
           return getter;
         })
         .ToList();
@@ -52,7 +53,8 @@ namespace CommunityPatch.Patches {
 
     private static readonly MethodInfo FirstPhaseFirstPhaseStartTimeGetter = AccessTools.PropertyGetter(FirstPhaseType, "FirstPhaseStartTime");
 
-    private static CampaignTime GetFirstPhaseFirstPhaseStartTime(object instance) => (CampaignTime) FirstPhaseFirstPhaseStartTimeGetter.Invoke(instance, null);
+    private static CampaignTime GetFirstPhaseFirstPhaseStartTime(object instance)
+      => (CampaignTime) FirstPhaseFirstPhaseStartTimeGetter.Invoke(instance, null);
 
     private static readonly Type SecondPhaseType = Type.GetType("StoryMode.StoryModePhases.SecondPhase" + StoryModeAsmSpecifierSuffix);
 
@@ -82,11 +84,11 @@ namespace CommunityPatch.Patches {
       if (FirstPhaseTimeLimitInYearsField == null)
         return false;
 
-      Type CampaignStoryModeType = Type.GetType("StoryMode.CampaignStoryMode" + StoryModeAsmSpecifierSuffix, false);
-      if (CampaignStoryModeType == null)
+      var campaignStoryModeType = Type.GetType("StoryMode.CampaignStoryMode" + StoryModeAsmSpecifierSuffix, false);
+      if (campaignStoryModeType == null)
         return false;
 
-      if (!game.GameType.GetType().IsEquivalentTo(CampaignStoryModeType))
+      if (!game.GameType.GetType().IsEquivalentTo(campaignStoryModeType))
         return false;
 
       if (FirstPhaseQuestRemainingTimeHiddenGetters.Count == 0)
@@ -105,7 +107,9 @@ namespace CommunityPatch.Patches {
       return true;
     }
 
-    public IEnumerable<MethodBase> GetMethodsChecked() => FirstPhaseQuestRemainingTimeHiddenGetters;
+    public IEnumerable<MethodBase> GetMethodsChecked() {
+      yield break;
+    }
 
     private static int ExtractFirstPhaseTimeLimitInYears() {
       if (FirstPhaseTimeLimitInYearsField == null)
@@ -152,7 +156,7 @@ namespace CommunityPatch.Patches {
       if (quest.QuestDueTime == newDueTime)
         return;
 
-      bool prevIsRemainingTimeHidden = quest.IsRemainingTimeHidden;
+      var prevIsRemainingTimeHidden = quest.IsRemainingTimeHidden;
       quest.ChangeQuestDueTime(newDueTime);
 
       if (quest.IsRemainingTimeHidden && prevIsRemainingTimeHidden)
@@ -179,9 +183,8 @@ namespace CommunityPatch.Patches {
       CampaignEvents.HourlyTickEvent.AddNonSerializedListener(onHourlyTickBoxed, onHourlyTickBoxed.Value);
     }
 
-    private static void RemainingTimeHiddenGetterPostfix(ref QuestBase __instance, ref bool __result) {
-      __result = (__instance.QuestDueTime == CampaignTime.Never);
-    }
+    private static void RemainingTimeHiddenGetterPostfix(ref QuestBase __instance, ref bool __result)
+      => __result = __instance.QuestDueTime == CampaignTime.Never;
 
   }
 

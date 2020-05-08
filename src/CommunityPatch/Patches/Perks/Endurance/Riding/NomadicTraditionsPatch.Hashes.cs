@@ -2,7 +2,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
   public partial class NomadicTraditionsPatch {
 
-    private static readonly byte[][] HashesPureSpeed = {
+    public static readonly byte[][] HashesPureSpeed = {
       new byte[] {
         // e1.2.0.226110
         0x61, 0xD7, 0x4D, 0xF5, 0xB0, 0x0E, 0x84, 0x52,
@@ -12,7 +12,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    private static readonly byte[][] HashesCavalryRatioModifier = {
+    public static readonly byte[][] HashesCavalryRatioModifier = {
       new byte[] {
         // e1.2.0.226110
         0xAF, 0x54, 0x52, 0x23, 0x2B, 0xBE, 0x19, 0x6E,
@@ -22,7 +22,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    private static readonly byte[][] HashesMountedFootmenRatioModifier = {
+    public static readonly byte[][] HashesMountedFootmenRatioModifier = {
       new byte[] {
         // e1.2.0.226110
         0x04, 0x9E, 0x68, 0x08, 0x36, 0x8C, 0xDC, 0x58,
@@ -32,7 +32,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    private static readonly byte[][] HashesBaseSpeedForParty = {
+    public static readonly byte[][] HashesBaseSpeedForParty = {
       new byte[] {
         // e1.2.0.226110
         0xCE, 0xEC, 0x8D, 0x04, 0x4F, 0xFC, 0x58, 0x37,
@@ -42,11 +42,11 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    private static bool HashesMatch() =>
-      PureSpeedMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesPureSpeed) &&
-      CavalryRatioModifierMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesCavalryRatioModifier) &&
-      MountedFootmenRatioModifierMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesMountedFootmenRatioModifier) &&
-      BaseSpeedMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesBaseSpeedForParty);
+    private static bool HashesMatch()
+      => PureSpeedMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesPureSpeed) &&
+        CavalryRatioModifierMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesCavalryRatioModifier) &&
+        MountedFootmenRatioModifierMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesMountedFootmenRatioModifier) &&
+        BaseSpeedMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(HashesBaseSpeedForParty);
 
   }
 

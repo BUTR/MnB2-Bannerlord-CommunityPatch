@@ -19,16 +19,35 @@ namespace CommunityPatch.Patches {
       = typeof(Hero).GetMethod("get_MapFaction",
         Public | NonPublic | Instance | Static | DeclaredOnly);
 
+    private static readonly MethodInfo TargetMethodInfo2
+      // using assembly qualified name here
+      // ReSharper disable once PossibleNullReferenceException
+      = typeof(PartyBase).GetMethod("get_MapFaction",
+        Public | NonPublic | Instance | Static | DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo
       = typeof(MapFactionLogicLoopPatch)
         .GetMethod(nameof(Prefix),
           Public | NonPublic | Static | DeclaredOnly);
 
+    private static readonly MethodInfo PatchMethodInfo2
+      = typeof(MapFactionLogicLoopPatch)
+        .GetMethod(nameof(Prefix2),
+          Public | NonPublic | Static | DeclaredOnly);
+
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
+      yield return TargetMethodInfo2;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
+      new byte[] {
+        // e1.3.0.227640
+        0x5D, 0xF0, 0xDC, 0xC6, 0x76, 0xB8, 0x1A, 0x28,
+        0x55, 0xC3, 0x63, 0x81, 0x27, 0xD7, 0x53, 0x78,
+        0x7F, 0xD1, 0x05, 0x42, 0x2D, 0x90, 0xFD, 0x2D,
+        0xBB, 0x52, 0x62, 0xCC, 0x74, 0x76, 0x17, 0x8C
+      },
       new byte[] {
         // e1.2.0.225830
         0x92, 0x25, 0xA9, 0xE4, 0x53, 0x37, 0x22, 0xB0,
@@ -59,16 +78,32 @@ namespace CommunityPatch.Patches {
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
         new HarmonyMethod(PatchMethodInfo));
+
+      CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo2,
+        new HarmonyMethod(PatchMethodInfo2));
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool Prefix(Hero __instance, ref IFaction __result) {
-      if (__instance.IsNotable
-        || __instance.CurrentSettlement?.Party?.Owner != __instance)
+      if (__instance.CharacterObject != null
+        && (__instance.IsNotable
+          || __instance.CurrentSettlement?.Party?.Owner != __instance))
         return true;
 
-      __result = __instance?.Clan?.Kingdom ?? (IFaction) __instance?.Clan ?? CampaignData.NeutralFaction;
+      __result = __instance.Clan?.Kingdom ?? (IFaction) __instance?.Clan ?? CampaignData.NeutralFaction;
+      return false;
+    }
+
+    public static bool Prefix2(PartyBase __instance, ref IFaction __result) {
+      var hero = __instance.Owner;
+      if (hero == null)
+        return true;
+      if (hero.CharacterObject != null
+        && (hero.IsNotable
+          || hero.CurrentSettlement?.Party?.Owner != hero))
+        return true;
+
+      __result = hero.Clan?.Kingdom ?? (IFaction) hero?.Clan ?? CampaignData.NeutralFaction;
       return false;
     }
 

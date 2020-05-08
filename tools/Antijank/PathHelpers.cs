@@ -50,6 +50,27 @@ namespace Antijank {
       return _configsDir;
     }
 
+    private static string _savesDir;
+
+    public static string GetSavesDir() {
+      if (_savesDir != null)
+        return _savesDir;
+
+      try {
+        _savesDir = EnsureTrailingDirectorySeparatorAndNormalize(Utilities.GetGameSavesPath());
+      }
+      catch (NullReferenceException) {
+        _savesDir = EnsureTrailingDirectorySeparatorAndNormalize(Path.Combine(
+          Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+          "Mount and Blade II Bannerlord",
+          "Game Saves",
+          "Native"
+        ));
+      }
+
+      return _savesDir;
+    }
+
     public static string Normalize(string path) {
       var sb = new StringBuilder(path);
 

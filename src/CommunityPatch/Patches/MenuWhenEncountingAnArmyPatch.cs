@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
-using Harmony = HarmonyLib.Harmony;
 
 namespace CommunityPatch.Patches {
 
@@ -23,13 +21,20 @@ namespace CommunityPatch.Patches {
     private static readonly MethodInfo PatchMethodInfo = typeof(MenuWhenEncounteringAnArmyPatch)
       .GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.0.11
         0x18, 0xC5, 0x16, 0xD2, 0x46, 0x07, 0xBB, 0x08,
         0xAE, 0xC3, 0x6D, 0xE6, 0xFA, 0xCD, 0x2E, 0x63,
         0x0E, 0x1A, 0x73, 0xB6, 0x76, 0xF9, 0xAD, 0x0E,
         0x3F, 0xD9, 0xFA, 0x7A, 0x68, 0xFB, 0xEB, 0xE7
+      },
+      new byte[] {
+        // e1.3.0.227640
+        0x4F, 0xDD, 0xEF, 0x54, 0x13, 0xCB, 0xBB, 0x10,
+        0xC1, 0x77, 0xF8, 0xF4, 0x11, 0xEF, 0x97, 0x40,
+        0x26, 0x88, 0x96, 0x76, 0xA2, 0x57, 0x9C, 0x50,
+        0xF5, 0xF6, 0x2C, 0x2C, 0xDA, 0x9E, 0x47, 0x21
       }
     };
 
@@ -53,6 +58,11 @@ namespace CommunityPatch.Patches {
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
+      if (EncounteredPartyField == null || MapEventStateField == null || StateHandledField == null || DefenderPartyField == null || MeetingDoneField == null) {
+        CommunityPatchSubModule.Error($"{nameof(MenuWhenEncounteringAnArmyPatch)}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
+        return false;
+      }
+
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       return hash.MatchesAnySha256(Hashes);
     }
@@ -67,23 +77,18 @@ namespace CommunityPatch.Patches {
 
     private static readonly FieldInfo MeetingDoneField = typeof(PlayerEncounter).GetField("_meetingDone", Instance | NonPublic);
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool Prefix(PlayerEncounter __instance) {
       if (!CommunityPatchSubModule.EnableMenuWhenEncouteringAnArmy)
         return true;
 
-      if (EncounteredPartyField == null || MapEventStateField == null || StateHandledField == null || DefenderPartyField == null || MeetingDoneField == null) {
-        CommunityPatchSubModule.Error($"{typeof(MenuWhenEncounteringAnArmyPatch).Name}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
-        return true;
-      }
-
       var attacker = (PartyBase) EncounteredPartyField.GetValue(__instance);
       if (attacker.IsSettlement)
-        foreach (var defender in (IEnumerable<PartyBase>) MobileParty.MainParty.MapEvent.DefenderSide.Parties) {
-          if (!defender.IsSettlement) {
-            attacker = defender;
-            break;
-          }
+        foreach (var defender in MobileParty.MainParty.MapEvent.DefenderSide.Parties) {
+          if (defender.IsSettlement)
+            continue;
+
+          attacker = defender;
+          break;
         }
 
       Campaign.Current.CurrentConversationContext = ConversationContext.PartyEncounter;
@@ -92,8 +97,13 @@ namespace CommunityPatch.Patches {
 
       var defenderParty = (PartyBase) DefenderPartyField.GetValue(__instance);
 
-      if (PlayerEncounter.PlayerIsAttacker && defenderParty.IsMobile && defenderParty.MobileParty.Army != null && defenderParty.MobileParty.Army.LeaderParty == defenderParty.MobileParty
-        && !defenderParty.MobileParty.Army.LeaderParty.AttachedParties.Contains(MobileParty.MainParty))
+      if (!PlayerEncounter.PlayerIsAttacker)
+        return false;
+
+      var defenderMobileParty = defenderParty.IsMobile ? defenderParty.MobileParty : null;
+      var defenderArmy = defenderMobileParty?.Army;
+      if (defenderArmy != null && defenderArmy.LeaderParty == defenderMobileParty
+        && !defenderArmy.LeaderParty.AttachedParties.Contains(MobileParty.MainParty))
         GameMenu.SwitchToMenu("army_encounter");
       else {
         MeetingDoneField.SetValue(__instance, true);

@@ -1,13 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml;
-using System.Xml.Linq;
 using HarmonyLib;
-using TaleWorlds.Library;
 using TaleWorlds.ObjectSystem;
 using static System.Reflection.BindingFlags;
 
@@ -15,75 +14,87 @@ namespace Antijank {
 
   public static class MbObjectManagerPatch {
 
+    private static int InitCount = 0;
+    
     static MbObjectManagerPatch() {
+      if (InitCount > 0) {
+        if (Debugger.IsAttached)
+          Debugger.Break();
+        throw new InvalidOperationException("Multiple static initializer runs!");
+      }
+
+      ++InitCount;
       Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "CreateDocumentFromXmlFile"),
         postfix: new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(CreateDocumentFromXmlFilePostfix)));
       Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "MergeTwoXmls"),
         new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(MergeTwoXmlsReplacement)));
       Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "LoadXml"),
-        prefix: new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(LoadXmlReplacement)));
+        new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(LoadXmlReplacement)));
     }
 
     public static void Init() {
       // run static initializer
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void CreateDocumentFromXmlFilePostfix(ref XmlDocument __result, string xmlPath, string xsdPath, bool forceSkipValidation) {
       var root = __result.DocumentElement;
       if (root == null)
         return;
+
+      __result.PreserveWhitespace = false;
 
       var fullPath = xmlPath;
       if (fullPath.StartsWith("./") || fullPath.StartsWith("../") || fullPath.StartsWith(".\\") || fullPath.StartsWith("..\\"))
         fullPath = new Uri(Path.Combine(Environment.CurrentDirectory, xmlPath)).LocalPath;
       PathHelpers.Normalize(fullPath);
 
-      root.SetAttribute("xmlns:xaj", "https://antijank/");
-      root.SetAttribute("source", "https://antijank/", fullPath);
+      root.SetAttribute("xmlns:xaj", AntijankXmlNamespace);
+      root.SetAttribute("source", AntijankXmlNamespace, fullPath);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool MergeTwoXmlsReplacement(ref XmlDocument __result, XmlDocument xmlDocument1, XmlDocument xmlDocument2, string id) {
-      var newDoc = new XmlDocument();
+      var root = xmlDocument1?.DocumentElement;
+      var root2 = xmlDocument2?.DocumentElement;
 
-      var root = (XmlElement) newDoc.ImportNode(xmlDocument1.DocumentElement!, false);
-      newDoc.AppendChild(root);
-
-      root.SetAttribute("xmlns:xaj", "https://antijank/");
-
-      root.RemoveAttribute("source", "https://antijank/");
-      root.SetAttribute("id", "https://antijank/", id);
-
-      newDoc.AppendChild(root);
-
-      if (xmlDocument1.GetNamespaceOfPrefix("xaj") == null)
-        throw new NotImplementedException();
-      if (xmlDocument2.GetNamespaceOfPrefix("xaj") == null)
-        throw new NotImplementedException();
-
-      var src1 = xmlDocument1.DocumentElement!.GetAttribute("source", "https://antijank/");
-      var src2 = xmlDocument2.DocumentElement!.GetAttribute("source", "https://antijank/");
-
-      foreach (XmlNode node in xmlDocument1.DocumentElement.ChildNodes) {
-        var copy = newDoc.ImportNode(node, true);
-        if (copy is XmlElement copyElement) {
-          if (string.IsNullOrEmpty(copyElement.GetAttribute("source", "https://antijank/")))
-            copyElement.SetAttribute("source", "https://antijank/", src1);
-        }
-
-        newDoc.DocumentElement!.AppendChild(copy);
+      if (root == null && root2 == null) {
+        var newDoc = new XmlDocument {PreserveWhitespace = false};
+        newDoc.AppendChild(newDoc.CreateElement(id + "s"));
+        __result = newDoc;
+        return false;
       }
 
-      foreach (XmlNode node in xmlDocument2.DocumentElement.ChildNodes) {
-        var copy = newDoc.ImportNode(node, true);
-        if (copy is XmlElement copyElement) {
-          if (string.IsNullOrEmpty(copyElement.GetAttribute("source", "https://antijank/")))
-            copyElement.SetAttribute("source", "https://antijank/", src2);
-        }
-
-        newDoc.DocumentElement!.AppendChild(copy);
+      if (root == null) {
+        __result = xmlDocument2;
+        return false;
       }
 
-      __result = newDoc;
+      if (root2 == null) {
+        __result = xmlDocument1;
+        return false;
+      }
+
+      var source1 = string.Intern(root!.GetAttribute("source", AntijankXmlNamespace));
+      var source2 = string.Intern(root2!.GetAttribute("source", AntijankXmlNamespace));
+
+      foreach (XmlNode node in root.ChildNodes) {
+        if (!(node is XmlElement element))
+          continue;
+
+        if (!element.HasAttribute("source", AntijankXmlNamespace))
+          element.SetAttribute("source", AntijankXmlNamespace, source1);
+      }
+
+      foreach (XmlNode node in root2.ChildNodes) {
+        if (node is XmlElement element)
+          if (!element.HasAttribute("source", AntijankXmlNamespace))
+            element.SetAttribute("source", AntijankXmlNamespace, source2);
+
+        root.AppendChild(xmlDocument1.ImportNode(node, true));
+      }
+
+      __result = xmlDocument1;
       return false;
     }
 
@@ -93,7 +104,7 @@ namespace Antijank {
 
     private static readonly MethodInfo ObjTypeRecElementNameMethod = AccessTools.PropertyGetter(ObjTypeRecType, "ElementName");
 
-    private static readonly MethodInfo MBObjectManagerGetPresumedObjectMethod = AccessTools.Method(typeof(MBObjectManager), "GetPresumedObject");
+    private static readonly MethodInfo MbObjectManagerGetPresumedObjectMethod = AccessTools.Method(typeof(MBObjectManager), "GetPresumedObject");
 
     private static string ObjTypeRecElementListName(object otr) => (string) ObjTypeRecElementListNameMethod.Invoke(otr, null);
 
@@ -101,6 +112,9 @@ namespace Antijank {
 
     private static readonly Dictionary<string, bool> ContinueWithErrorRememberChoice = new Dictionary<string, bool>();
 
+    private static readonly string AntijankXmlNamespace = "https://antijank/";
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool LoadXmlReplacement(MBObjectManager __instance, IList ___ObjectTypeRecords, IList ___NonSerializedObjectTypeRecords, XmlDocument doc, Type typeOfGameMenusCallbacks) {
       var nodeIndex = 0;
       var found = false;
@@ -143,7 +157,7 @@ namespace Antijank {
 
         var id = elem.GetAttribute("id");
         try {
-          var obj = (MBObjectBase) MBObjectManagerGetPresumedObjectMethod.Invoke(__instance, new object[] {typeName, id, true});
+          var obj = (MBObjectBase) MbObjectManagerGetPresumedObjectMethod.Invoke(__instance, new object[] {typeName, id, true});
           if (typeOfGameMenusCallbacks != null)
             obj.Deserialize(__instance, node, typeOfGameMenusCallbacks);
           else
@@ -151,9 +165,9 @@ namespace Antijank {
           obj.AfterInitialized();
         }
         catch (Exception ex) {
-          var source = elem.GetAttribute("source", "https://antijank/");
+          var source = elem.GetAttribute("source", AntijankXmlNamespace);
           if (string.IsNullOrEmpty(source))
-            source = doc.DocumentElement!.GetAttribute("source", "https://antijank/");
+            source = doc.DocumentElement!.GetAttribute("source", AntijankXmlNamespace);
           var isMod = PathHelpers.IsModulePath(new Uri(source).LocalPath, out var mod);
           var rememberedChoice = ContinueWithErrorRememberChoice.TryGetValue(mod.Alias, out var rememberedContinue);
 

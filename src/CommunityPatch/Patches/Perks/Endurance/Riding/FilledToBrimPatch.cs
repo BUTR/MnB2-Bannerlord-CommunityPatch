@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  public sealed class FilledToBrimPatch : PatchBase<FilledToBrimPatch> {
+  public sealed class FilledToBrimPatch : PerkPatchBase<FilledToBrimPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -25,9 +25,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.0.11
         0x91, 0x8F, 0x69, 0x36, 0xA9, 0x4F, 0xE9, 0x5E,
@@ -37,8 +35,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "jikaakdy");
+    public FilledToBrimPatch() : base("jikaakdy") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -61,14 +59,14 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Prefix(ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix(ref int __result, MobileParty mobileParty, StatExplainer explanation, bool includeFollowers) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       if (!(mobileParty.LeaderHero?.GetPerkValue(perk) ?? false))
         return;

@@ -11,19 +11,22 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class RulerPatch : IPatch {
+  public sealed class RulerPatch : PerkPatchBase<RulerPatch> {
 
-    public bool Applied { get; private set; }
+    public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(Clan).GetMethod("get_CompanionLimit", Public | Instance | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(RulerPatch).GetMethod(nameof(CompanionLimitPatched), NonPublic | Static | DeclaredOnly);
 
-    public IEnumerable<MethodBase> GetMethodsChecked() {
+    public RulerPatch() : base("IcgVKFxZ") {
+    }
+
+    public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x18, 0xDB, 0x6B, 0x5B, 0xF9, 0x74, 0xDC, 0xA3,
@@ -33,7 +36,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public void Apply(Game game) {
+    public override void Apply(Game game) {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
@@ -42,7 +45,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       Applied = true;
     }
 
-    public bool? IsApplicable(Game game) {
+    public override bool? IsApplicable(Game game) {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
@@ -52,13 +55,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void CompanionLimitPatched(Clan __instance, ref int __result) {
-      if (__instance.Leader.GetPerkValue(DefaultPerks.Steward.Ruler))
+      if (__instance.Leader.GetPerkValue(ActivePatch.Perk))
         __result += Town.All.Count(t => t.Owner.Owner == __instance.Leader);
-    }
-
-    public void Reset() {
     }
 
   }

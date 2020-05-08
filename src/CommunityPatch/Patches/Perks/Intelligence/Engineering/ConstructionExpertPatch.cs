@@ -5,12 +5,15 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class ConstructionExpertPatch : PatchBase<ConstructionExpertPatch> {
+  // appears to be fixed in 1.3?
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 3)]
+  public sealed class ConstructionExpertPatch : PerkPatchBase<ConstructionExpertPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -27,9 +30,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return WithoutBoostTargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x51, 0xAD, 0x16, 0x28, 0x7C, 0x93, 0x7A, 0x2E,
@@ -39,7 +40,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    private static readonly byte[][] WithoutBoostHashes = {
+    public static readonly byte[][] WithoutBoostHashes = {
       new byte[] {
         // e1.1.0.225190
         0x8C, 0x3A, 0x1F, 0xC9, 0xAE, 0x69, 0x29, 0x4B,
@@ -49,14 +50,14 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "KBcNYbIC");
+    public ConstructionExpertPatch() : base("KBcNYbIC") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -76,12 +77,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     public static void Postfix(ref int __result, Town town, StatExplainer explanation = null)
       => TryToApplyConstructionExpert(ref __result, town, explanation);
 
     private static void TryToApplyConstructionExpert(ref int productionPower, Town town, StatExplainer explanation = null) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       if (town.BuildingsInProgress.IsEmpty()) return;
 
@@ -99,7 +100,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       => HasGovernorWithConstructionExpert(town) && IsWallOrFortificationBuilding(building);
 
     private static bool HasGovernorWithConstructionExpert(Town town)
-      => town.Governor?.GetPerkValue(ActivePatch._perk) == true;
+      => town.Governor?.GetPerkValue(ActivePatch.Perk) == true;
 
     private static bool IsWallOrFortificationBuilding(Building building)
       => building.BuildingType == DefaultBuildingTypes.Wall || building.BuildingType == DefaultBuildingTypes.Fortifications;

@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class LogisticsExpertPatch : PatchBase<LogisticsExpertPatch> {
+  public sealed class LogisticsExpertPatch : PerkPatchBase<LogisticsExpertPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -22,9 +22,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x58, 0xF5, 0x64, 0xA2, 0xE1, 0x17, 0x5C, 0x0C,
@@ -34,8 +32,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "6JaeM2p2");
+    public LogisticsExpertPatch() : base("6JaeM2p2") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -55,9 +53,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(ref float __result, MobileParty mobileParty, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(mobileParty.Army?.LeaderParty?.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 

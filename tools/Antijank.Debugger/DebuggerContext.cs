@@ -8,8 +8,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Antijank.Debugging;
-using Antijank.Interop;
-using Microsoft.Diagnostics.Runtime;
 using static System.Reflection.BindingFlags;
 
 namespace Antijank {
@@ -22,30 +20,19 @@ namespace Antijank {
       ExecutionQueue = new BlockingCollection<(SendOrPostCallback, object, ManualResetEvent?)>
         (new ConcurrentQueue<(SendOrPostCallback, object, ManualResetEvent?)>());
 
-    private DataTarget _attachedDt = null!;
-
     [DllImport("AntijankProfiler")]
     [return: MarshalAs(UnmanagedType.Interface)]
     public static extern object GetCorProfilerInfo();
 
     public DebuggerContext()
       => _thread = new Thread(DebuggerThreadAction) {
-        Name = "Stack Scanner",
+        Name = "Debugger Thread",
         IsBackground = true,
         Priority = ThreadPriority.Highest
       };
 
     public void Start()
       => _thread.Start();
-
-    [ThreadStatic]
-    public static DataTarget? InProcDataTarget;
-
-    [ThreadStatic]
-    public static ClrInfo? InProcClrInfo;
-
-    [ThreadStatic]
-    public static ClrRuntime? InProcClrRuntime;
 
     [ThreadStatic]
     private static CLRMetaHost? MetaHost;
@@ -65,8 +52,6 @@ namespace Antijank {
     public static int ThreadId;
 
     public static readonly MethodInfo TestEnCMethod = typeof(DebuggerContext).GetMethod(nameof(TestEnC), DeclaredOnly | Public | Static);
-
-    private Guid profilerClsid;
 
     public static bool TestEnC() => false;
 
@@ -143,7 +128,6 @@ namespace Antijank {
             }
           }
         }
-        
 
         var sbName = new StringBuilder(4096);
         foreach (var appDom in DebugHelpers.GetEnumerable<ICorDebugAppDomain>(DebugProcess.EnumerateAppDomains().Next)) {
@@ -168,28 +152,9 @@ namespace Antijank {
         }
       }
 
-      DataTarget inProcDt;
-      ClrRuntime clrRt2;
-      {
-        _attachedDt = DataTarget.PassiveAttachToProcess(pid);
-        inProcDt = new DataTarget(new InProcDataReader(_attachedDt.DataReader));
-        var clrInfo = inProcDt.ClrVersions.Single();
-        clrRt2 = clrInfo.CreateRuntime();
-
-        InProcDataTarget = inProcDt;
-        InProcClrInfo = clrInfo;
-        InProcClrRuntime = clrRt2;
-      }
-      try {
-        foreach (var (callback, state, waiter) in ExecutionQueue.GetConsumingEnumerable()) {
-          callback(state);
-          waiter?.Set();
-        }
-      }
-      finally {
-        _attachedDt.Dispose();
-        inProcDt.Dispose();
-        clrRt2.Dispose();
+      foreach (var (callback, state, waiter) in ExecutionQueue.GetConsumingEnumerable()) {
+        callback(state);
+        waiter?.Set();
       }
     }
 

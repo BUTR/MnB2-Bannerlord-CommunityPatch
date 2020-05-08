@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class EverydayEngineerPatch : PatchBase<EverydayEngineerPatch> {
+  public sealed class EverydayEngineerPatch : PerkPatchBase<EverydayEngineerPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,9 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xAA, 0x75, 0x66, 0xFC, 0x8F, 0x81, 0x1E, 0xB2,
@@ -36,12 +34,12 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "wwuuplH7");
+    public EverydayEngineerPatch() : base("wwuuplH7") {
+    }
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus.IsDifferentFrom(.3f)) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus.IsDifferentFrom(.3f)) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -51,23 +49,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, 60f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        _perk.IncrementType
-      );
+      Perk.SetPrimaryBonus(60f);
 
       if (Applied) return;
 
@@ -75,12 +57,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref float __result, Building building) {
       if (!building.BuildingType.IsDefaultProject) return;
       if (building.Town == null) return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var totalEffect = new ExplainedNumber(__result);
       PerkHelper.AddPerkBonusForTown(perk, building.Town, ref totalEffect);
       __result = totalEffect.ResultNumber;

@@ -13,7 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public class ImperialFirePatch : PatchBase<ImperialFirePatch> {
+  public class ImperialFirePatch : PerkPatchBase<ImperialFirePatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -32,9 +32,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       yield return DefenderTargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] AttackerHashes = {
+    public static readonly byte[][] AttackerHashes = {
       new byte[] {
         // e1.1.0.225190
         0xAC, 0x2D, 0x81, 0xE5, 0xC9, 0xA7, 0x97, 0x09,
@@ -44,7 +42,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    private static readonly byte[][] DefenderHashes = {
+    public static readonly byte[][] DefenderHashes = {
       new byte[] {
         // e1.1.0.225190
         0x36, 0x8E, 0x5A, 0x15, 0x31, 0xDC, 0xB0, 0x6F,
@@ -54,14 +52,14 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "UaZSa5mY");
+    public ImperialFirePatch() : base("UaZSa5mY") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var attackerPatchInfo = Harmony.GetPatchInfo(AttackerTargetMethodInfo);
       if (AlreadyPatchedByOthers(attackerPatchInfo)) return false;
@@ -75,22 +73,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     public override void Apply(Game game) {
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-      // most of the properties of skills have private setters, yet Initialize is public
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, 1f,
-        _perk.SecondaryRole, _perk.SecondaryBonus
-      );
+      Perk.Modify(1f, SkillEffect.EffectIncrementType.Add);
+
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(AttackerTargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfoPostfix));
@@ -99,7 +83,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     public static void Postfix(ref IEnumerable<SiegeEngineType> __result) {
       if (Hero.MainHero == null) return;
       if (AnyPartyMemberHasThePerkActive(Hero.MainHero.PartyBelongedTo)) return;
@@ -108,7 +92,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     private static bool AnyPartyMemberHasThePerkActive(MobileParty party) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var partyMemberValue = new ExplainedNumber(0f);
       PerkHelper.AddPerkBonusForParty(perk, party, ref partyMemberValue);
 

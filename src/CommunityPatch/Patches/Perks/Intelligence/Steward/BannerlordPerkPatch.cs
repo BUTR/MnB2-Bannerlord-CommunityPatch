@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class BannerlordPatch : PatchBase<BannerlordPatch> {
+  public sealed class BannerlordPatch : PerkPatchBase<BannerlordPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -23,9 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225664
         0x41, 0xDD, 0x60, 0x12, 0x52, 0xAC, 0x6C, 0xA7,
@@ -49,8 +48,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "MMv0U5Yr");
+    public BannerlordPatch() : base("MMv0U5Yr") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -70,22 +69,25 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 
-      var extra = party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus;
-      if (extra > 0) {
-        var explainedNumber = new ExplainedNumber(__result, explanation);
-        var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
-        if (baseLine != null)
-          explanation.Lines.Remove(baseLine);
+      var fiefCount = party.LeaderHero.Clan.Settlements.Count(s => !s.IsVillage);
+      var extra = fiefCount * perk.PrimaryBonus;
 
-        explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
-        __result = (int) explainedNumber.ResultNumber;
-      }
+      if (extra < float.Epsilon)
+        return;
+
+      var explainedNumber = new ExplainedNumber(__result, explanation);
+      var baseLine = explanation?.Lines.Find(x => x.Name == "Base");
+      if (baseLine != null)
+        explanation.Lines.Remove(baseLine);
+
+      explainedNumber.Add(extra, perk.Name);
+      __result = (int) explainedNumber.ResultNumber;
     }
 
   }

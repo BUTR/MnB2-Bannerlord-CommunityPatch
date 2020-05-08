@@ -1,36 +1,33 @@
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using TaleWorlds.CampaignSystem;
-using TaleWorlds.Core;
 using HarmonyLib;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
-using TaleWorlds.Localization;
-using static System.Reflection.BindingFlags;
-using static CommunityPatch.HarmonyHelpers;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
-  public sealed class BuilderPatch : PatchBase<BuilderPatch> {
+  // v1.3 and up, see BuilderPatch2
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 3)]
+  public sealed class BuilderPatch : PerkPatchBase<BuilderPatch> {
 
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo =
-      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPower), Public | Instance | DeclaredOnly);
+      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPower), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
     private static readonly MethodInfo WithoutBoostTargetMethodInfo =
-      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPowerWithoutBoost), Public | Instance | DeclaredOnly);
+      typeof(DefaultBuildingConstructionModel).GetMethod(nameof(DefaultBuildingConstructionModel.CalculateDailyConstructionPowerWithoutBoost), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(BuilderPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfoPostfix = typeof(BuilderPatch).GetMethod(nameof(Postfix), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
       yield return WithoutBoostTargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x51, 0xAD, 0x16, 0x28, 0x7C, 0x93, 0x7A, 0x2E,
@@ -40,7 +37,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    private static readonly byte[][] WithoutBoostHashes = {
+    public static readonly byte[][] WithoutBoostHashes = {
       new byte[] {
         // e1.1.0.225190
         0x8C, 0x3A, 0x1F, 0xC9, 0xAE, 0x69, 0x29, 0x4B,
@@ -50,40 +47,23 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "dsNV3sgp");
+    public BuilderPatch() : base("dsNV3sgp") {
+    }
 
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
-      if (AlreadyPatchedByOthers(patchInfo)) return false;
+      if (HarmonyHelpers.AlreadyPatchedByOthers(patchInfo)) return false;
 
-      var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      var withoutBoostHash = WithoutBoostTargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes) && withoutBoostHash.MatchesAnySha256(WithoutBoostHashes);
+      return TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes)
+        && WithoutBoostTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(WithoutBoostHashes);
     }
 
     public override void Apply(Game game) {
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, .5f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        _perk.IncrementType
-      );
+      Perk.SetPrimaryBonus(.5f);
 
       if (Applied) return;
 
@@ -94,14 +74,14 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     public static void Postfix(ref int __result, Town town, StatExplainer explanation = null)
       => TryToApplyBuilderPerk(ref __result, town, explanation);
 
     private static void TryToApplyBuilderPerk(ref int productionPower, Town town, StatExplainer explanation = null) {
       if (!HasGovernorWithBuilderPerk(town)) return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var productionPowerBonus = new ExplainedNumber(productionPower, explanation);
       productionPowerBonus.AddFactor(perk.PrimaryBonus, perk.Name);
 
@@ -109,7 +89,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
     }
 
     private static bool HasGovernorWithBuilderPerk(Town town)
-      => town.Governor?.GetPerkValue(ActivePatch._perk) == true;
+      => town.Governor?.GetPerkValue(ActivePatch.Perk) == true;
 
   }
 

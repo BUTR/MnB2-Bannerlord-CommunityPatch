@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class SwordsAsTributePatch : PatchBase<SwordsAsTributePatch> {
+  public sealed class SwordsAsTributePatch : PerkPatchBase<SwordsAsTributePatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,9 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225664
         0x41, 0xDD, 0x60, 0x12, 0x52, 0xAC, 0x6C, 0xA7,
@@ -50,8 +48,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "7fHHThQr");
+    public SwordsAsTributePatch() : base("7fHHThQr") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -71,9 +69,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var hero = party.LeaderHero;
 
       if (hero == null || hero.Clan?.Kingdom?.RulingClan?.Leader != hero)

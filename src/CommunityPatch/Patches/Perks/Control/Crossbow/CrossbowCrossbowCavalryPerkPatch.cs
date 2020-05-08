@@ -19,13 +19,6 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowCavalryPerkPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
-    private static PerkObject _crossbowCavalry;
-
-    public override void Reset() {
-      _crossbowCavalry = PerkObject.FindFirst(perk => perk.Name.GetID() == "sHXLjzCb");
-      base.Reset();
-    }
-
     public override void Apply(Game game) {
       if (Applied) return;
 
@@ -38,13 +31,12 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
         yield return mb;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
 
       // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
       if (weapon.WeaponClass == WeaponClass.Crossbow
-        && HeroHasPerk(character, _crossbowCavalry))
+        && HeroHasPerk(character, ActivePatch.Perk))
         weapon.WeaponFlags &= ~WeaponFlags.CantReloadOnHorseback;
     }
 
@@ -55,7 +47,6 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
 
     [UsedImplicitly]
     // workaround for https://github.com/pardeike/Harmony/issues/286
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void CallWeaponEquippedPrefix(ref Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
@@ -71,13 +62,16 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
       for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
         if (weapon.WeaponClass != (int) WeaponClass.Crossbow
-          || !HeroHasPerk(__instance.Character, _crossbowCavalry))
+          || !HeroHasPerk(__instance.Character, ActivePatch.Perk))
           continue;
 
         var updatedWeapon = weapon;
         updatedWeapon.WeaponFlags = weapon.WeaponFlags & ~(ulong) WeaponFlags.CantReloadOnHorseback;
         weaponStatsData[i] = updatedWeapon;
       }
+    }
+
+    public CrossbowCavalryPerkPatch() : base("sHXLjzCb") {
     }
 
   }

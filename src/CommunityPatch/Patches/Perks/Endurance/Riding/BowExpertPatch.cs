@@ -18,11 +18,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(BowExpertPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
-    private static PerkObject _bowExpert;
-
-    public override void Reset() {
-      _bowExpert = PerkObject.FindFirst(perk => perk.Name.GetID() == "cKTeea27");
-      base.Reset();
+    public BowExpertPatch() : base("cKTeea27") {
     }
 
     public override void Apply(Game game) {
@@ -37,12 +33,11 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         yield return mb;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Prefix(ItemMenuVM __instance, MBBindingList<ItemFlagVM> list, ref WeaponComponentData weapon) {
       var character = (BasicCharacterObject) ItemMenuVmCharacterField.GetValue(__instance);
       if (weapon.ItemUsage == "long_bow") // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
         WeaponComponentDataItemUsageMethod
-          .Invoke(weapon, new[] {HeroHasPerk(character, _bowExpert) ? "bow" : weapon.ItemUsage});
+          .Invoke(weapon, new[] {HeroHasPerk(character, ActivePatch.Perk) ? "bow" : weapon.ItemUsage});
     }
 
     protected override bool AppliesToVersion(Game game)
@@ -50,7 +45,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     [UsedImplicitly]
     // workaround for https://github.com/pardeike/Harmony/issues/286
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void CallWeaponEquippedPrefix(ref Agent __instance,
       EquipmentIndex equipmentSlot,
       ref WeaponData weaponData,
@@ -66,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       for (var i = 0; i < weaponStatsData.Length; i++) {
         var weapon = weaponStatsData[i];
         if (weapon.ItemUsageIndex != MBItem.GetItemUsageIndex("long_bow")
-          || !HeroHasPerk(__instance.Character, _bowExpert))
+          || !HeroHasPerk(__instance.Character, ActivePatch.Perk))
           continue;
 
         var updatedWeapon = weapon;

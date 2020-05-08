@@ -11,13 +11,11 @@ namespace CommunityPatch.Patches.Feats {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly MethodInfo TargetMethodInfo = AccessTools.Method(
-      AccessTools.TypeByName("Helpers.PerkHelper"),
-      "AddFeatBonusForPerson");
+    private static readonly MethodInfo TargetMethodInfo = AccessTools.Method(typeof(Helpers.PerkHelper), nameof(Helpers.PerkHelper.AddFeatBonusForPerson));
 
     private static readonly MethodInfo PatchMethodInfo = AccessTools.Method(typeof(DisableTaleWorldsAgilityBonusesPatch), nameof(Prefix));
 
-    private static readonly byte[][] ValidHashes = {
+    public static readonly byte[][] ValidHashes = {
       new byte[] {
         // e1.3.0.226834
         0x29, 0x53, 0x91, 0xD0, 0xA9, 0xC2, 0x81, 0xA5,
@@ -36,6 +34,11 @@ namespace CommunityPatch.Patches.Feats {
         CommunityPatchSubModule.Error("DisableTaleWorldsAgilityBonusesPatch:  Invalid target method");
         return false;
       }
+
+      if (!((BattanianForestAgilityPatch.ActivePatch.IsApplicable(game) ?? false)
+        || (KhuzaitCavalryAgilityPatch.ActivePatch.IsApplicable(game) ?? false)
+        || (SturgianSnowAgilityPatch.ActivePatch.IsApplicable(game) ?? false)))
+        return false;
 
       // This patch will probably not play nicely with others because it disables the target method in certain
       // circumstances
@@ -58,22 +61,15 @@ namespace CommunityPatch.Patches.Feats {
     public override void Reset()
       => Applied = false;
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool Prefix(
       ref FeatObject feat,
       ref CharacterObject character,
-      ref ExplainedNumber bonuses) {
-      if (character == null ||
-        !character.GetFeatValue(feat))
-        return true;
-
-      if (feat == DefaultFeats.Cultural.BattanianForestAgility ||
-        feat == DefaultFeats.Cultural.KhuzaitCavalryAgility ||
-        feat == DefaultFeats.Cultural.SturgianSnowAgility)
-        return false;
-
-      return true;
-    }
+      ref ExplainedNumber bonuses)
+      => character == null
+        || !character.GetFeatValue(feat)
+        || feat != DefaultFeats.Cultural.BattanianForestAgility
+        && feat != DefaultFeats.Cultural.KhuzaitCavalryAgility
+        && feat != DefaultFeats.Cultural.SturgianSnowAgility;
 
   }
 

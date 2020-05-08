@@ -2,24 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
-using System.Xml.Linq;
-using System.Xml.XPath;
 using HarmonyLib;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade.Launcher;
 using TaleWorlds.MountAndBlade.Launcher.UserDatas;
 using Medallion.Collections;
+using Antijank.Interop;
+using TaleWorlds.Core;
 using TaleWorlds.GauntletUI;
 using TaleWorlds.GauntletUI.Data;
 using TaleWorlds.InputSystem;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.SaveSystem;
 using TaleWorlds.TwoDimension.Standalone;
 using TaleWorlds.TwoDimension.Standalone.Native.Windows;
 using Module = TaleWorlds.MountAndBlade.Module;
@@ -31,8 +32,16 @@ namespace Antijank {
 
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
-    static LoaderPatch() {
+    private static int InitCount = 0;
 
+    static LoaderPatch() {
+      if (InitCount > 0) {
+        if (Debugger.IsAttached)
+          Debugger.Break();
+        throw new InvalidOperationException("Multiple static initializer runs!");
+      }
+
+      ++InitCount;
       Context.Harmony.Patch(
         typeof(LauncherModsVM).GetMethod("LoadSubModules", Declared),
         new HarmonyMethod(typeof(LoaderPatch), nameof(LoadSubModulesPrefix)));
@@ -146,6 +155,8 @@ namespace Antijank {
 
     private static bool _waitForKeysReset;
 
+    private static UserDataManager _userDataManager;
+
     private static void LauncherUiInitializePostfix(LauncherUI __instance) {
       _launcherVm = _launcherVmAccessor(__instance);
       _movie = _gauntletMovieAccessor(__instance);
@@ -157,6 +168,7 @@ namespace Antijank {
       //_uiContext = context;
       _launcherVmAccessor = AccessTools.FieldRefAccess<LauncherUI, LauncherVM>("_viewModel");
       _gauntletMovieAccessor = AccessTools.FieldRefAccess<LauncherUI, GauntletMovie>("_movie");
+      _userDataManager = userDataManager;
 
       var input = context.EventManager.InputContext;
 
@@ -201,15 +213,175 @@ namespace Antijank {
           Console.WriteLine("Pasting modules list from clipboard.");
           ref var launcherVm = ref _launcherVmAccessor(__instance);
           var inputText = TextCopy.Clipboard.GetText() ?? "";
-          var ids = inputText.Split(new[] {
-            ", ", ",",
-            "; ", ";",
-            "\r\n",
-            "\r", "\n"
-          }, StringSplitOptions.RemoveEmptyEntries);
-          var idSet = new HashSet<string>(ids);
-          Loader.IdentitySort(launcherVm.ModsData.Modules, ids);
-          foreach (var mod in launcherVm.ModsData.Modules) {
+          if (!string.IsNullOrWhiteSpace(inputText)) {
+            var ids = inputText.Split(new[] {
+              ", ", ",",
+              "; ", ";",
+              "\r\n",
+              "\r", "\n"
+            }, StringSplitOptions.RemoveEmptyEntries);
+            var idSet = new HashSet<string>(ids);
+
+            var dict = Loader.ModuleList.ToDictionary(mi => mi.Id);
+            var missingDeps = new HashSet<ModuleInfo>();
+            var list = Loader.ModuleList
+              .Where(mod => {
+                var hasNoMissingDeps = mod.DependedModuleIds.All(id => dict.ContainsKey(id));
+                if (!hasNoMissingDeps)
+                  missingDeps.Add(mod);
+                return hasNoMissingDeps;
+              })
+              .OrderTopologicallyBy(mod => mod
+                .GetDependedModuleIds(Loader.ModuleList)
+                .Select(id => dict[id]))
+              .ThenBy(Loader.GetLoadGroup)
+              .ThenBy(x => ids.Contains(x.Id) ? 0 : 1)
+              .ToList();
+
+            if (missingDeps.Count > 0) {
+              var sb = new StringBuilder("Mods missing dependencies:\n");
+              foreach (var mod in missingDeps) {
+                mod.IsSelected = false;
+                list.Add(mod);
+                sb.Append(mod.Name).Append(": ").AppendLine(string.Join(", ", mod.DependedModuleIds.Where(id => !dict.ContainsKey(id))));
+              }
+
+              MessageBox.Warning(sb.ToString());
+            }
+
+            Loader.ModuleList = list;
+            var moduleVms = launcherVm.ModsData.Modules;
+            Loader.IdentitySort(moduleVms, list);
+            foreach (var mod in moduleVms) {
+              var info = mod.Info;
+              if (info.IsOfficial)
+                continue;
+
+              var id = info.Id;
+              mod.IsSelected = idSet.Contains(id);
+            }
+          }
+
+          _waitForKeysReset = true;
+        }
+
+        if (input.IsKeyDown(InputKey.O)) {
+          IFileOpenDialog ofd = new FileOpenDialogClass();
+          var savesDir = Path.GetDirectoryName(PathHelpers.GetSavesDir());
+          var savesDirItem = ShellItemHelpers.Parse(savesDir);
+          ofd.SetDefaultFolder(savesDirItem);
+          ofd.SetOptions(
+            FileDialogOptions.PathMustExist
+            | FileDialogOptions.FileMustExist
+            | FileDialogOptions.NoChangeDir
+            | FileDialogOptions.ForceFileSystem
+            | FileDialogOptions.HideMruPlaces
+            | FileDialogOptions.HidePinnedPlaces
+            | FileDialogOptions.NoDereferenceLinks
+            | FileDialogOptions.DontAddToRecent
+            | FileDialogOptions.NoValidate
+            | FileDialogOptions.StrictFileTypes
+          );
+          ofd.SetFileTypes(1, new[] {
+            new COMDLG_FILTERSPEC {
+              pszName = "Save Games",
+              pszSpec = "*.sav"
+            }
+          });
+          ofd.SetTitle("Select Save Game");
+          ofd.SetOkButtonLabel("Read Modules List");
+          var cancelled = false;
+          try {
+            ofd.Show(default);
+          }
+          catch (COMException cex) when (cex.ErrorCode == unchecked((int) 0x800704C7)) {
+            // operation cancelled by user; hit cancel button or closed window
+            cancelled = true;
+          }
+
+          IShellItem picked = null;
+          if (!cancelled)
+            ofd.GetResult(out picked);
+
+          if (picked == null)
+            return;
+
+          picked.GetDisplayName(ShellItemDisplayName.FileSysPath, out var path);
+          var metaData = SaveManager.LoadMetaData(new FileDriver(path));
+          var modsNamesList = metaData.GetModules();
+          Console.WriteLine(string.Join(", ", modsNamesList));
+
+          var mods = modsNamesList
+            .Select(name => (Name: name, Id: Loader.ModuleList.FirstOrDefault(m => m.Name == name)?.Id))
+            .ToList();
+
+          var missingMods = mods
+            .Where(m => m.Id == null).Select(m => m.Name)
+            .ToList();
+
+          var foundMods = mods
+            .Where(m => m.Id != null)
+            .Select(m => m.Id)
+            .ToList();
+
+          if (missingMods.Count > 0) {
+            if (MessageBox.Warning("Missing modules from save:\n"
+              + $"{string.Join("\n", missingMods)}\n\n"
+              + $"Do you want to select the remaining {foundMods.Count} module(s)?\n"
+              + "Any mods not listed will be deselected.",
+              "Missing Modules From Save Game",
+              MessageBoxType.YesNo,
+              () => {
+                MessageBox.Info("Complete list of modules in save:\n\n"
+                  + $"{string.Join("\n", modsNamesList)}");
+              }) != MessageBoxResult.Yes)
+              return;
+          }
+          else {
+            if (MessageBox.Warning("Module list from save:\n"
+              + $"{string.Join("\n", modsNamesList)}\n\n"
+              + $"Do you want to select the {foundMods.Count} module(s)?\n"
+              + "Any mods not listed will be deselected.",
+              "Missing Modules From Save Game",
+              MessageBoxType.YesNo
+            ) != MessageBoxResult.Yes)
+              return;
+          }
+
+          //Loader.IdentitySort(list, foundMods);
+          var dict = Loader.ModuleList.ToDictionary(mi => mi.Id);
+          var missingDeps = new HashSet<ModuleInfo>();
+          var list = Loader.ModuleList
+            .Where(mod => {
+              var hasNoMissingDeps = mod.DependedModuleIds.All(id => dict.ContainsKey(id));
+              if (!hasNoMissingDeps)
+                missingDeps.Add(mod);
+              return hasNoMissingDeps;
+            })
+            .OrderTopologicallyBy(mod => mod
+              .GetDependedModuleIds(Loader.ModuleList)
+              .Select(id => dict[id]))
+            .ThenBy(Loader.GetLoadGroup)
+            .ThenBy(x => foundMods.Contains(x.Id) ? 0 : 1)
+            .ToList();
+
+          if (missingDeps.Count > 0) {
+            var sb = new StringBuilder("Mods missing dependencies:\n");
+            foreach (var mod in missingDeps) {
+              mod.IsSelected = false;
+              list.Add(mod);
+              sb.Append(mod.Name).Append(": ").AppendLine(string.Join(", ", mod.DependedModuleIds.Where(id => !dict.ContainsKey(id))));
+            }
+
+            MessageBox.Warning(sb.ToString());
+          }
+
+          Loader.ModuleList = list;
+          var idSet = new HashSet<string>(foundMods);
+          ref var launcherVm = ref _launcherVmAccessor(__instance);
+          var moduleVms = launcherVm.ModsData.Modules;
+          Loader.IdentitySort(moduleVms, list);
+          foreach (var mod in moduleVms) {
             var info = mod.Info;
             if (info.IsOfficial)
               continue;
@@ -217,9 +389,6 @@ namespace Antijank {
             var id = info.Id;
             mod.IsSelected = idSet.Contains(id);
           }
-
-          Loader.FixSequence(launcherVm.ModsData.Modules);
-          _waitForKeysReset = true;
         }
       }
 
@@ -272,7 +441,7 @@ namespace Antijank {
             continue;
 
           module.IsSelected |= targetModule.Info
-            .GetDependedModuleIdsWithOptional(Loader.ModuleList)
+            .GetDependedModuleIds(Loader.ModuleList)
             .Contains(module.Info.Id);
         }
       else
@@ -400,13 +569,17 @@ namespace Antijank {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static IEnumerable<CodeInstruction> InitializeSubModulesTranspiler(IEnumerable<CodeInstruction> instr) {
       foreach (var il in instr) {
-        if (il.operand as MethodInfo == MbSubModuleBaseOnSubModuleLoadMethod) {
-          il.operand = OnSubModuleLoadInterceptorMethod;
-          il.opcode = OpCodes.Call;
-        }
-        else if (il.operand as MethodInfo == ConstructorInfoInvokeMethod) {
+        var method = il.operand as MethodInfo;
+
+        if (method == ConstructorInfoInvokeMethod) {
           il.operand = SubModuleCtorInterceptorMethod;
           il.opcode = OpCodes.Call;
+          Console.WriteLine("Hooked SubModule constructor invocation.");
+        }
+        else if (method == MbSubModuleBaseOnSubModuleLoadMethod) {
+          il.operand = OnSubModuleLoadInterceptorMethod;
+          il.opcode = OpCodes.Call;
+          Console.WriteLine("Hooked OnSubModuleLoad event.");
         }
 
         yield return il;

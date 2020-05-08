@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class EyeForLoot : PatchBase<EyeForLoot> {
+  public sealed class EyeForLoot : PerkPatchBase<EyeForLoot> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,16 +24,14 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
+    public static byte[][] Hashes => RaidingHelper.Hashes;
 
-    private static readonly byte[][] Hashes = RaidingHelper.Hashes;
-
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "bRGnkt9B");
+    public EyeForLoot() : base("bRGnkt9B") {
+    }
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus.IsDifferentFrom(.05f)) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus.IsDifferentFrom(.05f)) return false;
       if (TargetMethodInfo == null) return false;
       if (RaidingHelper.NextSettlementDamage == null) return false;
       if (RaidingHelper.IsFinishCalled == null) return false;
@@ -46,23 +44,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     public override void Apply(Game game) {
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, 5f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        _perk.IncrementType
-      );
+      Perk.SetPrimaryBonus(5f);
 
       if (Applied) return;
 
@@ -70,7 +52,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Prefix(ref MapEvent __instance) {
       if (RaidingHelper.IsNotRaidingEvent(__instance)) return;
       if (RaidingHelper.IsTheRaidHitNotHappeningNow(__instance, out var damageAccumulated)) return;
@@ -79,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
     }
 
     private static void ApplyPerkExtraRewardBonusToRaidHit(MapEvent __instance, float hitDamage) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var partyMemberHitDamage = new ExplainedNumber(hitDamage);
 
       foreach (var party in __instance.AttackerSide.Parties.Where(x => x.MobileParty != null))

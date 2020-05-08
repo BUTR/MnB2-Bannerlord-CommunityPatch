@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class ReconstructionPatch : PatchBase<ReconstructionPatch> {
+  public sealed class ReconstructionPatch : PerkPatchBase<ReconstructionPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -23,9 +23,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.0.10
         0x28, 0xDC, 0x69, 0xF2, 0xC3, 0xC2, 0x19, 0xBD,
@@ -35,28 +33,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "Fa01e9kY");
+    public ReconstructionPatch() : base("Fa01e9kY") {
+    }
 
     public override void Apply(Game game) {
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-
-      // most of the properties of skills have private setters, yet Initialize is public
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, 2.0f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        SkillEffect.EffectIncrementType.AddFactor
-      );
+      Perk.Modify(2.0f, SkillEffect.EffectIncrementType.AddFactor);
 
       if (Applied) return;
 
@@ -75,9 +56,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Prefix(Settlement settlement, ref float percentage) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var governor = settlement.Town?.Governor;
       if (governor == null || !governor.GetPerkValue(perk))
         return;

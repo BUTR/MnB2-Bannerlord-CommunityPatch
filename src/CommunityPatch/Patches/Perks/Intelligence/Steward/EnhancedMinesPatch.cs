@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class EnhancedMinesPatch : PatchBase<EnhancedMinesPatch> {
+  public sealed class EnhancedMinesPatch : PerkPatchBase<EnhancedMinesPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,9 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x83, 0xCF, 0x66, 0x4A, 0x31, 0x3B, 0xF7, 0x98,
@@ -36,13 +34,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "6oE7rB6q");
+    public EnhancedMinesPatch() : base("6oE7rB6q") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
     {
-      if (_perk == null)
+      if (Perk == null)
         return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
@@ -54,23 +52,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     public override void Apply(Game game) {
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-      // most of the properties of skills have private setters, yet Initialize is public
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, 0.5f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        SkillEffect.EffectIncrementType.AddFactor
-      );
+      Perk.Modify(0.5f, SkillEffect.EffectIncrementType.AddFactor);
+
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
@@ -80,7 +63,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     // ReSharper disable once t
     public static void Postfix(ref int __result, Village village, int marketIncome) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))
         return;
 

@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class ManAtArmsPatch : PatchBase<ManAtArmsPatch> {
+  public sealed class ManAtArmsPatch : PerkPatchBase<ManAtArmsPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -23,9 +23,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225664
         0x41, 0xDD, 0x60, 0x12, 0x52, 0xAC, 0x6C, 0xA7,
@@ -49,8 +47,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "WVLzi1fa");
+    public ManAtArmsPatch() : base("WVLzi1fa") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -70,13 +68,14 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix(ref int __result, MobileParty party, StatExplainer explanation) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))
         return;
 
-      var extra = party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus;
+      var fiefCount = party.LeaderHero.Clan.Settlements.Count(s => !s.IsVillage);
+      var extra = fiefCount * perk.PrimaryBonus;
       if (extra < float.Epsilon)
         return;
 
@@ -85,7 +84,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (baseLine != null)
         explanation.Lines.Remove(baseLine);
 
-      explainedNumber.Add(party.LeaderHero.Clan.Settlements.Count() * perk.PrimaryBonus, perk.Name);
+      explainedNumber.Add(extra, perk.Name);
       __result = (int) explainedNumber.ResultNumber;
     }
 

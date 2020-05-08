@@ -14,8 +14,7 @@ namespace CommunityPatch {
   [PublicAPI]
   public partial class CommunityPatchSubModule : MBSubModuleBase {
 
-    internal static CommunityPatchSubModule Current
-      => Module.CurrentModule.SubModules.OfType<CommunityPatchSubModule>().FirstOrDefault();
+    internal static CommunityPatchSubModule Current => Module.CurrentModule.SubModules.OfType<CommunityPatchSubModule>().FirstOrDefault();
 
     [PublicAPI]
     internal static CampaignGameStarter CampaignGameStarter;

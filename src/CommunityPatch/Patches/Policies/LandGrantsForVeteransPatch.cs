@@ -6,6 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Policies {
@@ -16,26 +17,26 @@ namespace CommunityPatch.Patches.Policies {
 
     private static readonly MethodInfo TargetMethodInfo1 =
       Type.GetType("TaleWorlds.CampaignSystem.SandBox.GameComponents.DefaultSettlementTaxModel, TaleWorlds.CampaignSystem")?
-        .GetMethod("CalculateDailyTaxInternal", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+        .GetMethod("CalculateDailyTaxInternal", NonPublic | Instance | DeclaredOnly);
 
     private static readonly MethodInfo TargetMethodInfo2 =
-      typeof(DefaultSettlementMilitiaModel).GetMethod("CalculateMilitiaSpawnRate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+      typeof(DefaultSettlementMilitiaModel).GetMethod("CalculateMilitiaSpawnRate", Public | Instance | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo1Prefix =
-      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Prefix1), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Prefix1), NonPublic | Static | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo1Postfix =
-      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix1), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix1), NonPublic | Static | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo2 =
-      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix2), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+      typeof(LandGrantsForVeteransPatch).GetMethod(nameof(Postfix2), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo1;
       yield return TargetMethodInfo2;
     }
 
-    private static readonly byte[][] Hashes1 = {
+    public static readonly byte[][] Hashes1 = {
       new byte[] {
         // CalculateDailyTaxInternal e1.0.10
         0x52, 0xFC, 0xCB, 0x7C, 0xF9, 0x90, 0xBB, 0xAD,
@@ -45,7 +46,7 @@ namespace CommunityPatch.Patches.Policies {
       }
     };
 
-    private static readonly byte[][] Hashes2 = {
+    public static readonly byte[][] Hashes2 = {
       new byte[] {
         // CalculateMilitiaSpawnRate e1.0.10
         0xE4, 0x38, 0xF5, 0x91, 0x73, 0x90, 0x52, 0x1E,
@@ -89,12 +90,12 @@ namespace CommunityPatch.Patches.Policies {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Prefix1(Town town, ref StatExplainer explanation)
       => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix1(ref int __result, Town town, StatExplainer explanation) {
       var kingdom = town.Owner?.Settlement?.OwnerClan?.Kingdom;
       if (kingdom == null)
@@ -110,7 +111,7 @@ namespace CommunityPatch.Patches.Policies {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix2(
       Settlement settlement,
       ref float meleeEliteTroopRate,

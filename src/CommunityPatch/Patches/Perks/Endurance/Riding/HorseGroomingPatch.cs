@@ -10,19 +10,20 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  public class HorseGroomingPatch : PatchBase<HorseGroomingPatch> {
+  public class HorseGroomingPatch : PerkPatchBase<HorseGroomingPatch> {
 
-     public override bool Applied { get; protected set; }
+    public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultVillageProductionCalculatorModel)
       .GetMethod(nameof(DefaultVillageProductionCalculatorModel.CalculateDailyProductionAmount), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
     private static readonly MethodInfo PatchMethodInfo = typeof(HorseGroomingPatch).GetMethod(nameof(Postfix), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.2.1.227410
         0xD6, 0xD4, 0xA4, 0xA8, 0x19, 0xEF, 0xE1, 0x6F,
@@ -32,7 +33,8 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       }
     };
 
-    public override void Reset() {}
+    public HorseGroomingPatch() : base("wtyLhmz5") {
+    }
 
     public override bool? IsApplicable(Game game)
       => TargetMethodInfo != null
@@ -41,23 +43,27 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, postfix: new HarmonyMethod(PatchMethodInfo));
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Postfix(Village village, ItemObject item, ref float __result) {
-      if (village.VillageState != Village.VillageStates.Normal || !item.IsMountable) {
+      if (village?.VillageState != Village.VillageStates.Normal || !(item?.IsMountable ?? false))
         return;
-      }
 
-      if (village.Bound.Town.Owner?.Settlement.OwnerClan?.Leader.GetPerkValue(DefaultPerks.Riding.HorseGrooming) ?? false) {
-        __result = village.VillageType.Productions
-          .Where(productionItemTuple => productionItemTuple.Item1 == item)
-          .Select(productionItemTuple => productionItemTuple.Item2)
-          .Aggregate(0, (float acc, float currentProductionValue)
-            => acc + currentProductionValue * (1 + DefaultPerks.Riding.HorseGrooming.PrimaryBonus));
-      }
+      if (!(village.Bound?.Town?.Owner?.Settlement?.OwnerClan?.Leader?.GetPerkValue(ActivePatch.Perk) ?? false))
+        return;
+
+      var production = village.VillageType?.Productions
+        ?.Where(productionItemTuple => productionItemTuple.Item1 == item)
+        .Select(productionItemTuple => productionItemTuple.Item2)
+        .Aggregate(0, (float acc, float currentProductionValue)
+          => acc + currentProductionValue * (1 + ActivePatch.Perk.PrimaryBonus));
+
+      __result = production ?? __result;
     }
+
   }
+
 }

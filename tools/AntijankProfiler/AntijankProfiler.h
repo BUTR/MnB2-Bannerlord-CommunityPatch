@@ -3,12 +3,33 @@
 #include <cor.h>
 #include <corprof.h>
 #include <corhlpr.h>
+#include <string>
+#include <memory>
+#include <unordered_set>
+#include <unordered_map>
+#include "pair_hash.h"
 
 const GUID g_ClsIdAntijankProfiler = {0x204AEE3C, 0xCEE0, 0x43D7, {0xBF, 0xCA, 0x6B, 0x0A, 0xFB, 0x22, 0xF0, 0x9C}};
 
+
 class AntijankProfiler final : public ICorProfilerCallback4 {
+private:
+    LONG m_refCount;
+
+    typedef std::pair<std::wstring, mdToken> replacement_key_t;
+
+    std::unordered_map<replacement_key_t, LPCBYTE, pair_hash> m_replacements;
+
+    std::unordered_map<std::wstring_view, std::unique_ptr<std::wstring>> m_replacement_module_names;
+
+    template<int wszModuleSize>
+    bool GetMethodInfo(FunctionID functionId, ULONG &wszModuleLength, WCHAR (&wszModule)[wszModuleSize], mdToken &mdMethod) const;
+
 public:
-    static AntijankProfiler* Instance();
+
+    struct ICorProfilerInfo3 *pInfo;
+
+    static AntijankProfiler *Instance();
 
     AntijankProfiler();
 
@@ -66,7 +87,7 @@ public:
 
     STDMETHODIMP FunctionUnloadStarted(FunctionID functionId) final { return S_OK; };
 
-    STDMETHODIMP JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock) final { return S_OK; };
+    STDMETHODIMP JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock) final;;
 
     STDMETHODIMP JITCompilationFinished(FunctionID functionId, HRESULT hrStatus, BOOL fIsSafeToBlock) final { return S_OK; };
 
@@ -192,8 +213,4 @@ public:
 
     STDMETHODIMP SurvivingReferences2(ULONG cSurvivingObjectIDRanges, ObjectID *objectIDRangeStart, SIZE_T *cObjectIDRangeLength) final { return S_OK; }
 
-    struct ICorProfilerInfo3 *pInfo;
-
-private:
-    LONG m_refCount;
 };

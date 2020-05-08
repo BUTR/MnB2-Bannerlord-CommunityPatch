@@ -6,6 +6,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 using Harmony = HarmonyLib.Harmony;
 
@@ -15,15 +16,15 @@ namespace CommunityPatch.Patches {
 
     public bool Applied { get; private set; }
 
-    private static readonly MethodInfo TargetMethodInfo = typeof(ItemMenuVM).GetMethod("GetColorFromComparison", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = typeof(ItemMenuVM).GetMethod("GetColorFromComparison", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(ItemComparisonColorPatch).GetMethod(nameof(GetColorFromComparisonPatched), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    private static readonly MethodInfo PatchMethodInfo = typeof(ItemComparisonColorPatch).GetMethod(nameof(GetColorFromComparisonPatched), NonPublic | Static | DeclaredOnly);
 
     public IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
 
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x37, 0x16, 0xDE, 0xA4, 0x54, 0x11, 0x5A, 0xB1,
@@ -58,7 +59,7 @@ namespace CommunityPatch.Patches {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static bool GetColorFromComparisonPatched(int result, bool isCompared, out Color __result) {
       if (MobileParty.MainParty == null) {
         __result = Colors.Black;

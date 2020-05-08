@@ -12,12 +12,12 @@ endforeach ()
 
 project(AntijankProfiler)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 add_library(AntijankProfiler SHARED
         AntijankProfiler.cpp AntijankProfiler.h AntijankProfiler.def
         AntijankProfilerClassFactory.cpp AntijankProfilerClassFactory.h
-        Plumbing.cpp Plumbing.h EasyHook.h)
+        Plumbing.cpp Plumbing.h pair_hash.h)
 
 set_property(TARGET AntijankProfiler PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 

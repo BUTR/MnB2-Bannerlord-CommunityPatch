@@ -43,7 +43,7 @@ namespace CommunityPatch.Patches {
 
   }
 
-  public abstract class AgentWeaponEquippedPatch<TPatch> : PatchBase<TPatch> where TPatch : AgentWeaponEquippedPatch<TPatch> {
+  public abstract class AgentWeaponEquippedPatch<TPatch> : PerkPatchBase<TPatch> where TPatch : AgentWeaponEquippedPatch<TPatch> {
 
     internal static byte[][] HashesItemMenuVmAddWeaponItemFlags => AgentWeaponEquippedPatch.HashesItemMenuVmAddWeaponItemFlags;
 
@@ -110,6 +110,9 @@ namespace CommunityPatch.Patches {
       => (character as CharacterObject)?.GetPerkValue(perk) ?? false;
 
     public override void Reset() {
+    }
+
+    protected AgentWeaponEquippedPatch(string perkId) : base(perkId) {
     }
 
   }

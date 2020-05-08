@@ -14,7 +14,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
 
-  public sealed class HealthyScoutPatch : PatchBase<HealthyScoutPatch> {
+  public sealed class HealthyScoutPatch : PerkPatchBase<HealthyScoutPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -27,9 +27,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0x92, 0xC3, 0x48, 0x33, 0x3C, 0x1A, 0x39, 0x52,
@@ -39,8 +37,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "dDKOoD3e");
+    public HealthyScoutPatch() : base("dDKOoD3e") {
+    }
 
     public override bool? IsApplicable(Game game)
       // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -54,8 +52,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
         return false;
 
       try {
-        if (!(_perk.PrimaryRole == SkillEffect.PerkRole.PartyMember
-          && _perk.PrimaryBonus == 0.15f))
+        if (!(Perk.PrimaryRole == SkillEffect.PerkRole.PartyMember
+          && Perk.PrimaryBonus == 0.15f))
           return null;
       }
       catch (Exception) {
@@ -66,26 +64,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     }
 
     public override void Apply(Game game) {
-      // Dear TaleWorlds; Value should probably be publicly exposed, maybe by a method
-      // and maybe marked [Obsolete] if you want to avoid your developers doing dirty deeds
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-
-      // most of the properties of skills have private setters, yet Initialize is public
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        SkillEffect.PerkRole.Personal, 8f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        _perk.IncrementType
-      );
+      Perk.SetPrimary(SkillEffect.PerkRole.Personal, 8f);
 
       if (Applied) return;
 
@@ -96,13 +75,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     public static void Postfix(ref int __result, CharacterObject character, StatExplainer explanation) {
       var result = __result;
 
       var explainedNumber = new ExplainedNumber(result, explanation);
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
 
       PerkHelper.AddPerkBonusForCharacter(perk, character, ref explainedNumber);
 

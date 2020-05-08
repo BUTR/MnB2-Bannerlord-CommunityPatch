@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
-        <MSBuildWarningsAsMessages>MSB3106;MSB3277</MSBuildWarningsAsMessages>
+        <MSBuildWarningsAsMessages>MSB3106</MSBuildWarningsAsMessages>
         <Configurations>Debug;Release</Configurations>
         <Platform>x64</Platform>
         <PlatformTarget>x64</PlatformTarget>
@@ -28,7 +28,7 @@
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll">
+        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll" Exclude="$(MnB2BannerlordBinDir)\TaleWorlds.Starter.DotNetCore.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
@@ -77,8 +77,14 @@
             <WouldDependOn>$([System.Text.RegularExpressions.Regex]::Replace('%(Filename)', '^(.*?)\..*$', '$1.cs'))</WouldDependOn>
             <DependentUpon Condition="'%(DependentUpon)' == '' And '%(WouldDependOn)' != '%(Filename)'">%(WouldDependOn)</DependentUpon>
         </Compile>
-        <Compile Update="Patches\GroupMainMenuOptionsPatch.cs">
-          <WouldDependOn>MenuCleanerPatch</WouldDependOn>
+        <Compile Update="Patches\IPatch.cs">
+          <WouldDependOn>IPatch</WouldDependOn>
+        </Compile>
+        <Compile Update="Patches\PatchBase.cs">
+          <WouldDependOn>PatchBase</WouldDependOn>
+        </Compile>
+        <Compile Update="Patches\PerkPatchBase.cs">
+          <WouldDependOn>PerkPatchBase</WouldDependOn>
         </Compile>
     </ItemGroup>
 
@@ -86,7 +92,7 @@
         <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
         <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
         <PropertyGroup>
-            <SourceRevisionId>$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
+            <SourceRevisionId Condition="'$(DesignTimeBuild)' != 'true'">$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
         </PropertyGroup>
         <Message Importance="high" Text="Shortened SCI Version: $(SourceRevisionId)" />
     </Target>

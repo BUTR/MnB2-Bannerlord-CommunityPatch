@@ -1,8 +1,5 @@
-
-
 namespace Antijank.Interop {
 
-  
   public enum UrlZone {
 
     Invalid = -1,

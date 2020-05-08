@@ -11,7 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
-  public sealed class NegotiatorPatch : PatchBase<NegotiatorPatch> {
+  public sealed class NegotiatorPatch : PerkPatchBase<NegotiatorPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,9 +24,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0x7C, 0x2F, 0x71, 0x0A, 0x54, 0x2E, 0x4F, 0x9D,
@@ -36,11 +34,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "lH8ZMjEo");
+    public NegotiatorPatch() : base("lH8ZMjEo") {
+    }
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -56,12 +54,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       Applied = true;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Postfix(ref int __result) {
       var scout = Hero.MainHero?.PartyBelongedTo?.EffectiveScout;
       if (scout == null) return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!scout.GetPerkValue(perk)) return;
 
       __result = (int) (__result * Math.Abs(perk.PrimaryBonus));

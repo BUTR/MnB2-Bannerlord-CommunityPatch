@@ -12,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class EvisceratorPatch : PatchBase<EvisceratorPatch> {
+  public sealed class EvisceratorPatch : PerkPatchBase<EvisceratorPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -24,9 +24,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.225190
         0xDC, 0x73, 0xE5, 0x9D, 0x02, 0x06, 0x68, 0x6B,
@@ -36,13 +34,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "C2CwsC91");
+    public EvisceratorPatch() : base("C2CwsC91") {
+    }
 
     // ReSharper disable once CompareOfFloatsByEqualityOperator
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
-      if (_perk.PrimaryBonus != 0.3f) return false;
+      if (Perk == null) return false;
+      if (Perk.PrimaryBonus != 0.3f) return false;
 
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
@@ -52,23 +50,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     public override void Apply(Game game) {
-      var textObjStrings = TextObject.ConvertToStringList(
-        new List<TextObject> {
-          _perk.Name,
-          _perk.Description
-        }
-      );
-      // most of the properties of skills have private setters, yet Initialize is public
-      _perk.Initialize(
-        textObjStrings[0],
-        textObjStrings[1],
-        _perk.Skill,
-        (int) _perk.RequiredSkillValue,
-        _perk.AlternativePerk,
-        _perk.PrimaryRole, -30f,
-        _perk.SecondaryRole, _perk.SecondaryBonus,
-        SkillEffect.EffectIncrementType.AddFactor
-      );
+      Perk.Modify(-30f, SkillEffect.EffectIncrementType.AddFactor);
+
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, new HarmonyMethod(PatchMethodInfo));
@@ -76,7 +59,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     public static bool Prefix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
 
@@ -91,8 +74,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
       if (!AnyMoralChanges(moralChangeEnemy, moralChangeFriend)) return false;
 
-      if (affectorCharacter.GetPerkValue(ActivePatch._perk))
-        moralChangeFriend += moralChangeFriend * ActivePatch._perk.PrimaryBonus / -100;
+      if (affectorCharacter.GetPerkValue(ActivePatch.Perk))
+        moralChangeFriend += moralChangeFriend * ActivePatch.Perk.PrimaryBonus / -100;
 
       __instance.ApplyAoeMoraleEffect(
         affectedAgent.GetWorldPosition(),

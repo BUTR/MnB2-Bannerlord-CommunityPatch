@@ -7,10 +7,7 @@
     <envs>
       <env name="COR_ENABLE_PROFILING" value="1" />
       <env name="COR_PROFILER_PATH" value="$PROJECT_DIR$/../../../../bin/Win64_Shipping_Client/AntijankProfiler.dll" />
-      <env name="ComPLUS_ReadyToRun" value="0" />
-      <env name="ComPLUS_JitMinOpts" value="1" />
       <env name="COR_PROFILER" value="{204AEE3C-CEE0-43D7-BFCA-6B0AFB22F09C}" />
-      <env name="ComPLUS_ZapDisable" value="1" />
     </envs>
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="USE_MONO" value="0" />

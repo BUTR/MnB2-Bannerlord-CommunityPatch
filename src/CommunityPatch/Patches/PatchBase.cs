@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -8,8 +9,7 @@ namespace CommunityPatch {
   public abstract class PatchBase<TPatch> : IPatch where TPatch : IPatch {
 
     [PublicAPI]
-    public static TPatch ActivePatch
-      => (TPatch) CommunityPatchSubModule.ActivePatches[typeof(TPatch)];
+    public static TPatch ActivePatch => (TPatch) CommunityPatchSubModule.ActivePatches[typeof(TPatch)];
 
     public abstract bool? IsApplicable(Game game);
 

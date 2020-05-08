@@ -10,7 +10,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class AgriculturePatch : PatchBase<AgriculturePatch> {
+  public sealed class AgriculturePatch : PerkPatchBase<AgriculturePatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -22,9 +22,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
-    private PerkObject _perk;
-
-    private static readonly byte[][] Hashes = {
+    public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
         0xB6, 0x97, 0x7F, 0x48, 0x9D, 0x7D, 0x8D, 0x7F,
@@ -34,8 +32,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "ebiXdm5W");
+    public AgriculturePatch() : base("ebiXdm5W") {
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -55,9 +53,9 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     // ReSharper disable once InconsistentNaming
-    [MethodImpl(MethodImplOptions.NoInlining)]
+
     private static void Postfix(ref float __result, Village village) {
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (!(village.Bound?.OwnerClan?.Leader?.GetPerkValue(perk) ?? false))
         return;
 

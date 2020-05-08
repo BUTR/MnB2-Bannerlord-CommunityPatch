@@ -1,10 +1,14 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using CommunityPatch;
 using JetBrains.Annotations;
+using static System.Reflection.BindingFlags;
 
 internal static class CommunityPatchLoader {
+
+  private static readonly ApplicationVersionComparer VersionComparer = new ApplicationVersionComparer();
 
   public static string GetFormattedCsHexArray(this byte[] bytes) {
     var sb = new StringBuilder();
@@ -30,7 +34,7 @@ internal static class CommunityPatchLoader {
   public static string GetFormattedHexOfCilSignatureSha256(string typeName, string methodName) {
     var type = Type.GetType(typeName);
     var method = type?.GetMethod(methodName,
-      BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+      DeclaredOnly | Public | NonPublic | Static | Instance);
     return method?.GetFormattedHexOfCilSignatureSha256();
   }
 
@@ -38,14 +42,69 @@ internal static class CommunityPatchLoader {
   public static string GetFormattedHexOfCilSignatureSha256(this MethodBase mb)
     => mb?.MakeCilSignatureSha256().GetFormattedCsHexArray();
 
-  public static void GenerateHashes() {
-    foreach (var patch in CommunityPatchSubModule.Patches) {
-      foreach (var mb in patch.GetMethodsChecked()) {
-        var patchName = patch.GetType().Name;
-        var mbName = mb.Name;
+  [PublicAPI]
+  public static string GetFormattedHexOfCilSignatureSha256(byte[] bytes)
+    => bytes?.GetFormattedCsHexArray();
 
-        Console.WriteLine($"{patchName} {mbName}:");
-        Console.WriteLine(mb.GetFormattedHexOfCilSignatureSha256());
+  public static void GenerateHashes() {
+    var gameVersion = CommunityPatchSubModule.GameVersion;
+    foreach (var patch in CommunityPatchSubModule.Patches) {
+      var type = patch.GetType();
+      var obsolete = type.GetCustomAttribute<PatchObsoleteAttribute>();
+      var patchName = type.Name;
+      if (obsolete != null)
+        if (VersionComparer.Compare(gameVersion, obsolete.Version) >= 0) {
+          Console.WriteLine($"{patchName}: obsoleted by version, {gameVersion} vs. {obsolete.Version}");
+          continue;
+        }
+
+      try {
+        foreach (var mb in patch.GetMethodsChecked()) {
+          var mbName = mb.Name;
+
+          MemberInfo match;
+          var hash = mb.MakeCilSignatureSha256();
+
+          var hashFields = type
+            .GetFields(Public | NonPublic | Static | FlattenHierarchy)
+            .Where(f => f.Name.Contains("Hash") && f.FieldType == typeof(byte[][]))
+            .ToList();
+
+          foreach (var field in hashFields) {
+            var hashes = (byte[][]) field.GetValue(field.IsStatic ? null : patch);
+            if (!hash.MatchesAnySha256(hashes))
+              continue;
+
+            match = field;
+            goto matched;
+          }
+
+          var hashStaticProps = type
+            .GetProperties(Public | NonPublic | Static | FlattenHierarchy)
+            .Where(f => f.Name.Contains("Hash") && f.PropertyType == typeof(byte[][]))
+            .ToList();
+
+          foreach (var prop in hashStaticProps) {
+            var hashes = (byte[][]) prop.GetValue(null);
+            if (!hash.MatchesAnySha256(hashes))
+              continue;
+
+            match = prop;
+            goto matched;
+          }
+
+          Console.WriteLine($"{patchName} {mbName}:");
+          Console.WriteLine(mb.GetFormattedHexOfCilSignatureSha256());
+
+          continue;
+
+          matched:
+          Console.WriteLine($"{patchName} {mbName}: {match.Name} already matched.");
+        }
+      }
+      catch (Exception ex) {
+        Console.WriteLine($"{patchName}: Failed due to exception.");
+        Console.WriteLine(ex.ToString());
       }
     }
   }
