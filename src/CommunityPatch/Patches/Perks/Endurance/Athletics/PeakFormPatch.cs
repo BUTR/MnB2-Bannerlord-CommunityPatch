@@ -66,7 +66,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
     }
 
     public override void Apply(Game game) {
-      Perk.SetPrimaryBonus(10f);
+      Perk.Modify(SkillEffect.PerkRole.Personal, 10f, SkillEffect.EffectIncrementType.Add);
 
       if (Applied) return;
 

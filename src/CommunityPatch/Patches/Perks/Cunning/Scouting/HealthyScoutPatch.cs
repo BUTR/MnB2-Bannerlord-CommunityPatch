@@ -71,7 +71,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     }
 
     public override void Apply(Game game) {
-      Perk.SetPrimary(SkillEffect.PerkRole.Personal, 8f);
+      Perk.Modify(SkillEffect.PerkRole.Personal, 8f, SkillEffect.EffectIncrementType.Add);
 
       if (Applied) return;
 
