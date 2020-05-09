@@ -45,7 +45,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     public override bool? IsApplicable(Game game)
       => TargetMethodInfo != null
         && !AlreadyPatchedByOthers(Harmony.GetPatchInfo(TargetMethodInfo))
-        && TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes[0]);
+        && TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes);
 
     public override void Apply(Game game) {
       if (Applied) return;
