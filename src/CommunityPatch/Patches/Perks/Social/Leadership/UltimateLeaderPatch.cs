@@ -97,28 +97,10 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
     }
 
     private static PerkObject GetUltimateLeadershipPerk(IReadOnlyList<PerkObject> probablePerks) {
-      try {
-        // ReSharper disable once PossibleNullReferenceException
-        return (PerkObject) typeof(DefaultPerks.Leadership)
-          .GetProperty("UltimateLeader", Public | NonPublic | Static | DeclaredOnly)
-          .GetGetMethod()
-          .Invoke(null, null);
-      }
-      catch {
-        // ignored
-      }
+      if (probablePerks.Count == 0)
+        throw new KeyNotFoundException("Can't locate Ultimate Leader perk: No probable perks found.");
 
-      try {
-        if (probablePerks.Count == 0)
-          throw new InvalidOperationException("No probable perks while looking for Ultimate Leadership");
-
-        return probablePerks[0];
-      }
-      catch {
-        // ignored
-      }
-
-      throw new InvalidOperationException("can't locate UltimateLeadership perk");
+      return probablePerks[0];
     }
 
     private bool HasUltimateLeadershipPerk(Hero hero)
