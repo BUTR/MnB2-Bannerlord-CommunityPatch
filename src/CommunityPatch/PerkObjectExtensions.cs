@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Localization;
 

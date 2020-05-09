@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
@@ -65,7 +64,7 @@ namespace CommunityPatch {
 
       elements.Add(new InquiryElement(
         nameof(QuartermasterIsClanWide),
-        QuartermasterIsClanWide ? "Quartermaster Is Clan Wide" : "Quartermaster Is Party Specific",
+        QuartermasterIsClanWide ? "Make Quartermaster Party Specific" : "Make Quartermaster Clan Wide",
         null));
 
       elements.Add(new InquiryElement(

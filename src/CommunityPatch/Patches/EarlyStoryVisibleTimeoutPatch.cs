@@ -5,11 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
-using Mono.Cecil.Cil;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-using TaleWorlds.MountAndBlade;
 using static CommunityPatch.HarmonyHelpers;
 using OpCodes = System.Reflection.Emit.OpCodes;
 

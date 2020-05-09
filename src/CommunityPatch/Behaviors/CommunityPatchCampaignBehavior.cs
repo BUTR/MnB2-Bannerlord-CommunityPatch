@@ -1,7 +1,5 @@
-﻿using System.Reflection;
-using HarmonyLib;
+﻿using HarmonyLib;
 using TaleWorlds.CampaignSystem;
-using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Behaviors {
 

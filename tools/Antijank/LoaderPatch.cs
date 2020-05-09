@@ -491,6 +491,7 @@ namespace Antijank {
         return ctor.Invoke(args);
       }
       catch (Exception ex) {
+        ex = CallStackHelpers.UnnestCommonExceptions(ex);
         var type = ctor.DeclaringType;
         var asm = type!.Assembly;
         var isMod = PathHelpers.IsModuleAssembly(asm, out var mod);

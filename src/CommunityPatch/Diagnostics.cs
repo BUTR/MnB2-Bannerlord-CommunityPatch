@@ -14,7 +14,6 @@ using HarmonyLib;
 using Microsoft.IO;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
-using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
 using static CommunityPatch.CommunityPatchSubModule;
 using Harmony = HarmonyLib.Harmony;

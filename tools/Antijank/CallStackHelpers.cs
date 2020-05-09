@@ -4,14 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-
 using Sigil;
 using static System.Reflection.BindingFlags;
 using ModuleInfo = TaleWorlds.Library.ModuleInfo;
 
 namespace Antijank {
 
-  
   public static class CallStackHelpers {
 
     public const BindingFlags AnyAccess = Public | NonPublic;
@@ -153,25 +151,29 @@ namespace Antijank {
     }
 
     public static Exception UnnestCommonExceptions(Exception ex) {
-      switch (ex) {
-        case null:
-          break;
-        case TypeLoadException tle:
-          ex = UnnestCommonExceptions(tle.InnerException);
-          break;
-        case AggregateException aex:
-          ex = UnnestCommonExceptions(aex.InnerExceptions.FirstOrDefault()) ?? ex;
-          break;
-        case ReflectionTypeLoadException rtl:
-          ex = UnnestCommonExceptions(rtl.LoaderExceptions.FirstOrDefault()) ?? ex;
-          break;
-        case TypeInitializationException tie:
-          ex = UnnestCommonExceptions(tie.InnerException);
-          break;
-        case TargetInvocationException tie2:
-          ex = UnnestCommonExceptions(tie2.InnerException);
-          break;
-      }
+      Exception check;
+      do {
+        check = ex;
+        switch (ex) {
+          case null:
+            break;
+          case ReflectionTypeLoadException rtl:
+            ex = rtl.LoaderExceptions.FirstOrDefault() ?? ex;
+            break;
+          case TypeLoadException tle:
+            ex = tle.InnerException ?? ex;
+            break;
+          case AggregateException aex:
+            ex = aex.InnerExceptions.FirstOrDefault() ?? ex;
+            break;
+          case TypeInitializationException tie:
+            ex = tie.InnerException ?? ex;
+            break;
+          case TargetInvocationException tie2:
+            ex = tie2.InnerException ?? ex;
+            break;
+        }
+      } while (ex != check);
 
       return ex;
     }

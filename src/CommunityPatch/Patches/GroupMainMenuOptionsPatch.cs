@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,7 +19,30 @@ namespace CommunityPatch {
 
   [UsedImplicitly]
   [HarmonyPatch(typeof(InitialMenuVM), MethodType.Constructor)]
-  public class GroupMainMenuOptionsPatch {
+  public static class GroupMainMenuOptionsPatch {
+
+    private readonly struct InitialMenuItemInfo {
+
+      public readonly InitialStateOption Item;
+
+
+      public readonly bool IsMod;
+
+      public readonly ModuleInfo? Mod;
+
+      public readonly MergablePropertyAttribute? Mergeable;
+
+      public readonly string Name;
+
+      public InitialMenuItemInfo(InitialStateOption item, bool isMod, ModuleInfo? mod, MergablePropertyAttribute? mergeable, string name) {
+        Item = item;
+        IsMod = isMod;
+        Mod = mod;
+        Mergeable = mergeable;
+        Name = name;
+      }
+
+    }
 
     [UsedImplicitly]
     public static void Prefix() {
@@ -28,7 +52,7 @@ namespace CommunityPatch {
 
     private const int MaxMenuLength = 8;
 
-    private static List<InitialStateOption> _modOptionsMenus;
+    private static List<InitialStateOption>? _modOptionsMenus;
 
     internal static List<InitialStateOption> GetThirdPartyOptionsMenus()
       => _modOptionsMenus ??= Module.CurrentModule.GetInitialStateOptions()
@@ -38,14 +62,15 @@ namespace CommunityPatch {
 
     private static bool _alreadyCleanedUpMainMenu;
 
-    internal static List<InitialStateOption> GroupedOptionsMenus;
+    internal static List<InitialStateOption>? GroupedOptionsMenus;
 
     internal static void CleanUpMainMenu() {
-      var menu = Module.CurrentModule.GetInitialStateOptions().ToArray();
+      var menu = Module.CurrentModule.GetInitialStateOptions()?.ToArray()
+        ?? throw new NotImplementedException("Initial state options missing!");
 
       var menuLength = menu.Length;
 
-      if (_alreadyCleanedUpMainMenu) {
+      if (_alreadyCleanedUpMainMenu && GroupedOptionsMenus != null) {
         if (menuLength <= MaxMenuLength + 1)
           return;
 
@@ -91,21 +116,22 @@ namespace CommunityPatch {
       if (GroupedOptionsMenus != null)
         return;
 
-      // ReSharper disable InconsistentNaming
       var menuItems = menu
-        .Select(Item => {
-          var Action = (Action) InitOptActField.GetValue(Item);
-          var Method = Action.Method;
-          var Type = Method.DeclaringType;
-          var IsMod = PathHelpers.IsModuleAssembly(Type?.Assembly, out var Mod);
-          var Mergeable = Method?.GetCustomAttribute<MergablePropertyAttribute>();
-          var Name = TextObject.ConvertToStringList(new List<TextObject> {
-            Item.Name
-          }).FirstOrDefault();
-          return (Item, Action, Method, Type, IsMod, Mod, Mergeable, Name);
+        .Where(item => item != null)
+        .Select(item => {
+          var action = InitOptActGetter(item);
+          var name = TextObject.ConvertToStringList(new List<TextObject> {
+            item.Name
+          }).FirstOrDefault() ?? item.ToString();
+          if (action == null)
+            return new InitialMenuItemInfo(item, false, null, MergablePropertyAttribute.No, name);
+          var method = action.Method;
+          var type = method.DeclaringType;
+          var isMod = PathHelpers.IsModuleAssembly(type?.Assembly, out var mod);
+          var mergeable = method?.GetCustomAttribute<MergablePropertyAttribute>();
+          return new InitialMenuItemInfo(item, isMod, mod, mergeable, name);
         })
         .ToList();
-      // ReSharper restore InconsistentNaming
 
       // because of course people pick the same names...
       var nameCollisions = menuItems
@@ -113,53 +139,51 @@ namespace CommunityPatch {
         .Select(g => (Name: g.Key, Items: g.ToList()))
         .ToList();
 
-      foreach (var collision in nameCollisions) {
-        if (collision.Items.Count == 1)
+      foreach (var (_, items) in nameCollisions) {
+        if (items.Count == 1)
           continue;
 
-        var id = collision.Name;
-
-        var dontMerge = new List<(InitialStateOption, Action, MethodInfo, Type, bool, ModuleInfo, MergablePropertyAttribute, string)>();
-        collision.Items.RemoveAll(x => {
-          var disallowed = !x.Mergeable?.AllowMerge ?? true; // Changed to true to assume if AllowMerge method is null, it's not mergable.
-                                                             // Otherwise items were geting removed by the next AllowMerge test below and not added back.
+        var dontMerge = new List<InitialMenuItemInfo>();
+        items.RemoveAll(x => {
+          var disallowed = !x.IsMergeAllowed();
           if (disallowed)
             dontMerge.Add(x);
 
           return disallowed;
         });
 
-        if (collision.Items.Any(x => !x.IsMod)) {
+        if (items.Any(x => !x.IsMod)) {
           // 1st party wins
-          collision.Items.RemoveAll(item => item.IsMod);
-          collision.Items.RemoveRange(1, collision.Items.Count - 1);
+          items.RemoveAll(item => item.IsMod);
+          items.RemoveRange(1, items.Count - 1);
           continue;
         }
 
-        if (collision.Items.Count(x => x.Mergeable?.AllowMerge ?? false) <= 1)
-          collision.Items.RemoveAll(x => !x.Mergeable?.AllowMerge ?? true);
+        if (items.Count(x => x.IsMergeAllowed()) <= 1)
+          items.RemoveAll(x => !x.IsMergeAllowed());
         else {
-          var item = collision.Items.FindLast(x => x.Mergeable?.AllowMerge ?? false);
-          collision.Items.Clear();
-          collision.Items.Add(item);
+          var item = items.FindLast(x => x.IsMergeAllowed());
+          items.Clear();
+          items.Add(item);
         }
 
-        collision.Items.AddRange(dontMerge);
+        items.AddRange(dontMerge);
 
-        if (collision.Items.Count <= 1)
+        if (items.Count <= 1)
           continue;
 
         try {
-          collision.Items.Sort((a, b) => a.Item.OrderIndex.CompareTo(b.Item.OrderIndex));
+          items.Sort((a, b) => a.Item.OrderIndex.CompareTo(b.Item.OrderIndex));
         }
         catch {
           // why you not sort
         }
 
         // add mod names on the end of options other than the first one
-        foreach (var info in collision.Items /*.Skip(1)*/) { // It's better to not skip the first one, so it's clear what mod each redundantly named option belongs to
+        foreach (var info in items /*.Skip(1)*/) {
+          // It's better to not skip the first one, so it's clear what mod each redundantly named option belongs to
           InitOptNameSetter.Invoke(info.Item,
-            new object[] {new TextObject($"{info.Name} ({info.Mod.Name})")});
+            new object[] {new TextObject($"{info.Name} ({info.Mod?.Name ?? "not a mod"})")});
         }
       }
 
@@ -169,7 +193,7 @@ namespace CommunityPatch {
           .ToList();
 
       menu = collisionFreeMenu.ToArray();
-      menuLength = menu.Length;  // length needs to be updated in case collisionFreeMenu is shorter, otherwise the for loop below gets a null exception
+      menuLength = menu.Length; // length needs to be updated in case collisionFreeMenu is shorter, otherwise the for loop below gets a null exception
 
       try {
         Array.Sort(menu, Comparer<InitialStateOption>
@@ -187,8 +211,10 @@ namespace CommunityPatch {
         if (!IsThirdPartyOption(item))
           continue;
 
-        if (menuLength <= MaxMenuLength && !(item.Name.Length > 28)) // Always move items with name that's too wide due to collision renaming
-          continue;                                                  // onto submenu even if the menu is not at the MaxMenuLength
+        // Always move items with name that's too wide due to collision renaming
+        // onto submenu even if the menu is not at the MaxMenuLength
+        if (menuLength <= MaxMenuLength && item.Name.Length <= 28)
+          continue;
 
         GroupedOptionsMenus.Add(item);
         menu[i] = null;
@@ -209,8 +235,11 @@ namespace CommunityPatch {
         9999, ShowMoreMainMenuOptions, false));
     }
 
+    private static bool IsMergeAllowed(this InitialMenuItemInfo x)
+      => x.Mergeable?.AllowMerge ?? false;
+
     private static void SortGroupedOptionMenus()
-      => GroupedOptionsMenus.Sort(Comparer<InitialStateOption>.Create((a, b) => {
+      => GroupedOptionsMenus?.Sort(Comparer<InitialStateOption>.Create((a, b) => {
         var order = a.OrderIndex.CompareTo(b.OrderIndex);
         if (order == 0)
           order = string.Compare(a.Id ?? "", b.Id ?? "", StringComparison.OrdinalIgnoreCase);
@@ -222,8 +251,11 @@ namespace CommunityPatch {
       }));
 
     private static bool IsThirdPartyOption(InitialStateOption item) {
+      if (item is null)
+        throw new ArgumentNullException(nameof(item));
+
       try {
-        var act = (Action) InitOptActField.GetValue(item);
+        var act = InitOptActGetter(item);
         var optAsm = act.Method.DeclaringType?.Assembly;
         var optAsmName = optAsm?.GetName().Name;
         if (optAsmName == null
@@ -242,33 +274,28 @@ namespace CommunityPatch {
     }
 
     internal static void ShowMoreMainMenuOptions()
-      => ShowOptions(GroupedOptionsMenus);
+      => ShowOptions(GroupedOptionsMenus ?? throw new NotImplementedException("Missing GroupedOptionsMenus"));
 
-    internal static void ShowOptions(List<InitialStateOption> moreOptions)
-      => InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(
-        new TextObject("{=MoreOptions}More Options").ToString(),
-        null,
-        moreOptions
-          .Select(x => new InquiryElement(x.Id, x.Name.ToString(), null))
-          .Where(x => !string.IsNullOrWhiteSpace(x.Title))
-          .ToList(),
-        true,
-        true,
-        new TextObject("{=Open}Open").ToString(),
-        null,
-        picked => {
-          var item = picked.FirstOrDefault();
-          if (item == null)
-            return;
+    internal static void ShowOptions(List<InitialStateOption> moreOptions) {
+      if (moreOptions is null)
+        throw new ArgumentNullException(nameof(moreOptions));
 
-          SynchronizationContext.Current.Post(_ => {
-            moreOptions
-              .FirstOrDefault(x => string.Equals(x.Id, (string) item.Identifier, StringComparison.Ordinal))
-              ?.DoAction();
-          }, null);
-        }, null));
+      InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(new TextObject("{=MoreOptions}More Options").ToString(), null, moreOptions.Where(x => x != null)
+        .Select(x => new InquiryElement(x.Id, x.Name.ToString(), null))
+        .Where(x => !string.IsNullOrWhiteSpace(x.Title))
+        .ToList(), true, true, new TextObject("{=Open}Open").ToString(), null, picked => {
+        var item = picked.FirstOrDefault();
+        if (item == null)
+          return;
 
-    private static readonly FieldInfo InitOptActField = typeof(InitialStateOption).GetField("_action", NonPublic | Instance);
+        SynchronizationContext.Current.Post(_ => {
+          moreOptions.FirstOrDefault(x => string.Equals(x.Id, (string) item.Identifier, StringComparison.Ordinal))
+            ?.DoAction();
+        }, null);
+      }, null));
+    }
+
+    private static readonly AccessTools.FieldRef<InitialStateOption, Action> InitOptActGetter = AccessTools.FieldRefAccess<InitialStateOption, Action>("_action");
 
     private static readonly MethodInfo InitOptNameSetter = typeof(InitialStateOption).GetMethod("set_Name", NonPublic | Instance);
 

@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
 using HarmonyLib;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;

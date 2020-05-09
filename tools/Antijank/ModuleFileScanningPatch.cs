@@ -32,23 +32,25 @@ namespace Antijank {
         return;
       }
 
+      var ex = CallStackHelpers.UnnestCommonExceptions(__exception);
+
       var isMod = PathHelpers.IsModuleAssembly(moduleAssembly, out var mod);
 
       var alias = isMod ? "<Unknown>" : mod.Alias;
-      var excName = __exception.GetType().Name;
-      var excMsg = __exception.Message;
+      var excName = ex.GetType().Name;
+      var excMsg = ex.Message;
       Console.WriteLine($"Module {alias} is unable to be scanned.");
+      Console.WriteLine($"Assembly: {new Uri(moduleAssembly.CodeBase).LocalPath}");
       Console.WriteLine($"{excName}: {excMsg}");
 
       if (DontShowLoadFailure.TryGetValue(alias, out var prevChoice) && !prevChoice)
         return;
 
-      var exc = __exception;
-
       DontShowLoadFailure[alias] = MessageBox.Error($"Module {alias} is unable to be scanned.\n"
+        + $"Assembly: {new Uri(moduleAssembly.CodeBase).LocalPath}\n"
         + $"{excName}: {excMsg}\n\n"
         + "Continue showing loading errors for this module?", "Module Load Failure", MessageBoxType.YesNo, () => {
-          MessageBox.Info(exc.ToString(), "Error Details");
+          MessageBox.Info(ex.ToString(), "Error Details");
         }) == MessageBoxResult.No;
 
       __exception = null;

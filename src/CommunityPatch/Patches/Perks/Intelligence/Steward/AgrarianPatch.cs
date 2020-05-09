@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using static System.Reflection.BindingFlags;

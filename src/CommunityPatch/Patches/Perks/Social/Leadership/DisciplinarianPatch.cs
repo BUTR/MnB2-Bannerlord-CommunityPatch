@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
 
 namespace CommunityPatch.Patches.Perks.Social.Leadership {
 
