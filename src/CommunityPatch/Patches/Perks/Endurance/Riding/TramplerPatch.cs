@@ -5,6 +5,7 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using static System.Reflection.BindingFlags;
 using static System.Reflection.Emit.OpCodes;
@@ -12,6 +13,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 4)]
   public sealed class TramplerPatch : PerkPatchBase<TramplerPatch> {
 
     public override bool Applied { get; protected set; }
@@ -43,13 +45,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
         0xA3, 0x07, 0x20, 0x1C, 0x7F, 0xCB, 0x8F, 0xA4,
         0x3A, 0xC5, 0x8A, 0x34, 0xD2, 0x4E, 0x5F, 0x6B,
         0xFF, 0x69, 0x3B, 0x64, 0x5C, 0xEC, 0xEB, 0x9D
-      },
-      new byte[] {
-        // e1.4.0.228531
-        0x60, 0x5B, 0xC6, 0xF3, 0x2E, 0x2B, 0x67, 0x8B,
-        0x43, 0x81, 0x4D, 0xD6, 0x7A, 0xBA, 0x0F, 0xD2,
-        0x1F, 0x58, 0xD7, 0x81, 0xD5, 0x4A, 0x58, 0xE9,
-        0x07, 0xD8, 0x47, 0x1A, 0x2A, 0x80, 0x7C, 0x6A
       }
     };
 
@@ -89,7 +84,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       if (AlreadyPatchedByOthers(Harmony.GetPatchInfo(OverloadedTargetMethodInfo)))
         return false;
 
-      if (OverloadedTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(OverloadedTargetHashes))
+      if (!OverloadedTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(OverloadedTargetHashes))
         return false;
 
       if (CharacterLocalVariableInfos.Count != 2) {
