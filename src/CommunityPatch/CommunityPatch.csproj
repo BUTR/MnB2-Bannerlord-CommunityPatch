@@ -77,15 +77,6 @@
             <WouldDependOn>$([System.Text.RegularExpressions.Regex]::Replace('%(Filename)', '^(.*?)\..*$', '$1.cs'))</WouldDependOn>
             <DependentUpon Condition="'%(DependentUpon)' == '' And '%(WouldDependOn)' != '%(Filename)'">%(WouldDependOn)</DependentUpon>
         </Compile>
-        <Compile Update="Patches\IPatch.cs">
-          <WouldDependOn>IPatch</WouldDependOn>
-        </Compile>
-        <Compile Update="Patches\PatchBase.cs">
-          <WouldDependOn>PatchBase</WouldDependOn>
-        </Compile>
-        <Compile Update="Patches\PerkPatchBase.cs">
-          <WouldDependOn>PerkPatchBase</WouldDependOn>
-        </Compile>
     </ItemGroup>
 
     <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion" Condition="'$(DesignTimeBuild)' != 'true'">
