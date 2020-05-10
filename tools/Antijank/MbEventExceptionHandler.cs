@@ -388,8 +388,8 @@ namespace Antijank {
               // calli w/ sig: action.Method.MethodHandle.GetFunctionPointer() ?
               lock (actionInvokerCache) {
                 if (!actionInvokerCache.TryGetValue(actionMethod, out actionInvoker)) {
-                  var handler = MethodInvoker.GetHandler(actionMethod, true);
-                  actionInvoker = (target, args2) => handler(target, args2);
+                  var handler = MethodInvoker.GetHandler(actionMethod);
+                  actionInvoker = (t, a) => handler(t, a);
                   actionInvokerCache.Add(actionMethod, actionInvoker);
                 }
               }
