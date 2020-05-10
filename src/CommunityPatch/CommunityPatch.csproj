@@ -88,12 +88,9 @@
         </Compile>
     </ItemGroup>
 
-    <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion">
-        <Message Importance="high" Text="SCI Supported: $(SourceControlInformationFeatureSupported)" />
-        <Message Importance="high" Text="SCI Version: $(SourceRevisionId)" />
+    <Target Name="ReportVersionInfo" BeforeTargets="AddSourceRevisionToInformationalVersion" Condition="'$(DesignTimeBuild)' != 'true'">
         <PropertyGroup>
-            <SourceRevisionId Condition="'$(DesignTimeBuild)' != 'true'">$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
+            <SourceRevisionId Condition="'$(SourceRevisionId)' != ''">$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
         </PropertyGroup>
-        <Message Importance="high" Text="Shortened SCI Version: $(SourceRevisionId)" />
     </Target>
 </Project>
