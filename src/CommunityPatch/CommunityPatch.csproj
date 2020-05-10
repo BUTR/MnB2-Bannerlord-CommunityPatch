@@ -24,19 +24,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="$(MnB2BannerlordBinDir)\System.*.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
         <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll" Exclude="$(MnB2BannerlordBinDir)\TaleWorlds.Starter.DotNetCore.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
-        <Reference Include="$(MnB2BannerlordBinDir)\Steamworks.*.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
-        <Reference Include="$(MnB2BannerlordBinDir)\Mono.*.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>False</Private>
         </Reference>
