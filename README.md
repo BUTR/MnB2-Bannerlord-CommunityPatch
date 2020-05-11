@@ -5,7 +5,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
 
 ### Supported by JetBrains Open Source Development Program
 
-[<img align="right" alt="JetBrains" src="tools/jetbrains.svg" width="200" />][1]
+[<img align="right" loading="eager" decoding="async" referrerpolicy="no-referrer" width="200" alt="JetBrains" src="https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch/raw/dev/tools/jetbrains.svg?sanitize=true" />][1]
 
 We love [JetBrains][1]!
 
@@ -14,14 +14,14 @@ JetBrains Toolbox manages all of their products and keeps them up to date, and u
 
 ### JetBrains Rider for C# / .NET
 
-[<img align="right" alt="JetBrains Rider" title="JetBrains Rider" src="tools/rider.svg" width="100" />][3]
+[<img align="right" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="100" alt="JetBrains Rider" title="JetBrains Rider" src="https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch/raw/dev/tools/rider.svg?sanitize=true" />][3]
 
 Our C# projects are designed to work best in JetBrains Rider.
 We also use ReSharper with Visual Studio, dotPeek, dotCover, dotMemory and dotTrace.
 
 #### JetBrains CLion for C / C++
 
-[<img align="right" alt="JetBrains CLion" title="JetBrains CLion" src="tools/clion.svg" width="100" />][4]
+[<img align="right" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="100" alt="JetBrains CLion" title="JetBrains CLion" src="https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch/raw/dev/tools/clion.svg?sanitize=true" />][4]
 
 Our C++ projects are designed to work best in JetBrains CLion.
 We also use ReSharper C++ with Visual Studio.
