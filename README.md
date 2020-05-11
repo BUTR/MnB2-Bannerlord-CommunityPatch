@@ -35,6 +35,7 @@ We also use ReSharper C++ with Visual Studio.
     * Peak Form
   * Leadership
     * Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub>
+    * Ultimate Leader
   * Scouting
     * Healthy Scout
   * Riding
