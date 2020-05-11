@@ -6,7 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using static System.Reflection.BindingFlags;
-using static CommunityPatch.HarmonyHelpers;
+using static CommunityPatch.PatchApplicabilityHelper;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
@@ -18,6 +18,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(RulerPatch).GetMethod(nameof(CompanionLimitPatched), NonPublic | Static | DeclaredOnly);
 
+    private static readonly MethodInfo TownAllTownsGetter = GetGetterForAllTowns();
+
     public RulerPatch() : base("IcgVKFxZ") {
     }
 
@@ -25,6 +27,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       yield return TargetMethodInfo;
     }
 
+    // ReSharper disable once MemberCanBePrivate.Global
     public static readonly byte[][] Hashes = {
       new byte[] {
         // e1.1.0.224785
@@ -45,19 +48,36 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
     }
 
     public override bool? IsApplicable(Game game) {
-      var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
-      if (AlreadyPatchedByOthers(patchInfo))
+      if (TownAllTownsGetter == null)
         return false;
 
-      var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      return IsTargetPatchable(TargetMethodInfo, Hashes);
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     private static void CompanionLimitPatched(Clan __instance, ref int __result) {
-      if (__instance.Leader.GetPerkValue(ActivePatch.Perk))
-        __result += Town.All.Count(t => t.Owner.Owner == __instance.Leader);
+      if (!__instance.Leader.GetPerkValue(ActivePatch.Perk)) return;
+
+      __result += GetAllTowns().Count(t => t.Owner.Owner == __instance.Leader);
     }
+
+    private static MethodInfo GetGetterForAllTowns() {
+      var campaignType = typeof(Campaign);
+
+      try {
+        var getter = AccessTools.PropertyGetter(campaignType, "AllTowns");
+        if (getter != null)
+          return getter;
+      }
+      catch {
+        // ignored
+      }
+
+      throw new KeyNotFoundException("can't find a property for AllTowns like behavior.");
+    }
+
+    private static IReadOnlyList<Town> GetAllTowns()
+      => (IReadOnlyList<Town>) TownAllTownsGetter.Invoke(Campaign.Current, null);
 
   }
 
