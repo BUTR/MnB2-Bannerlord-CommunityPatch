@@ -10,7 +10,9 @@ using TaleWorlds.Localization;
 namespace CommunityPatch.Patches.Feats {
 
   public sealed class AseraiCheapCaravansPatch : PatchBase<AseraiCheapCaravansPatch> {
-
+    // This patch only applies to player characters because it is triggered during a conversation where starting a
+    // caravan is possible.  See TargetMethodInfo
+    // The feat *should* apply to AI elsewhere in the TW codebase
     public override bool Applied { get; protected set; }
 
     private static readonly Type TargetType = Type.GetType("SandBox.LordConversationsCampaignBehavior, SandBox, Version=1.0.0.0, Culture=neutral");
@@ -29,27 +31,7 @@ namespace CommunityPatch.Patches.Feats {
         0x77, 0x37, 0x51, 0xC3, 0x5B, 0x6A, 0x46, 0xF6,
         0x22, 0x1B, 0x88, 0xED, 0x36, 0xFB, 0xAA, 0x7A
       },
-      new byte[] {
-        // e1.3.0.227640
-        0x04, 0x9A, 0x8B, 0xF9, 0x6B, 0x3E, 0x7F, 0x41,
-        0x71, 0x68, 0x1A, 0x12, 0xF2, 0xC5, 0x08, 0x9D,
-        0x96, 0xF0, 0x1A, 0x85, 0xC2, 0x7D, 0x95, 0xEB,
-        0xED, 0xA6, 0x63, 0x7A, 0x98, 0x90, 0xA6, 0xC1
-      },
-      new byte[] {
-        // e1.4.0.228531
-        0x92, 0x68, 0x8E, 0x68, 0x38, 0x3D, 0xC7, 0x5F,
-        0x0B, 0x7F, 0x49, 0xD9, 0xD8, 0x7B, 0xD7, 0x31,
-        0x6A, 0x39, 0x34, 0xFD, 0x28, 0x16, 0x59, 0xC0,
-        0xB9, 0x71, 0xB0, 0xE9, 0xCC, 0x83, 0x85, 0x2F
-      },
-      new byte[] {
-        // e1.4.0.228616
-        0xC7, 0xCD, 0x5F, 0x01, 0xBF, 0xEC, 0x52, 0x5F,
-        0x50, 0xFC, 0xE9, 0xBC, 0xA9, 0x02, 0xB7, 0x6F,
-        0x07, 0xAB, 0xA1, 0x0B, 0xC0, 0xD5, 0x7D, 0xFD,
-        0x80, 0xC1, 0x99, 0x51, 0x98, 0x8B, 0xF9, 0x1D
-      }
+      // Feat fixed for player characters in e1.3.0+
     };
 
     private static readonly TextObject AseraiCheapCaravansFlavorText = new TextObject(
@@ -83,12 +65,17 @@ namespace CommunityPatch.Patches.Feats {
     static void Prefix(out int __state)
       // get player gold and make it available for Postfix
     {
-      var hero = (ConversationSentence.LastSelectedRepeatObject as CharacterObject)?.HeroObject;
-      __state = hero?.Gold ?? 0;
+      if (Hero.MainHero == null) {
+        __state = 0;
+      }
+      else {
+        __state = Hero.MainHero.Gold;
+      }
     }
 
-    static void Postfix(int __state) {
-      var hero = (ConversationSentence.LastSelectedRepeatObject as CharacterObject)?.HeroObject;
+    static void Postfix(int __state)
+    {
+      var hero = Hero.MainHero;
       if (hero == null)
         return;
 
