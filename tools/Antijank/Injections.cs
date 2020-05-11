@@ -16,17 +16,17 @@ namespace Antijank {
 
     public static readonly MethodInfo Method = Type.GetMethod("Dispatch", Public | Static | DeclaredOnly);
 
-    private static readonly Delegate[] Switchboard = {
-      (Action<object, object[]>) MbEventExceptionHandler.InvokeListReplacementBase
-    };
-
     [NonVersionable]
     [TargetedPatchingOptOut("Optimization.")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Dispatch(int token, object data) {
       if (data is object[] args) {
         try {
-          Switchboard[token].DynamicInvoke(args);
+          switch (token) {
+            case 0:
+              MbEventExceptionHandler.InvokeListReplacementBase(args[0], args[1] as object[]);
+              return;
+          }
           return;
         }
         catch (Exception ex) {
