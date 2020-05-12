@@ -98,11 +98,11 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     [CanBeNull]
     private static readonly FieldRef<IntPtr, BasicCharacterObject> AttackerAgentCharacter
-      = AttackerAgentCharacterFieldInfo == null ? null : AttackerAgentCharacterFieldInfo.BuildRef<IntPtr,BasicCharacterObject>();
+      = AttackerAgentCharacterFieldInfo == null ? null : AttackerAgentCharacterFieldInfo.BuildRef<IntPtr, BasicCharacterObject>();
 
     private static unsafe void UpdateCorrectCharacterForHorseChargeDamagePostfix(ref byte __instance, Agent attackerAgent, ref AttackCollisionData attackCollisionData) {
-      var p = (IntPtr)Unsafe.AsPointer(ref __instance);
-      if (attackCollisionData.IsHorseCharge && attackerAgent.RiderAgent?.Character != null)
+      var p = (IntPtr) Unsafe.AsPointer(ref __instance);
+      if (attackCollisionData.IsHorseCharge && attackerAgent.RiderAgent?.Character != null && p != default)
         AttackerAgentCharacter!(p) = attackerAgent.RiderAgent.Character;
     }
 
@@ -115,10 +115,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     private static unsafe void UpdateHorseDamagePostfix(ref byte attackInformation, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
-      var p = (IntPtr)Unsafe.AsPointer(ref attackInformation);
-      if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(AttackerAgentCharacter!(p), ActivePatch.Perk))) {
+      var p = (IntPtr) Unsafe.AsPointer(ref attackInformation);
+      if (!(attackCollisionData.IsHorseCharge && p != default && HeroHasPerk(AttackerAgentCharacter!(p), ActivePatch.Perk)))
         return;
-      }
 
       combatLog.InflictedDamage = ActivePatch.TramplerDamageModifier(combatLog.InflictedDamage);
       attackCollisionData.InflictedDamage = ActivePatch.TramplerDamageModifier(attackCollisionData.InflictedDamage);
