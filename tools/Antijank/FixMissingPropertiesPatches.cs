@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
@@ -43,6 +44,14 @@ namespace Antijank {
       // ItemModifier
       Context.Harmony.Patch(AccessTools.PropertyGetter(typeof(ItemModifier), nameof(ItemModifier.Name)),
         postfix: new HarmonyMethod(typeof(FixMissingPropertiesPatches), nameof(ItemModifierGetNamePostfix)));
+      // Concept
+      Context.Harmony.Patch(AccessTools.PropertyGetter(typeof(Concept), nameof(Concept.Title)),
+        postfix: new HarmonyMethod(typeof(FixMissingPropertiesPatches), nameof(ConceptTitlePostfix)));
+      Context.Harmony.Patch(AccessTools.PropertyGetter(typeof(Concept), nameof(Concept.Description)),
+        postfix: new HarmonyMethod(typeof(FixMissingPropertiesPatches), nameof(ConceptDescriptionPostfix)));
+      // SkeletonScale
+      Context.Harmony.Patch(AccessTools.PropertyGetter(typeof(SkeletonScale), nameof(SkeletonScale.BoneNames)),
+        postfix: new HarmonyMethod(typeof(FixMissingPropertiesPatches), nameof(SkeletonScaleBoneNamesPostfix)));
     }
 
     public static void Init() {
@@ -130,6 +139,18 @@ namespace Antijank {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ItemModifierGetNamePostfix(MethodBase __originalMethod, ItemModifier __instance, ref TextObject __result)
       => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ConceptTitlePostfix(MethodBase __originalMethod, Concept __instance, ref TextObject __result)
+      => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ConceptDescriptionPostfix(MethodBase __originalMethod, Concept __instance, ref TextObject __result)
+      => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => new TextObject($"{{={item.StringId}{item.StringId}}}"));
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void SkeletonScaleBoneNamesPostfix(MethodBase __originalMethod, SkeletonScale __instance, ref List<string> __result)
+      => GenericPostfix((MethodInfo) __originalMethod, __instance, ref __result, item => item.StringId, item => Enumerable.Range(0, item.BoneIndices?.Length ?? 0).Select(i => $"{item.StringId}_{i}").ToList());
 
   }
 

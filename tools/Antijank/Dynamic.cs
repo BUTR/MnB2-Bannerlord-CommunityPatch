@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using HarmonyLib;
 using MonoMod.Utils;
+using Sigil;
 using static System.Reflection.BindingFlags;
 
 namespace Antijank {
@@ -100,39 +101,51 @@ namespace Antijank {
     private static readonly CustomAttributeBuilder AggressiveInlining =
       new CustomAttributeBuilder(typeof(MethodImplAttribute).GetConstructor(Public | Instance, null, new[] {typeof(MethodImplOptions)}, null)!, new object[] {MethodImplOptions.AggressiveInlining});
 
+
     public static TDelegate BuildInvoker<TDelegate>(this MethodBase m, bool skipVerification = true) where TDelegate : Delegate {
       var td = typeof(TDelegate);
       AccessInternals(m);
-      var dtMi = td.GetMethod("Invoke", Public | NonPublic | Static | Instance);
+      var dtMi = td.GetMethod("Invoke", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
       var dtPs = dtMi!.GetParameters();
-      var dt = CreateStaticClass();
+      var dt = Dynamic.CreateStaticClass();
       var mn = $"{m.Name}Invoker";
-      var d = Sigil.Emit<TDelegate>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
+      var d = Emit<TDelegate>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
         allowUnverifiableCode: skipVerification, doVerify: !skipVerification);
       var ps = m.GetParameters();
       if (m.IsStatic) {
         for (ushort i = 0; i < ps.Length; i++) {
           var p = ps[i];
           var dp = dtPs[i];
-          if (p.ParameterType != dp.ParameterType)
+          var pType = p.ParameterType;
+          var dpType = dp.ParameterType;
+          if (pType.IsValueType != dpType.IsValueType || !pType.IsAssignableFrom(dpType) && !dpType.IsAssignableFrom(pType))
             throw new NotImplementedException($"Unhandled parameter difference: {p.ParameterType.FullName} vs. {dp.ParameterType.FullName}");
 
-          d.LoadArgument(i);
+          if (pType.IsByRef && !dpType.IsByRef)
+            d.LoadArgumentAddress(i);
+          else
+            d.LoadArgument(i);
         }
       }
       else {
         var thisParamType = m.GetThisParamType();
-        if (!dtPs[0].ParameterType.IsAssignableFrom(thisParamType))
-          throw new NotImplementedException($"Unhandled this parameter difference: {dtPs[0].ParameterType.FullName} vs. {thisParamType}");
+        var firstParamType = dtPs[0].ParameterType;
+        if (thisParamType.IsValueType != firstParamType.IsValueType || !thisParamType.IsAssignableFrom(firstParamType) && !firstParamType.IsAssignableFrom(thisParamType))
+            throw new NotImplementedException($"Unhandled this parameter difference: {thisParamType} vs. {firstParamType.FullName}");
 
         d.LoadArgument(0);
         for (var i = 0; i < ps.Length; i++) {
           var p = ps[i];
           var dp = dtPs[i + 1];
-          if (p.ParameterType != dp.ParameterType)
-            throw new NotImplementedException($"Unhandled parameter difference: {p.ParameterType.FullName} vs. {dp.ParameterType.FullName}");
+          var pType = p.ParameterType;
+          var dpType = dp.ParameterType;
+          if (pType.IsValueType != dpType.IsValueType || !pType.IsAssignableFrom(dpType) && !dpType.IsAssignableFrom(pType))
+            throw new NotImplementedException($"Unhandled parameter difference: {pType.FullName} vs. {dpType.FullName}");
 
-          d.LoadArgument((ushort) (i + 1));
+          if (pType.IsByRef && !dpType.IsByRef)
+            d.LoadArgumentAddress((ushort) (i + 1));
+          else
+            d.LoadArgument((ushort) (i + 1));
         }
       }
 
@@ -151,9 +164,10 @@ namespace Antijank {
       var mb = d.CreateMethod();
       mb.SetCustomAttribute(AggressiveInlining);
       var dti = dt.CreateTypeInfo();
-      var dmi = dti!.GetMethod(mn, DeclaredOnly | Static | Public);
+      var dmi = dti!.GetMethod(mn, BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public);
       return (TDelegate) dmi!.CreateDelegate(td);
     }
+
 
     public static Func<T, TField> BuildGetter<T, TField>(this FieldInfo fieldInfo, bool skipVerification = true) {
       if (fieldInfo == null)
@@ -167,7 +181,7 @@ namespace Antijank {
 
       var dt = CreateStaticClass();
       var mn = $"{fieldInfo.Name}Getter";
-      var d = Sigil.Emit<Func<T, TField>>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
+      var d = Emit<Func<T, TField>>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
         allowUnverifiableCode: skipVerification, doVerify: !skipVerification);
       d.LoadArgument(0);
       d.LoadField(fieldInfo);
@@ -194,7 +208,7 @@ namespace Antijank {
 
       var dt = CreateStaticClass();
       var mn = $"{fieldInfo.Name}Setter";
-      var d = Sigil.Emit<Func<T, TField>>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
+      var d = Emit<Func<T, TField>>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
         allowUnverifiableCode: skipVerification, doVerify: !skipVerification);
       d.LoadArgument(0);
       d.LoadArgument(1);
@@ -215,7 +229,7 @@ namespace Antijank {
       AccessInternals(m);
       var dt = CreateStaticClass();
       var mn = $"{m.Name}Invoker";
-      var d = Sigil.Emit<Func<object, object[], object>>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
+      var d = Emit<Func<object, object[], object>>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
         allowUnverifiableCode: skipVerification, doVerify: !skipVerification);
       var ps = m.GetParameters();
 
@@ -256,6 +270,33 @@ namespace Antijank {
       return (Func<object, object[], object>) dmi!.CreateDelegate(td);
     }
 
+    
+    public static FieldRef<T, TField> BuildRef<T, TField>(this FieldInfo fieldInfo, bool skipVerification = true) {
+      if (fieldInfo == null)
+        throw new ArgumentNullException(nameof(fieldInfo));
+
+      if (!typeof(TField).IsAssignableFrom(fieldInfo.FieldType))
+        throw new ArgumentException("Return type does not match.");
+
+      if (typeof(T) != typeof(object) && typeof(T) != typeof(IntPtr) && (fieldInfo.DeclaringType == null || !fieldInfo.DeclaringType.IsAssignableFrom(typeof(T))))
+        throw new MissingFieldException(typeof(T).Name, fieldInfo.Name);
+
+      var dt = CreateStaticClass();
+      var mn = $"{fieldInfo.Name}Getter";
+      var d = Emit<FieldRef<T, TField>>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
+        allowUnverifiableCode: skipVerification, doVerify: !skipVerification);
+      d.LoadArgument(0);
+      d.LoadFieldAddress(fieldInfo);
+
+      if (fieldInfo.FieldType.IsValueType && !typeof(TField).IsValueType)
+        d.Box(typeof(TField));
+      d.Return();
+      var mb = d.CreateMethod();
+      mb.SetCustomAttribute(AggressiveInlining);
+      var dti = dt.CreateTypeInfo();
+      var dmi = dti!.GetMethod(mn, DeclaredOnly | Static | Public);
+      return (FieldRef<T, TField>) dmi!.CreateDelegate(typeof(FieldRef<T, TField>));
+    }
   }
 
 }
