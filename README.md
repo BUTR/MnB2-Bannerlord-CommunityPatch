@@ -117,7 +117,7 @@ We also use ReSharper C++ with Visual Studio.
 * Policies
   * Land Grants For Veterans
 * Feats
-  * Aserai Cheap Caravans
+  * Aserai Cheap Caravans <sub><sup>Fixed in e1.3.0</sup></sub>
   * Battanian Forest Agility
   * Khuzait Cavalry Agility
   * Sturgian Snow Agility
