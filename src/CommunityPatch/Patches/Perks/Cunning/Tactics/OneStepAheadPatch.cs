@@ -13,9 +13,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     public override bool Applied { get; protected set; }
 
-    private static readonly Type MapNavigationHandler = Type.GetType("SandBox.View.Map.MapNavigationHandler, SandBox.View, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+    private static readonly Type MapNavigationHandlerType = Type.GetType("SandBox.View.Map.MapNavigationHandler, SandBox.View, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 
-    private static readonly MethodInfo TargetMethodInfo = MapNavigationHandler?.GetMethod("get_PartyEnabled", Public | Instance | DeclaredOnly);
+    private static readonly MethodInfo TargetMethodInfo = MapNavigationHandlerType?.GetMethod("get_PartyEnabled", Public | Instance | DeclaredOnly);
 
     private static readonly MethodInfo PatchMethodInfo = typeof(OneStepAheadPatch).GetMethod(nameof(Postfix), Public | NonPublic | Static | DeclaredOnly);
 
@@ -32,6 +32,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         0x88, 0x5F, 0xE5, 0x30, 0xC4, 0xF4, 0xB6, 0x8C
       }
     };
+
+    private static readonly Func<object,bool> MapNavHandlerPartyActiveGetter = MapNavigationHandlerType?.GetMethod("get_PartyActive", Public | Instance | DeclaredOnly)
+      ?.BuildInvoker<Func<object,bool>>();
 
     public OneStepAheadPatch() : base("V6mvBGDV") {
     }
@@ -56,17 +59,12 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     public static void Postfix(ref bool __result, ref object __instance) {
       if (__result) return;
-      if (IsPartyActive(__instance)) return;
+      if (MapNavHandlerPartyActiveGetter(__instance)) return;
       if (Hero.MainHero.HeroState == Hero.CharacterStates.Prisoner) return;
       if (MobileParty.MainParty.MapEvent == null) return;
 
       var perk = ActivePatch.Perk;
       __result = Hero.MainHero.GetPerkValue(perk);
-    }
-
-    private static bool IsPartyActive(object handler) {
-      var property = MapNavigationHandler.GetProperty("PartyActive", Public | Instance | DeclaredOnly);
-      return property != null && (bool) property.GetValue(handler);
     }
 
   }

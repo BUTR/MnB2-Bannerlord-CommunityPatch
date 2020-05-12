@@ -54,7 +54,6 @@ namespace CommunityPatch {
       }
     }
 
-
     public static FieldRef<T, TField> BuildRef<T, TField>(this FieldInfo fieldInfo, bool skipVerification = true) {
       if (fieldInfo == null)
         throw new ArgumentNullException(nameof(fieldInfo));
@@ -81,7 +80,6 @@ namespace CommunityPatch {
       var dmi = dti!.GetMethod(mn, BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public);
       return (FieldRef<T, TField>) dmi!.CreateDelegate(typeof(FieldRef<T, TField>));
     }
-
 
     public static Func<T, TField> BuildGetter<T, TField>(this FieldInfo fieldInfo, bool skipVerification = true) {
       if (fieldInfo == null)
@@ -137,38 +135,48 @@ namespace CommunityPatch {
       return (Action<T, TField>) dmi!.CreateDelegate(typeof(Action<T, TField>));
     }
 
-    public static TDelegate BuildInvoker<TDelegate>(this MethodBase m) where TDelegate : Delegate {
+    public static TDelegate BuildInvoker<TDelegate>(this MethodBase m, bool skipVerification = true) where TDelegate : Delegate {
       var td = typeof(TDelegate);
-      Dynamic.AccessInternals(m);
+      AccessInternals(m);
       var dtMi = td.GetMethod("Invoke", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
       var dtPs = dtMi!.GetParameters();
       var dt = Dynamic.CreateStaticClass();
       var mn = $"{m.Name}Invoker";
-      var d = Emit<TDelegate>.BuildStaticMethod(dt, mn, MethodAttributes.Public);
+      var d = Emit<TDelegate>.BuildStaticMethod(dt, mn, MethodAttributes.Public,
+        allowUnverifiableCode: skipVerification, doVerify: !skipVerification);
       var ps = m.GetParameters();
       if (m.IsStatic) {
         for (ushort i = 0; i < ps.Length; i++) {
           var p = ps[i];
           var dp = dtPs[i];
-          if (p.ParameterType != dp.ParameterType)
+          if (!p.ParameterType.IsAssignableFrom(dp.ParameterType))
             throw new NotImplementedException($"Unhandled parameter difference: {p.ParameterType.FullName} vs. {dp.ParameterType.FullName}");
 
-          d.LoadArgument(i);
+          if (p.ParameterType.IsByRef && !dp.ParameterType.IsByRef)
+            d.LoadArgumentAddress(i);
+          else
+            d.LoadArgument(i);
         }
       }
       else {
         var thisParamType = m.GetThisParamType();
-        if (dtPs[0].ParameterType != thisParamType)
-          throw new NotImplementedException($"Unhandled this parameter difference: {dtPs[0].ParameterType.FullName} vs. {thisParamType}");
+        if (thisParamType.IsValueType)
+          if (dtPs[0].ParameterType != typeof(object) && dtPs[0].ParameterType != thisParamType)
+            throw new NotImplementedException($"Unhandled this parameter difference: {dtPs[0].ParameterType.FullName} vs. {thisParamType}");
+          else if (dtPs[0].ParameterType != typeof(IntPtr) && dtPs[0].ParameterType != thisParamType)
+            throw new NotImplementedException($"Unhandled this parameter difference: {dtPs[0].ParameterType.FullName} vs. {thisParamType}");
 
         d.LoadArgument(0);
         for (var i = 0; i < ps.Length; i++) {
           var p = ps[i];
           var dp = dtPs[i + 1];
-          if (p.ParameterType != dp.ParameterType)
+          if (!p.ParameterType.IsAssignableFrom(dp.ParameterType))
             throw new NotImplementedException($"Unhandled parameter difference: {p.ParameterType.FullName} vs. {dp.ParameterType.FullName}");
 
-          d.LoadArgument((ushort) (i + 1));
+          if (p.ParameterType.IsByRef && !dp.ParameterType.IsByRef)
+            d.LoadArgumentAddress((ushort) (i + 1));
+          else
+            d.LoadArgument((ushort) (i + 1));
         }
       }
 
