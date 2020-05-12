@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(RulerPatch).GetMethod(nameof(CompanionLimitPatched), NonPublic | Static | DeclaredOnly);
 
-    private static readonly MethodInfo TownAllTownsGetter = GetGetterForAllTowns();
+    private static readonly Func<Campaign, IReadOnlyList<Town>> TownAllTownsGetter = AccessTools.PropertyGetter(typeof(Campaign), "AllTowns").BuildInvoker<Func<Campaign, IReadOnlyList<Town>>>();
 
     public RulerPatch() : base("IcgVKFxZ") {
     }
@@ -61,23 +62,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       __result += GetAllTowns().Count(t => t.Owner.Owner == __instance.Leader);
     }
 
-    private static MethodInfo GetGetterForAllTowns() {
-      var campaignType = typeof(Campaign);
-
-      try {
-        var getter = AccessTools.PropertyGetter(campaignType, "AllTowns");
-        if (getter != null)
-          return getter;
-      }
-      catch {
-        // ignored
-      }
-
-      throw new KeyNotFoundException("can't find a property for AllTowns like behavior.");
-    }
-
     private static IReadOnlyList<Town> GetAllTowns()
-      => (IReadOnlyList<Town>) TownAllTownsGetter.Invoke(Campaign.Current, null);
+      => TownAllTownsGetter(Campaign.Current);
 
   }
 
