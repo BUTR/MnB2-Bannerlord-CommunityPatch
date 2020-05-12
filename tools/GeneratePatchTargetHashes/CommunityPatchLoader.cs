@@ -50,16 +50,26 @@ internal static class CommunityPatchLoader {
     var gameVersion = CommunityPatchSubModule.GameVersion;
     foreach (var patch in CommunityPatchSubModule.Patches) {
       var type = patch.GetType();
-      var obsolete = type.GetCustomAttribute<PatchObsoleteAttribute>();
       var patchName = type.Name;
+      var obsolete = type.GetCustomAttribute<PatchObsoleteAttribute>();
       if (obsolete != null)
         if (VersionComparer.Compare(gameVersion, obsolete.Version) >= 0) {
-          Console.WriteLine($"{patchName}: obsoleted by version, {gameVersion} vs. {obsolete.Version}");
+          Console.WriteLine($"{patchName}: obsoleted by version {obsolete.Version}, game is {gameVersion}");
+          continue;
+        }
+      var notBefore = type.GetCustomAttribute<PatchNotBeforeAttribute>();
+      if (notBefore != null)
+        if (VersionComparer.Compare(gameVersion, notBefore.Version) <= 0) {
+          Console.WriteLine($"{patchName}: not before version {notBefore.Version}, game is {gameVersion}");
           continue;
         }
 
       try {
         foreach (var mb in patch.GetMethodsChecked()) {
+          if (mb == null) {
+            Console.WriteLine($"{patchName}: GetMethodsChecked invocation returned a null. Must be missing a method in this version.");
+            continue;
+          }
           var mbName = mb.Name;
 
           MemberInfo match;

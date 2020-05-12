@@ -5,10 +5,12 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
 namespace CommunityPatch.Patches.Feats {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess,1,3)]
   public sealed class AseraiCheapCaravansPatch : PatchBase<AseraiCheapCaravansPatch> {
     // This patch only applies to player characters because it is triggered during a conversation where starting a
     // caravan is possible.  See TargetMethodInfo

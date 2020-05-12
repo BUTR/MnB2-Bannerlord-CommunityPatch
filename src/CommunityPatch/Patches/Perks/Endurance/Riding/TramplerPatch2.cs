@@ -1,17 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.Engine;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
+  [PatchNotBefore(ApplicationVersionType.EarlyAccess, 1, 4)]
   public sealed class TramplerPatch2 : PerkPatchBase<TramplerPatch2> {
 
     public override bool Applied { get; protected set; }
@@ -94,12 +97,13 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     private static readonly FieldInfo AttackerAgentCharacterFieldInfo = AttackInformationType?.GetField("AttackerAgentCharacter", Public | Instance | DeclaredOnly);
 
     [CanBeNull]
-    private static readonly AccessTools.FieldRef<object, BasicCharacterObject> AttackerAgentCharacter
-      = AttackerAgentCharacterFieldInfo == null ? null : AccessTools.FieldRefAccess<object, BasicCharacterObject>(AttackerAgentCharacterFieldInfo);
+    private static readonly FieldRef<IntPtr, BasicCharacterObject> AttackerAgentCharacter
+      = AttackerAgentCharacterFieldInfo == null ? null : AttackerAgentCharacterFieldInfo.BuildRef<IntPtr,BasicCharacterObject>();
 
-    private static void UpdateCorrectCharacterForHorseChargeDamagePostfix(ref object __instance, Agent attackerAgent, ref AttackCollisionData attackCollisionData) {
+    private static unsafe void UpdateCorrectCharacterForHorseChargeDamagePostfix(ref byte __instance, Agent attackerAgent, ref AttackCollisionData attackCollisionData) {
+      var p = (IntPtr)Unsafe.AsPointer(ref __instance);
       if (attackCollisionData.IsHorseCharge && attackerAgent.RiderAgent?.Character != null)
-        AttackerAgentCharacter!(__instance) = attackerAgent.RiderAgent.Character;
+        AttackerAgentCharacter!(p) = attackerAgent.RiderAgent.Character;
     }
 
     private static bool HeroHasPerk(BasicCharacterObject character, PerkObject perk)
@@ -110,8 +114,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       return (int) Math.Round(tramplerDamage, MidpointRounding.AwayFromZero);
     }
 
-    private static void UpdateHorseDamagePostfix(ref object attackInformation, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
-      if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(AttackerAgentCharacter!(attackInformation), ActivePatch.Perk))) {
+    private static unsafe void UpdateHorseDamagePostfix(ref byte attackInformation, ref AttackCollisionData attackCollisionData, ref CombatLogData combatLog) {
+      var p = (IntPtr)Unsafe.AsPointer(ref attackInformation);
+      if (!(attackCollisionData.IsHorseCharge && HeroHasPerk(AttackerAgentCharacter!(p), ActivePatch.Perk))) {
         return;
       }
 
