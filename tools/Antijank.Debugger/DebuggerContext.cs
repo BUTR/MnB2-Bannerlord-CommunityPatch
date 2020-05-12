@@ -103,14 +103,14 @@ namespace Antijank {
     public static ICorDebugProcess? DebugProcess;
 
     [ThreadStatic]
-    public static ICLRRuntimeInfo ClrRuntime;
+    public static ICLRRuntimeInfo? ClrRuntime;
 
     [ThreadStatic]
     public static ICorProfilerInfo? ProfilerInfo;
 
     public static int ThreadId;
 
-    public static readonly MethodInfo TestEnCMethod = typeof(DebuggerContext).GetMethod(nameof(TestEnC), DeclaredOnly | Public | Static);
+    //public static readonly MethodInfo TestEnCMethod = typeof(DebuggerContext).GetMethod(nameof(TestEnC), DeclaredOnly | Public | Static);
 
     public static bool TestEnC() => false;
 
@@ -203,6 +203,7 @@ namespace Antijank {
         */
       }
 
+      // debugger loop
       foreach (var callback in _executionQueue.GetConsumingEnumerable()) {
         try {
           callback();

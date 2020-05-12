@@ -33,8 +33,11 @@ namespace Antijank {
       Context.Harmony.Patch(AccessTools.Method(typeof(Managed), "GarbageCollect"),
         new HarmonyMethod(typeof(MemoryCleanupPatch), nameof(MemoryCleanupReplacement)));
 
-      Context.Harmony.Patch(AccessTools.Method(Type.GetType("TaleWorlds.SaveSystem.Load.LoadCallbackInitializator, TaleWorlds.SaveSystem, Version=1.0.0.0, Culture=neutral"), "InitializeObjects"),
-        transpiler: new HarmonyMethod(typeof(MemoryCleanupPatch), nameof(GcCallsTranspiler)));
+      var loadCallbackInit = Type.GetType("TaleWorlds.SaveSystem.Load.LoadCallbackInitializator, TaleWorlds.SaveSystem, Version=1.0.0.0, Culture=neutral", false);
+      if (loadCallbackInit != null) {
+        var initObjs = AccessTools.Method(loadCallbackInit, "InitializeObjects");
+        Context.Harmony.Patch(initObjs, transpiler: new HarmonyMethod(typeof(MemoryCleanupPatch), nameof(GcCallsTranspiler)));
+      }
 
       Context.Harmony.Patch(AccessTools.Method(typeof(LoadContext), nameof(LoadContext.Load)),
         transpiler: new HarmonyMethod(typeof(MemoryCleanupPatch), nameof(GcCallsTranspiler)));

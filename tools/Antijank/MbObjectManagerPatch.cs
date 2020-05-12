@@ -7,15 +7,60 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using HarmonyLib;
-using TaleWorlds.ObjectSystem;
 using static System.Reflection.BindingFlags;
 
 namespace Antijank {
 
   public static class MbObjectManagerPatch {
 
-    private static int InitCount = 0;
+    private static readonly Type MbObjectMgrType
+      = Type.GetType("TaleWorlds.ObjectSystem.MBObjectManager, TaleWorlds.ObjectSystem, Version=1.0.0.0, Culture=neutral", false)
+      ?? Type.GetType("TaleWorlds.Core.MBObjectManager, TaleWorlds.Core, Version=1.0.0.0, Culture=neutral", true);
+
+    private static readonly Type MbObjectBaseType
+      = Type.GetType("TaleWorlds.ObjectSystem.MBObjectBase, TaleWorlds.ObjectSystem, Version=1.0.0.0, Culture=neutral", false)
+      ?? Type.GetType("TaleWorlds.Core.MBObjectBase, TaleWorlds.Core, Version=1.0.0.0, Culture=neutral", true);
+
+
+    private static readonly Type ObjTypeRecType = MbObjectMgrType.GetNestedType("IObjectTypeRecord", NonPublic | Instance | Static);
+
+    private static readonly MethodInfo ObjTypeRecElementListNameMethod = AccessTools.PropertyGetter(ObjTypeRecType, "ElementListName");
+
+    private static readonly MethodInfo ObjTypeRecElementNameMethod = AccessTools.PropertyGetter(ObjTypeRecType, "ElementName");
+
+    //private static string ObjTypeRecElementListName(object otr) => (string) ObjTypeRecElementListNameMethod.Invoke(otr, null);
+    private static readonly Func<object, string> ObjTypeRecElementListName
+      = ObjTypeRecElementListNameMethod.BuildInvoker<Func<object, string>>();
+
+    //private static string ObjTypeRecElementName(object otr) => (string) ObjTypeRecElementNameMethod.Invoke(otr, null);
+    private static readonly Func<object, string> ObjTypeRecElementName
+      = ObjTypeRecElementNameMethod.BuildInvoker<Func<object, string>>();
+
+    private static readonly MethodInfo MbObjectManagerGetPresumedObjectMethod = AccessTools.Method(MbObjectMgrType, "GetPresumedObject");
     
+    private static readonly MethodInfo MbObjectBaseDeserializeMethod1
+      = MbObjectBaseType.GetMethod("Deserialize", Public | NonPublic | Instance | DeclaredOnly, null, new[] {MbObjectMgrType, typeof(XmlNode)}, null);
+
+    private static readonly MethodInfo MbObjectBaseDeserializeMethod2
+      = MbObjectBaseType.GetMethod("Deserialize", Public | NonPublic | Instance | DeclaredOnly, null, new[] {MbObjectMgrType, typeof(XmlNode), typeof(Type)}, null);
+
+    private static readonly MethodInfo MbObjectBaseAfterInitializedMethod
+      = MbObjectBaseType.GetMethod("AfterInitialized", Public | NonPublic | Instance | DeclaredOnly);
+
+    private static readonly Action<object, object, XmlNode> MbObjectBaseDeserialize1
+      = MbObjectBaseDeserializeMethod1.BuildInvoker<Action<object, object, XmlNode>>();
+
+    private static readonly Action<object, object, XmlNode, Type> MbObjectBaseDeserialize2
+      = MbObjectBaseDeserializeMethod2.BuildInvoker<Action<object, object, XmlNode, Type>>();
+
+    private static readonly Action<object> MbObjectBaseAfterInitialized
+      = MbObjectBaseAfterInitializedMethod.BuildInvoker<Action<object>>();
+
+    private static readonly Func<object, string, string, bool, object> MbObjectManagerGetPresumedObject
+      = MbObjectManagerGetPresumedObjectMethod.BuildInvoker<Func<object, string, string, bool, object>>();
+
+    private static int InitCount = 0;
+
     static MbObjectManagerPatch() {
       if (InitCount > 0) {
         if (Debugger.IsAttached)
@@ -24,11 +69,12 @@ namespace Antijank {
       }
 
       ++InitCount;
-      Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "CreateDocumentFromXmlFile"),
+
+      Context.Harmony.Patch(AccessTools.Method(MbObjectMgrType, "CreateDocumentFromXmlFile"),
         postfix: new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(CreateDocumentFromXmlFilePostfix)));
-      Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "MergeTwoXmls"),
+      Context.Harmony.Patch(AccessTools.Method(MbObjectMgrType, "MergeTwoXmls"),
         new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(MergeTwoXmlsReplacement)));
-      Context.Harmony.Patch(AccessTools.Method(typeof(MBObjectManager), "LoadXml"),
+      Context.Harmony.Patch(AccessTools.Method(MbObjectMgrType, "LoadXml"),
         new HarmonyMethod(typeof(MbObjectManagerPatch), nameof(LoadXmlReplacement)));
     }
 
@@ -98,24 +144,12 @@ namespace Antijank {
       return false;
     }
 
-    private static readonly Type ObjTypeRecType = typeof(MBObjectManager).GetNestedType("IObjectTypeRecord", NonPublic | Instance | Static);
-
-    private static readonly MethodInfo ObjTypeRecElementListNameMethod = AccessTools.PropertyGetter(ObjTypeRecType, "ElementListName");
-
-    private static readonly MethodInfo ObjTypeRecElementNameMethod = AccessTools.PropertyGetter(ObjTypeRecType, "ElementName");
-
-    private static readonly MethodInfo MbObjectManagerGetPresumedObjectMethod = AccessTools.Method(typeof(MBObjectManager), "GetPresumedObject");
-
-    private static string ObjTypeRecElementListName(object otr) => (string) ObjTypeRecElementListNameMethod.Invoke(otr, null);
-
-    private static string ObjTypeRecElementName(object otr) => (string) ObjTypeRecElementNameMethod.Invoke(otr, null);
-
     private static readonly Dictionary<string, bool> ContinueWithErrorRememberChoice = new Dictionary<string, bool>();
 
     private static readonly string AntijankXmlNamespace = "https://antijank/";
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static bool LoadXmlReplacement(MBObjectManager __instance, IList ___ObjectTypeRecords, IList ___NonSerializedObjectTypeRecords, XmlDocument doc, Type typeOfGameMenusCallbacks) {
+    private static bool LoadXmlReplacement(object __instance, IList ___ObjectTypeRecords, IList ___NonSerializedObjectTypeRecords, XmlDocument doc, Type typeOfGameMenusCallbacks) {
       var nodeIndex = 0;
       var found = false;
       string typeName = null;
@@ -157,12 +191,13 @@ namespace Antijank {
 
         var id = elem.GetAttribute("id");
         try {
-          var obj = (MBObjectBase) MbObjectManagerGetPresumedObjectMethod.Invoke(__instance, new object[] {typeName, id, true});
+          // (MBObjectBase)
+          var obj = MbObjectManagerGetPresumedObject(__instance, typeName, id, true);
           if (typeOfGameMenusCallbacks != null)
-            obj.Deserialize(__instance, node, typeOfGameMenusCallbacks);
+            MbObjectBaseDeserialize2(obj, __instance, node, typeOfGameMenusCallbacks);
           else
-            obj.Deserialize(__instance, node);
-          obj.AfterInitialized();
+            MbObjectBaseDeserialize1(obj, __instance, node);
+          MbObjectBaseAfterInitialized(obj);
         }
         catch (Exception ex) {
           var source = elem.GetAttribute("source", AntijankXmlNamespace);
