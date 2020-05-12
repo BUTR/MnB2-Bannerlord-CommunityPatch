@@ -101,6 +101,7 @@ namespace CommunityPatch.Patches.Traits {
       Harmony.Patch(AddPlayerTraitXpMethod, postfix: new HarmonyMethod(typeof(TraitFixesPatch), nameof(AddPlayerTraitXpPrefix)));
 
       Harmony.Patch(NotableDaughterStartConvoMethod, transpiler: new HarmonyMethod(typeof(TraitFixesPatch), nameof(NotableDaughterStartConvoTranspiler)));
+      Applied = true;
     }
 
     public override bool Applied { get; protected set; }
