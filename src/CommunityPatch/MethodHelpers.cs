@@ -17,9 +17,6 @@ namespace CommunityPatch {
     private static readonly FieldInfo IlInstrOffsetField = typeof(Harmony).Assembly.GetType("HarmonyLib.ILInstruction")
       .GetField("offset", Public | NonPublic | Instance | DeclaredOnly);
 
-    private static readonly CustomAttributeBuilder AggressiveInlining =
-      new CustomAttributeBuilder(typeof(MethodImplAttribute).GetConstructor(Public | Instance, null, new[] {typeof(MethodImplOptions)}, null)!, new object[] {MethodImplOptions.AggressiveInlining});
-
     public static byte[] MakeCilSignatureSha256(this MethodBase mb) {
 #if DEBUG_METHOD_SIGNATURE
       using var hashSource = new MemoryStream(65536);
@@ -189,60 +186,6 @@ namespace CommunityPatch {
       if (type!.IsValueType)
         type = type.MakeByRefType();
       return type;
-    }
-
-    public static TDelegate BuildInvoker<TDelegate>(this MethodBase m) where TDelegate : Delegate {
-      var td = typeof(TDelegate);
-      Dynamic.AccessInternals(m);
-      var dtMi = td.GetMethod("Invoke", Public | NonPublic | Static | Instance);
-      var dtPs = dtMi!.GetParameters();
-      var dt = Dynamic.CreateStaticClass();
-      var mn = $"{m.Name}Invoker";
-      var d = Sigil.Emit<TDelegate>.BuildStaticMethod(dt, mn, MethodAttributes.Public);
-      var ps = m.GetParameters();
-      if (m.IsStatic) {
-        for (ushort i = 0; i < ps.Length; i++) {
-          var p = ps[i];
-          var dp = dtPs[i];
-          if (p.ParameterType != dp.ParameterType)
-            throw new NotImplementedException($"Unhandled parameter difference: {p.ParameterType.FullName} vs. {dp.ParameterType.FullName}");
-
-          d.LoadArgument(i);
-        }
-      }
-      else {
-        var thisParamType = m.GetThisParamType();
-        if (dtPs[0].ParameterType != thisParamType)
-          throw new NotImplementedException($"Unhandled this parameter difference: {dtPs[0].ParameterType.FullName} vs. {thisParamType}");
-
-        d.LoadArgument(0);
-        for (var i = 0; i < ps.Length; i++) {
-          var p = ps[i];
-          var dp = dtPs[i + 1];
-          if (p.ParameterType != dp.ParameterType)
-            throw new NotImplementedException($"Unhandled parameter difference: {p.ParameterType.FullName} vs. {dp.ParameterType.FullName}");
-
-          d.LoadArgument((ushort) (i + 1));
-        }
-      }
-
-      switch (m) {
-        case MethodInfo mi:
-          d.Call(mi);
-          break;
-        case ConstructorInfo ci:
-          d.Call(ci);
-          break;
-        default:
-          throw new NotSupportedException(m.MemberType.ToString());
-      }
-
-      d.Return();
-      var mb = d.CreateMethod();
-      mb.SetCustomAttribute(AggressiveInlining);
-      var dti = dt.CreateTypeInfo();
-      var dmi = dti!.GetMethod(mn, DeclaredOnly | Static | Public);
-      return (TDelegate) dmi!.CreateDelegate(td);
     }
 
   }
