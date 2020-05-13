@@ -69,6 +69,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     }
 
     public override bool? IsApplicable(Game game) {
+      if (Perk == null) {
+        return false;
+      }
+      
       if (TargetMethodInfo == null)
         return false;
 
