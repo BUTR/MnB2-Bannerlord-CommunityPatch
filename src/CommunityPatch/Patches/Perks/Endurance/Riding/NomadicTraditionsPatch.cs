@@ -45,7 +45,10 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
-      return HashesMatch();
+      if (!HashesMatch())
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

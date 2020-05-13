@@ -18,7 +18,6 @@
 
     <ItemGroup>
         <PackageReference Include="Lib.Harmony" Version="2.0.0.9" />
-        <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" />
         <PackageReference Include="Microsoft.SourceLink.Common" Version="1.0.0" PrivateAssets="All" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
         <PackageReference Include="Sigil" Version="5.0.0" />

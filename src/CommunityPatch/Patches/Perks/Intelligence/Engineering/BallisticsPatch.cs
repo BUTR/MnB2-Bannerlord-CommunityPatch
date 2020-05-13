@@ -66,7 +66,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       var tooltipHash = TooltipTargetMethodInfo.MakeCilSignatureSha256();
       var bombardHash = BombardTargetMethodInfo.MakeCilSignatureSha256();
-      return tooltipHash.MatchesAnySha256(TooltipHashes) && bombardHash.MatchesAnySha256(BombardHashes);
+      if (!(tooltipHash.MatchesAnySha256(TooltipHashes) && bombardHash.MatchesAnySha256(BombardHashes)))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

@@ -50,7 +50,10 @@ namespace CommunityPatch.Patches {
         return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(ExtraAmmoPerksPatch.Hashes);
+      if (!hash.MatchesAnySha256(ExtraAmmoPerksPatch.Hashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     protected static bool HasMount(Agent agent) {

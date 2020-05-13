@@ -30,14 +30,15 @@ namespace CommunityPatch.Patches {
     }
 
     public override bool? IsApplicable(Game game) {
-      if (Perk == null) return false;
-
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo))
         return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      if (!hash.MatchesAnySha256(Hashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     protected static void ApplyPerk(ref int totalDamage, PerkObject perk, PartyBase strikerParty) {

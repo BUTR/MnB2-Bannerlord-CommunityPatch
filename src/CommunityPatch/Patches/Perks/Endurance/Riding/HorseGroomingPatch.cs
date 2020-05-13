@@ -42,10 +42,14 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
     public HorseGroomingPatch() : base("wtyLhmz5") {
     }
 
-    public override bool? IsApplicable(Game game)
-      => TargetMethodInfo != null
-        && !AlreadyPatchedByOthers(Harmony.GetPatchInfo(TargetMethodInfo))
-        && TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes);
+    public override bool? IsApplicable(Game game) {
+      if (TargetMethodInfo == null
+        || AlreadyPatchedByOthers(Harmony.GetPatchInfo(TargetMethodInfo))
+        || !TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes))
+        return false;
+
+      return base.IsApplicable(game);
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;

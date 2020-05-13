@@ -65,7 +65,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
         return null;
       }
 
-      return true;
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

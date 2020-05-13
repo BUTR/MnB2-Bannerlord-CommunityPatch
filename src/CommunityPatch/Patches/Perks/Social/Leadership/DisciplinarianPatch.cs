@@ -9,8 +9,12 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
 
     public override bool Applied { get; protected set; }
 
-    public override bool? IsApplicable(Game game)
-      => Perk?.PrimaryRole == SkillEffect.PerkRole.Personal;
+    public override bool? IsApplicable(Game game) {
+      if (Perk?.PrimaryRole != SkillEffect.PerkRole.Personal)
+        return false;
+
+      return base.IsApplicable(game);
+    }
 
     public override void Apply(Game game) {
       Perk.SetPrimary(SkillEffect.PerkRole.PartyLeader, 0f);

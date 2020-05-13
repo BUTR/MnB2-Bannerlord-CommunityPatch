@@ -60,7 +60,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
       if (Perk.PrimaryBonus != 0f)
         return null;
 
-      return true;
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

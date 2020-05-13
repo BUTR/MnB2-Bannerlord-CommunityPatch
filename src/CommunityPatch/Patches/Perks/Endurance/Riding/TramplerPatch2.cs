@@ -79,7 +79,15 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       if (!TargetConstructorInfo.MakeCilSignatureSha256().MatchesAnySha256(ConstructorHashes))
         return false;
 
-      return true;
+      try {
+        if (Perk != null)
+          return false;
+      }
+      catch {
+        return false;
+      }
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

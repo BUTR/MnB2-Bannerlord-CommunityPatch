@@ -100,10 +100,13 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       var villagerSurrenderHash = VillagerSurrenderTargetMethodInfo.MakeCilSignatureSha256();
       var caravansBribeHash = CaravansBribeTargetMethodInfo.MakeCilSignatureSha256();
       var caravansSurrenderHash = CaravansSurrenderTargetMethodInfo.MakeCilSignatureSha256();
-      return villagerBribeHash.MatchesAnySha256(VillagerBribeHashes) &&
+      if (!(villagerBribeHash.MatchesAnySha256(VillagerBribeHashes) &&
         villagerSurrenderHash.MatchesAnySha256(VillagerSurrenderHashes) &&
         caravansBribeHash.MatchesAnySha256(CaravansBribeHashes) &&
-        caravansSurrenderHash.MatchesAnySha256(CaravansSurrenderHashes);
+        caravansSurrenderHash.MatchesAnySha256(CaravansSurrenderHashes)))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

@@ -16,7 +16,7 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo PatchMethodInfo
       = typeof(BowExpertPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
-    
+
     public BowExpertPatch() : base("cKTeea27") {
     }
 

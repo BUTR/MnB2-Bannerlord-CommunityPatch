@@ -43,7 +43,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       if (AlreadyPatchedByOthers(banditsJoinPatchInfo)) return false;
 
       var banditsJoinHash = BanditsJoinTargetMethodInfo.MakeCilSignatureSha256();
-      return banditsJoinHash.MatchesAnySha256(BanditsJoinHashes);
+      if (!banditsJoinHash.MatchesAnySha256(BanditsJoinHashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

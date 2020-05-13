@@ -72,8 +72,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var patchInfo = Harmony.GetPatchInfo(TargetMethodInfo);
       if (HarmonyHelpers.AlreadyPatchedByOthers(patchInfo)) return false;
 
-      return TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes)
-        && WithoutBoostTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(WithoutBoostHashes);
+      if (!TargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(Hashes)
+        || !WithoutBoostTargetMethodInfo.MakeCilSignatureSha256().MatchesAnySha256(WithoutBoostHashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

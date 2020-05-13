@@ -77,7 +77,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
       var withoutBoostHash = WithoutBoostTargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes) && withoutBoostHash.MatchesAnySha256(WithoutBoostHashes);
+      if (!hash.MatchesAnySha256(Hashes) || !withoutBoostHash.MatchesAnySha256(WithoutBoostHashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

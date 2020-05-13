@@ -8,8 +8,12 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     public override bool Applied { get; protected set; }
 
-    public override bool? IsApplicable(Game game)
-      => Perk?.PrimaryBonus.Equals(0.5f);
+    public override bool? IsApplicable(Game game) {
+      if (!Perk?.PrimaryBonus.Equals(0.5f) ?? false)
+        return false;
+
+      return base.IsApplicable(game);
+    }
 
     public override void Apply(Game game) {
       Perk.SetPrimaryBonus(0.3f);

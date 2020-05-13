@@ -10,14 +10,18 @@ using static CommunityPatch.PatchApplicabilityHelper;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
-  public class ElusivePatch : PatchBase<ElusivePatch> {
+  public class ElusivePatch : PerkPatchBase<ElusivePatch> {
 
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo SacrificeTargetMethodInfo = typeof(DefaultTroopSacrificeModel).GetMethod(nameof(DefaultTroopSacrificeModel.GetNumberOfTroopsSacrificedForTryingToGetAway), Public | Instance | DeclaredOnly);
+
     private static readonly MethodInfo BreakOutTargetMethodInfo = typeof(DefaultTroopSacrificeModel).GetMethod(nameof(DefaultTroopSacrificeModel.GetLostTroopCountForBreakingOutOfBesiegedSettlement), Public | Instance | DeclaredOnly);
+
     private static readonly MethodInfo BreakInTargetMethodInfo = typeof(DefaultTroopSacrificeModel).GetMethod(nameof(DefaultTroopSacrificeModel.GetLostTroopCountForBreakingInBesiegedSettlement), Public | Instance | DeclaredOnly);
+
     private static readonly MethodInfo SiegePatchMethodInfo = typeof(ElusivePatch).GetMethod(nameof(SiegePostfix), Public | NonPublic | Static | DeclaredOnly);
+
     private static readonly MethodInfo SacrificePatchMethodInfo = typeof(ElusivePatch).GetMethod(nameof(SacrificePostfix), Public | NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
@@ -25,8 +29,6 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       yield return BreakOutTargetMethodInfo;
       yield return BreakInTargetMethodInfo;
     }
-
-    private PerkObject _perk;
 
     private static readonly byte[][] SacrificeHashes = {
       new byte[] {
@@ -37,7 +39,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         0xEF, 0x1B, 0x96, 0x03, 0xE2, 0xBE, 0x32, 0x21
       }
     };
-    
+
     private static readonly byte[][] BreakOutHashes = {
       new byte[] {
         // e1.2.1.226961
@@ -47,7 +49,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         0x44, 0x2B, 0x75, 0xE3, 0x7B, 0xD7, 0xA6, 0xEA
       }
     };
-    
+
     private static readonly byte[][] BreakInHashes = {
       new byte[] {
         // e1.2.1.226961
@@ -58,19 +60,23 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       }
     };
 
-    public override void Reset()
-      => _perk = PerkObject.FindFirst(x => x.Name.GetID() == "iZ5hXYTl");
+    public ElusivePatch() : base("iZ5hXYTl") {
+    }
 
     public override bool? IsApplicable(Game game) {
-      if (_perk == null) return false;
+      if (Perk == null) return false;
 
-      return IsTargetPatchable(SacrificeTargetMethodInfo, SacrificeHashes) &&
-        IsTargetPatchable(BreakOutTargetMethodInfo, BreakOutHashes) && 
-        IsTargetPatchable(BreakInTargetMethodInfo, BreakInHashes);
+      if (!IsTargetPatchable(SacrificeTargetMethodInfo, SacrificeHashes)
+        || !IsTargetPatchable(BreakOutTargetMethodInfo, BreakOutHashes)
+        || !IsTargetPatchable(BreakInTargetMethodInfo, BreakInHashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {
       if (Applied) return;
+
       CommunityPatchSubModule.Harmony.Patch(SacrificeTargetMethodInfo, postfix: new HarmonyMethod(SacrificePatchMethodInfo));
       CommunityPatchSubModule.Harmony.Patch(BreakOutTargetMethodInfo, postfix: new HarmonyMethod(SiegePatchMethodInfo));
       CommunityPatchSubModule.Harmony.Patch(BreakInTargetMethodInfo, postfix: new HarmonyMethod(SiegePatchMethodInfo));
@@ -82,7 +88,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       ref var troopSacrificeSize = ref __result;
       if (troopSacrificeSize < 0) return;
 
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       if (party.LeaderHero?.GetPerkValue(perk) != true) return;
 
       troopSacrificeSize -= (int) (troopSacrificeSize * perk.PrimaryBonus);
@@ -94,7 +100,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       if (troopSacrificeSize < 0) return;
 
       var side = battleSide == BattleSideEnum.Attacker ? mapEvent.AttackerSide : mapEvent.DefenderSide;
-      var perk = ActivePatch._perk;
+      var perk = ActivePatch.Perk;
       var sideTotalMen = 0;
       var menInElusiveParties = 0;
       foreach (var sideParty in side.Parties) {
@@ -102,6 +108,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         if (sideParty.MobileParty?.LeaderHero?.GetPerkValue(perk) == true)
           menInElusiveParties += sideParty.NumberOfAllMembers;
       }
+
       var ratioMenInElusiveParties = menInElusiveParties / (float) sideTotalMen;
       troopSacrificeSize -= (int) (troopSacrificeSize * ratioMenInElusiveParties * perk.PrimaryBonus);
     }

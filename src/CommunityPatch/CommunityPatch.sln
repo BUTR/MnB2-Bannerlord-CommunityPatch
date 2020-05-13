@@ -16,6 +16,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BannerlordModuleManagement"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antijank.Debugger", "..\..\tools\Antijank.Debugger\Antijank.Debugger.csproj", "{08C9EDF6-684F-43CE-BEDE-6D451ADDC97E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityPatchAnalyzer", "..\..\tools\CommunityPatchAnalyzer\CommunityPatchAnalyzer.csproj", "{AA2FD4F4-5B32-4F51-817E-50611F91F17A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityPatchAnalyzerAttributes", "..\CommunityPatchAnalyzerAttributes\CommunityPatchAnalyzerAttributes.csproj", "{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -56,5 +60,13 @@ Global
 		{08C9EDF6-684F-43CE-BEDE-6D451ADDC97E}.Debug|x64.Build.0 = Debug|x64
 		{08C9EDF6-684F-43CE-BEDE-6D451ADDC97E}.Release|x64.ActiveCfg = Release|x64
 		{08C9EDF6-684F-43CE-BEDE-6D451ADDC97E}.Release|x64.Build.0 = Release|x64
+		{AA2FD4F4-5B32-4F51-817E-50611F91F17A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AA2FD4F4-5B32-4F51-817E-50611F91F17A}.Debug|x64.Build.0 = Debug|Any CPU
+		{AA2FD4F4-5B32-4F51-817E-50611F91F17A}.Release|x64.ActiveCfg = Release|Any CPU
+		{AA2FD4F4-5B32-4F51-817E-50611F91F17A}.Release|x64.Build.0 = Release|Any CPU
+		{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}.Debug|x64.Build.0 = Debug|Any CPU
+		{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}.Release|x64.ActiveCfg = Release|Any CPU
+		{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

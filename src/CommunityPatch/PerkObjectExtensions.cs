@@ -4,13 +4,6 @@ using TaleWorlds.Localization;
 
 namespace CommunityPatch {
 
-  internal static class PerkObjectHelpers {
-
-    public static PerkObject Load(string id)
-      => PerkObject.FindFirst(x => x.Name.GetID() == id);
-
-  }
-
   internal static class PerkObjectExtensions {
 
     public static void SetPrimaryBonus(this PerkObject perk, float primaryBonus)

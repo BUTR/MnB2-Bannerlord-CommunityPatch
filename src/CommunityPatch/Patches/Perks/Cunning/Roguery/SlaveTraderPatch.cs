@@ -40,7 +40,10 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       if (AlreadyPatchedByOthers(patchInfo)) return false;
 
       var hash = TargetMethodInfo.MakeCilSignatureSha256();
-      return hash.MatchesAnySha256(Hashes);
+      if (!hash.MatchesAnySha256(Hashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

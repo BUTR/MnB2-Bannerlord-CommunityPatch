@@ -107,10 +107,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var maxHitPointsHashes = MaxHitPointsTargetMethodInfo.MakeCilSignatureSha256();
       var tooltipHashes = TooltipTargetMethodInfo.MakeCilSignatureSha256();
 
-      return aiHash.MatchesAnySha256(AiHashes) &&
-        playerHash.MatchesAnySha256(PlayerHashes) &&
-        maxHitPointsHashes.MatchesAnySha256(MaxHitPointsHashes) &&
-        tooltipHashes.MatchesAnySha256(TooltipHashes);
+      if (!aiHash.MatchesAnySha256(AiHashes)
+        || !playerHash.MatchesAnySha256(PlayerHashes)
+        || !maxHitPointsHashes.MatchesAnySha256(MaxHitPointsHashes)
+        || !tooltipHashes.MatchesAnySha256(TooltipHashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     public override void Apply(Game game) {

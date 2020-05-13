@@ -32,7 +32,7 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
       var character = ItemMenuVmCharacterGetter(__instance);
       // Make sure we're always using the correct value, in case this overwrites some shared WeaponComponentData
       if (weapon.ItemUsage == "long_bow" && HeroHasPerk(character, ActivePatch.Perk))
-        WeaponComponentDataItemUsageMethod.Invoke(weapon, new object[] { "bow"});
+        WeaponComponentDataItemUsageMethod.Invoke(weapon, new object[] {"bow"});
     }
 
     protected override bool AppliesToVersion(Game game)

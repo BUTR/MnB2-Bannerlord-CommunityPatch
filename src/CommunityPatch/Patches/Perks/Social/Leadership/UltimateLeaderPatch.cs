@@ -1,18 +1,18 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.PatchApplicabilityHelper;
 
 namespace CommunityPatch.Patches.Perks.Social.Leadership {
 
-  public sealed class UltimateLeaderPatch : PatchBase<UltimateLeaderPatch> {
+  public sealed class UltimateLeaderPatch : PerkPatchBase<UltimateLeaderPatch> {
+
+    public UltimateLeaderPatch() : base("FK3W0SKk") {
+    }
 
     public override bool Applied { get; protected set; }
 
@@ -22,35 +22,16 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
     private static readonly MethodInfo PrefixMethodInfo =
       typeof(UltimateLeaderPatch).GetMethod(nameof(AddUltimateLeaderPerkEffectPrefix), Public | NonPublic | Static | DeclaredOnly);
 
-    private List<PerkObject> _ultimateLeaderProbablePerks;
-
-    private PerkObject _ultimateLeaderPerk;
-
-    private TextObject _leadershipPerkUltimateLeaderBonusText;
-
     public override IEnumerable<MethodBase> GetMethodsChecked() {
       yield return TargetMethodInfo;
     }
 
     public override void Reset() {
-      Initialize();
       if (!Applied)
         return;
 
       CommunityPatchSubModule.Harmony.Unpatch(TargetMethodInfo, PrefixMethodInfo);
       Applied = false;
-    }
-
-    private void Initialize() {
-      _leadershipPerkUltimateLeaderBonusText =
-        GameTexts.FindText("str_leadership_perk_bonus");
-
-      _ultimateLeaderProbablePerks =
-        Campaign.Current.PerkList.Where(perk => perk.Name.GetID() == "FK3W0SKk").ToList();
-
-      _ultimateLeaderPerk = GetUltimateLeadershipPerk(_ultimateLeaderProbablePerks);
-
-      _ultimateLeaderProbablePerks.Add(_ultimateLeaderPerk);
     }
 
     // ReSharper disable once MemberCanBePrivate.Global
@@ -64,8 +45,12 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
       }
     };
 
-    public override bool? IsApplicable(Game game)
-      => _ultimateLeaderPerk != null && IsTargetPatchable(TargetMethodInfo, Hashes);
+    public override bool? IsApplicable(Game game) {
+      if (!IsTargetPatchable(TargetMethodInfo, Hashes))
+        return false;
+
+      return base.IsApplicable(game);
+    }
 
     public override void Apply(Game game) {
       if (Applied) return;
@@ -86,25 +71,15 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
       if (leadershipValue <= 250)
         return false;
 
-      if (!ActivePatch.HasUltimateLeadershipPerk(clanLeader))
+      var perk = ActivePatch.Perk;
+
+      if (!clanLeader.GetPerkValue(perk))
         return false;
 
-      result.Add(
-        (leadershipValue - 250) * ActivePatch._ultimateLeaderPerk.PrimaryBonus,
-        ActivePatch._leadershipPerkUltimateLeaderBonusText);
+      result.Add((leadershipValue - 250) * perk!.PrimaryBonus, perk.Description);
 
       return false;
     }
-
-    private static PerkObject GetUltimateLeadershipPerk(IReadOnlyList<PerkObject> probablePerks) {
-      if (probablePerks.Count == 0)
-        throw new KeyNotFoundException("Can't locate Ultimate Leader perk: No probable perks found.");
-
-      return probablePerks[0];
-    }
-
-    private bool HasUltimateLeadershipPerk(Hero hero)
-      => _ultimateLeaderProbablePerks.Any(hero.GetPerkValue);
 
   }
 

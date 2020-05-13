@@ -52,7 +52,10 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (TownAllTownsGetter == null)
         return false;
 
-      return IsTargetPatchable(TargetMethodInfo, Hashes);
+      if (!IsTargetPatchable(TargetMethodInfo, Hashes))
+        return false;
+
+      return base.IsApplicable(game);
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
