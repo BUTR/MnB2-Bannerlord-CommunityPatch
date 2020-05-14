@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.PatchApplicabilityHelper;
 
@@ -53,6 +55,8 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
     }
 
     public override void Apply(Game game) {
+      DedupePerksIfNeeded();
+
       if (Applied) return;
 
       // ReSharper disable once ArgumentsStyleOther
@@ -76,10 +80,27 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
       if (!clanLeader.GetPerkValue(perk))
         return false;
 
-      result.Add((leadershipValue - 250) * perk!.PrimaryBonus, perk.Description);
+      result.Add((leadershipValue - 250) * perk!.PrimaryBonus, perk.Name);
 
       return false;
     }
+
+    private static readonly AccessTools.FieldRef<MBReadOnlyList<PerkObject>, List<PerkObject>> MbReadOnlyListGetter
+      = AccessTools.FieldRefAccess<MBReadOnlyList<PerkObject>, List<PerkObject>>("_list");
+
+    private void DedupePerksIfNeeded() {
+      var dupePerkList = GetDuplicatePerks(Campaign.Current.PerkList);
+      foreach (var dupePerk in dupePerkList) {
+        // ReSharper disable once ArgumentsStyleOther
+        MbReadOnlyListGetter(Campaign.Current.PerkList).Remove(dupePerk);
+      }
+    }
+
+    // the description for Ultimate Leader indicates everything except the lowest skill required version are duplicates
+    // ReSharper disable once ReturnTypeCanBeEnumerable.Local
+    private List<PerkObject> GetDuplicatePerks(IEnumerable<PerkObject> perkList)
+      => perkList.Where(perk => perk.Name.GetID() == PerkId)
+        .OrderBy(perk => perk.RequiredSkillValue).Skip(1).ToList();
 
   }
 
