@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GeneratePatchTargetHashes" type="DotNetProject" factoryName=".NET Project">
+  <configuration default="false" name="GeneratePatchTargetHashes (No Build)" type="DotNetProject" factoryName=".NET Project">
     <option name="EXE_PATH" value="$PROJECT_DIR$/../../tools/GeneratePatchTargetHashes/bin/x64/Release/GeneratePatchTargetHashes.dll" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../tools/GeneratePatchTargetHashes/bin/x64/Release" />
@@ -13,8 +13,6 @@
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
     <option name="PROJECT_KIND" value="DotNetCore" />
     <option name="PROJECT_TFM" value=".NETCoreApp,Version=v3.1" />
-    <method v="2">
-      <option name="Build" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>

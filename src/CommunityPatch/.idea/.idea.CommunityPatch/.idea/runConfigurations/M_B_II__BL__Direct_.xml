@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="M&amp;B II: BL" type="RunExe" factoryName=".NET Executable" activateToolWindowBeforeRun="false">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/../../../../bin/Win64_Shipping_Client/TaleWorlds.MountAndBlade.Launcher.exe" />
-    <option name="PROGRAM_PARAMETERS" value="/no-startup-dialog /diag" />
+  <configuration default="false" name="M&amp;B II: BL (Direct)" type="RunExe" factoryName=".NET Executable" activateToolWindowBeforeRun="false">
+    <option name="EXE_PATH" value="$PROJECT_DIR$/../../../../bin/Win64_Shipping_Client/Bannerlord.exe" />
+    <option name="PROGRAM_PARAMETERS" value="/singleplayer /no-startup-dialog /diag _MODULES_*Native*CommunityPatch*SandBoxCore*Sandbox*CustomBattle*StoryMode*_MODULES_" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../../../bin/Win64_Shipping_Client" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <envs>

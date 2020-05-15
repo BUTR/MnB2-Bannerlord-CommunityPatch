@@ -23,11 +23,33 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
+    <Choose>
+        <When Condition="'$(MnB2BannerlordRefAsmsVersion)'==''">
+            <ItemGroup>
+                <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll" Exclude="$(MnB2BannerlordBinDir)\TaleWorlds.Starter.DotNetCore.dll">
+                    <HintPath>%(Identity)</HintPath>
+                    <Private>False</Private>
+                </Reference>
+            </ItemGroup>
+        </When>
+        <Otherwise>
+            <PropertyGroup>
+                <ReferenceAssemblyGeneratorDir Condition="'$(ReferenceAssemblyGeneratorDir)'==''">..\..\tools\ReferenceAssemblyGenerator</ReferenceAssemblyGeneratorDir>
+                <MnB2BannerlordRefAsmsDir Condition="'$(MnB2BannerlordRefAsmsDir)'==''">$(ReferenceAssemblyGeneratorDir)\ref-$(MnB2BannerlordRefAsmsVersion)</MnB2BannerlordRefAsmsDir>
+            </PropertyGroup>
+            <ItemGroup>
+                <Reference Include="$(MnB2BannerlordRefAsmsDir)\TaleWorlds.*.dll" Exclude="$(MnB2BannerlordRefAsmsDir)\TaleWorlds.Starter.DotNetCore.dll">
+                    <HintPath>%(Identity)</HintPath>
+                    <Private>False</Private>
+                </Reference>
+            </ItemGroup>
+            <ItemGroup>
+                <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="All" />
+            </ItemGroup>
+        </Otherwise>
+    </Choose>
+    
     <ItemGroup>
-        <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll" Exclude="$(MnB2BannerlordBinDir)\TaleWorlds.Starter.DotNetCore.dll">
-            <HintPath>%(Identity)</HintPath>
-            <Private>False</Private>
-        </Reference>
         <Reference Include="$(PkgLib_Harmony)\lib\net472\0Harmony.dll">
             <HintPath>%(Identity)</HintPath>
             <Private>True</Private>
@@ -46,7 +68,7 @@
     <ItemGroup>
         <PackageReference Include="HardwareProviders.CPU.Standard" Version="2.0.1" />
         <PackageReference Include="HardwareProviders.Standard" Version="2.0.1" />
-        <PackageReference Include="Lib.Harmony" Version="2.0.0.9" PrivateAssets="All">
+        <PackageReference Include="Lib.Harmony" Version="2.0.1" PrivateAssets="All">
             <GeneratePathProperty>True</GeneratePathProperty>
             <NoWarn>NU1701</NoWarn>
         </PackageReference>
@@ -80,5 +102,14 @@
         <PropertyGroup>
             <SourceRevisionId Condition="'$(SourceRevisionId)' != ''">$(SourceRevisionId.Substring(0,7))</SourceRevisionId>
         </PropertyGroup>
+    </Target>
+
+    <Target Name="PostBuildCleanup" AfterTargets="Build">
+        <Message Importance="high" Text="PostBuildCleanup" />
+        <ItemGroup>
+            <FilesToRemove Include="$(OutputPath)\InlineIL.dll" />
+            <FilesToRemove Include="$(OutputPath)\JetBrains.Annotations.dll" />
+        </ItemGroup>
+        <Delete Files="@(FilesToRemove)" ContinueOnError="false" />
     </Target>
 </Project>
