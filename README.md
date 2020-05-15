@@ -57,6 +57,7 @@ We also use ReSharper C++ with Visual Studio.
     * Crossbow Cavalry
   * Throwing
     * Fully Armed
+    * Concealed Carry
     * Battle Ready
   * Steward
     * Agrarian
