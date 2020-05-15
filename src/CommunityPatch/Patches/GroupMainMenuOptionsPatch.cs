@@ -25,7 +25,6 @@ namespace CommunityPatch {
 
       public readonly InitialStateOption Item;
 
-
       public readonly bool IsMod;
 
       public readonly ModuleInfo? Mod;
@@ -125,6 +124,7 @@ namespace CommunityPatch {
           }).FirstOrDefault() ?? item.ToString();
           if (action == null)
             return new InitialMenuItemInfo(item, false, null, MergablePropertyAttribute.No, name);
+
           var method = action.Method;
           var type = method.DeclaringType;
           var isMod = PathHelpers.IsModuleAssembly(type?.Assembly, out var mod);
@@ -281,18 +281,24 @@ namespace CommunityPatch {
         throw new ArgumentNullException(nameof(moreOptions));
 
       InformationManager.ShowMultiSelectionInquiry(new MultiSelectionInquiryData(new TextObject("{=MoreOptions}More Options").ToString(), null, moreOptions.Where(x => x != null)
-        .Select(x => new InquiryElement(x.Id, x.Name.ToString(), null))
-        .Where(x => !string.IsNullOrWhiteSpace(x.Title))
-        .ToList(), true, true, new TextObject("{=Open}Open").ToString(), null, picked => {
-        var item = picked.FirstOrDefault();
-        if (item == null)
-          return;
+          .Select(x => new InquiryElement(x.Id, x.Name.ToString(), null))
+          .Where(x => !string.IsNullOrWhiteSpace(x.Title))
+          .ToList(), true,
+#if AFTER_E1_4_1
+          1,
+#else
+        true,
+#endif
+        new TextObject("{=Open}Open").ToString(), null, picked => {
+          var item = picked.FirstOrDefault();
+          if (item == null)
+            return;
 
-        SynchronizationContext.Current.Post(_ => {
-          moreOptions.FirstOrDefault(x => string.Equals(x.Id, (string) item.Identifier, StringComparison.Ordinal))
-            ?.DoAction();
-        }, null);
-      }, null));
+          SynchronizationContext.Current.Post(_ => {
+            moreOptions.FirstOrDefault(x => string.Equals(x.Id, (string) item.Identifier, StringComparison.Ordinal))
+              ?.DoAction();
+          }, null);
+        }, null));
     }
 
     private static readonly AccessTools.FieldRef<InitialStateOption, Action> InitOptActGetter = AccessTools.FieldRefAccess<InitialStateOption, Action>("_action");

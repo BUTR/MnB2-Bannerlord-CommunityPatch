@@ -61,7 +61,8 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     // ReSharper disable once InconsistentNaming
 
-    public static bool Prefix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
+    public static bool Prefix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState,
+      KillingBlow killingBlow) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
 
       if (affectorCharacter == null) return false;
@@ -69,14 +70,21 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
       if (agentState != AgentState.Killed && agentState != AgentState.Unconscious) return false;
       if (affectedAgent.Team == null) return false;
 
+#if AFTER_E1_4_1
+      var skill = WeaponComponentData.GetRelevantSkillFromWeaponClass((WeaponClass) killingBlow.ItmClass);
+      var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled
+        (affectedAgent, affectorCharacter, skill);
+#else
       var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled(affectedAgent);
+#endif
       var moralChangeFriend = moralChangesTuple.Item1;
       var moralChangeEnemy = moralChangesTuple.Item2;
 
       if (!AnyMoralChanges(moralChangeEnemy, moralChangeFriend)) return false;
 
-      if (affectorCharacter.GetPerkValue(ActivePatch.Perk))
-        moralChangeFriend += moralChangeFriend * ActivePatch.Perk.PrimaryBonus / -100;
+      var perk = ActivePatch.Perk;
+      if (affectorCharacter.GetPerkValue(perk))
+        moralChangeFriend += moralChangeFriend * perk!.PrimaryBonus / -100;
 
       __instance.ApplyAoeMoraleEffect(
         affectedAgent.GetWorldPosition(),

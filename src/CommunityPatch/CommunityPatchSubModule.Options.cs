@@ -32,7 +32,6 @@ namespace CommunityPatch {
     internal static bool QuartermasterIsClanWide {
       get => Options.Get<bool>(nameof(QuartermasterIsClanWide));
       set => Options.Set(nameof(QuartermasterIsClanWide), value);
-      
     }
 
     internal void ShowOptions() {
@@ -89,7 +88,11 @@ namespace CommunityPatch {
         null,
         elements,
         true,
+#if AFTER_E1_4_1
+          1,
+#else
         true,
+#endif
         new TextObject("{=BAaS5Dkc}Apply").ToString(),
         null,
         HandleOptionChoice,

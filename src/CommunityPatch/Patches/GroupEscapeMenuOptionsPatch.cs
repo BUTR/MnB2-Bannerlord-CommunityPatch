@@ -86,23 +86,27 @@ namespace CommunityPatch.Patches {
           null,
           options,
           true,
+#if AFTER_E1_4_1
+          1,
+#else
           true,
-          new TextObject("{=Open}Open").ToString(),
-          null,
-          selection => {
-            var picked = selection.FirstOrDefault()?.Identifier;
-            if (picked == GroupEscMenuOptsKey) {
-              CommunityPatchSubModule.Current.ShowOptions();
-              return;
-            }
+#endif
+        new TextObject("{=Open}Open").ToString(),
+        null,
+        selection => {
+          var picked = selection.FirstOrDefault()?.Identifier;
+          if (picked == GroupEscMenuOptsKey) {
+            CommunityPatchSubModule.Current.ShowOptions();
+            return;
+          }
 
-            if (picked is EscapeMenuItemVM vm)
-              SynchronizationContext.Current.Post(_ => {
-                vm.ExecuteAction();
-              }, null);
-          },
-          null
-        ), true);
+          if (picked is EscapeMenuItemVM vm)
+            SynchronizationContext.Current.Post(_ => {
+              vm.ExecuteAction();
+            }, null);
+        },
+        null
+          ), true);
       }, "MoreOptions", false));
 
       ____menuItems = newList;

@@ -58,19 +58,28 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     // ReSharper disable once InconsistentNaming
 
-    public static void Postfix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState) {
+    public static void Postfix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState,
+      KillingBlow killingBlow) {
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
       var affectorLeaderCharacter = (CharacterObject) affectorAgent?.Team?.Leader?.Character;
 
       if (affectorCharacter == null) return;
-      if (affectorLeaderCharacter?.GetPerkValue(ActivePatch.Perk) != true) return;
       if (!affectorAgent.HasMount) return;
+
+      var perk = ActivePatch.Perk;
+      if (affectorLeaderCharacter?.GetPerkValue(perk) != true) return;
+
       if (affectedAgent.Character == null) return;
       if (affectedAgent.Team == null) return;
       if (agentState != AgentState.Killed && agentState != AgentState.Unconscious) return;
-
+#if AFTER_E1_4_1
+      var skill = WeaponComponentData.GetRelevantSkillFromWeaponClass((WeaponClass) killingBlow.ItmClass);
+      var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled
+        (affectedAgent, affectorCharacter, skill);
+#else
       var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled(affectedAgent);
-      var moralChangeFriend = moralChangesTuple.Item1 * ActivePatch.Perk.PrimaryBonus;
+#endif
+      var moralChangeFriend = moralChangesTuple.Item1 * perk!.PrimaryBonus;
 
       __instance.ApplyAoeMoraleEffect(
         affectedAgent.GetWorldPosition(),
