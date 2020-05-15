@@ -100,6 +100,7 @@ We also use ReSharper C++ with Visual Studio.
     * Escape Artist
     * Slave Trader
     * Merry men
+    * Concealed Blade
   * Two Handed
     * Quick Plunder
     * Eviscerate
@@ -166,6 +167,7 @@ If your Bannerlord or local repo are in a different place, you can change the pr
 * [wonkotron](https://www.nexusmods.com/users/87193583) ([Discord](https://discordapp.com/users/171467525660344320))
 * [iPherian](https://www.nexusmods.com/users/86335488)
 * [miguelcjalmeida](https://github.com/miguelcjalmeida)
+* [Eagle](https://github.com/JoeFwd) ([Discord](https://discordapp.com/users/242802595347955715))
 
 ##### Others
 * Xaphedo for providing the banner art
