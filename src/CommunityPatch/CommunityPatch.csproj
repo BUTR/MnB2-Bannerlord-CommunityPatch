@@ -3,7 +3,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
         <MSBuildWarningsAsMessages>MSB3106</MSBuildWarningsAsMessages>
-        <Configurations>Debug;Release;Debug (Post e1.4.1);Release (Post e1.4.1)</Configurations>
+        <Configurations>Debug;Release;Release - Post e1.4.1;Debug - Post e1.4.1</Configurations>
         <Platform>x64</Platform>
         <PlatformTarget>x64</PlatformTarget>
         <RootNamespace />
@@ -28,21 +28,14 @@
     <PropertyGroup Condition="$(Configuration.StartsWith('Debug'))">
       <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
       <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
+        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
     </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.EndsWith('(Post e1.4.1)'))">
+    <PropertyGroup Condition="$(Configuration.EndsWith('Post e1.4.1'))">
         <DefineConstants>$(DefineConstants);AFTER_E1_4_1</DefineConstants>
     </PropertyGroup>
     
     <Choose>
-        <When Condition="'$(MnB2BannerlordRefAsmsVersion)'==''">
-            <ItemGroup>
-                <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll" Exclude="$(MnB2BannerlordBinDir)\TaleWorlds.Starter.DotNetCore.dll">
-                    <HintPath>%(Identity)</HintPath>
-                    <Private>False</Private>
-                </Reference>
-            </ItemGroup>
-        </When>
-        <Otherwise>
+        <When Condition="'$(MnB2BannerlordRefAsmsVersion)'!=''">
             <PropertyGroup>
                 <ReferenceAssemblyGeneratorDir Condition="'$(ReferenceAssemblyGeneratorDir)'==''">..\..\tools\ReferenceAssemblyGenerator</ReferenceAssemblyGeneratorDir>
                 <MnB2BannerlordRefAsmsDir Condition="'$(MnB2BannerlordRefAsmsDir)'==''">$(ReferenceAssemblyGeneratorDir)\ref-$(MnB2BannerlordRefAsmsVersion)</MnB2BannerlordRefAsmsDir>
@@ -55,6 +48,14 @@
             </ItemGroup>
             <ItemGroup>
                 <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="All" />
+            </ItemGroup>
+        </When>
+        <Otherwise>
+            <ItemGroup>
+                <Reference Include="$(MnB2BannerlordBinDir)\TaleWorlds.*.dll" Exclude="$(MnB2BannerlordBinDir)\TaleWorlds.Starter.DotNetCore.dll">
+                    <HintPath>%(Identity)</HintPath>
+                    <Private>False</Private>
+                </Reference>
             </ItemGroup>
         </Otherwise>
     </Choose>
