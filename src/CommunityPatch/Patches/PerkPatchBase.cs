@@ -51,7 +51,7 @@ namespace CommunityPatch {
         return false;
       }
 
-      return true;
+      return base.IsApplicable(game);
     }
 
     public override void Reset()
