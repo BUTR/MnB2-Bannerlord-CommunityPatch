@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.Core;
@@ -41,7 +42,7 @@ namespace CommunityPatch {
         if (patchApplied)
           ActivePatches[patch.GetType()] = patch;
 
-        ShowMessage($"{(patchApplied ? "Applied" : "Skipped")} Patch: {patch.GetType().Name}");
+        ShowMessage($"{(patchApplied ? "Applied" : "Skipped")} Patch: {patch.GetType().Namespace.Split('.').Last()}.{patch.GetType().Name}");
       }
     }
 
