@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using HarmonyLib;
 using static CommunityPatch.HarmonyHelpers;
@@ -7,6 +8,9 @@ namespace CommunityPatch {
   public static class PatchApplicabilityHelper {
 
     public static bool IsTargetPatchable(MethodInfo targetMethodInfo, byte[][] targetHashes) {
+      if (targetMethodInfo == null)
+        return false;
+
       var patchInfo = Harmony.GetPatchInfo(targetMethodInfo);
       if (AlreadyPatchedByOthers(patchInfo)) return false;
 

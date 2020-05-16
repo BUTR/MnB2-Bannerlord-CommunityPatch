@@ -3,7 +3,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
         <MSBuildWarningsAsMessages>MSB3106</MSBuildWarningsAsMessages>
-        <Configurations>Debug;Release</Configurations>
+        <Configurations>Debug;Release;Debug (Post e1.4.1);Release (Post e1.4.1)</Configurations>
         <Platform>x64</Platform>
         <PlatformTarget>x64</PlatformTarget>
         <RootNamespace />
@@ -22,7 +22,17 @@
         <Platforms>x64</Platforms>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
-
+    <PropertyGroup Condition="$(Configuration.StartsWith('Release'))">
+      <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.StartsWith('Debug'))">
+      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.EndsWith('(Post e1.4.1)'))">
+        <DefineConstants>$(DefineConstants);AFTER_E1_4_1</DefineConstants>
+    </PropertyGroup>
+    
     <Choose>
         <When Condition="'$(MnB2BannerlordRefAsmsVersion)'==''">
             <ItemGroup>

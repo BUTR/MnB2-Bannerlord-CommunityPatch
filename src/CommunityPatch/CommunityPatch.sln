@@ -26,12 +26,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Debug|x64.Build.0 = Debug|x64
-		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Debug|x64.Deploy.0 = Debug|x64
-		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Debug|x64.ActiveCfg = Debug|x64
-		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|x64.Build.0 = Release|x64
-		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|x64.Deploy.0 = Release|x64
-		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|x64.ActiveCfg = Release|x64
 		{AC3538B8-1B44-4B2B-B1EF-F847F8717BB3}.Debug|x64.ActiveCfg = Debug|x64
 		{AC3538B8-1B44-4B2B-B1EF-F847F8717BB3}.Debug|x64.Build.0 = Debug|x64
 		{AC3538B8-1B44-4B2B-B1EF-F847F8717BB3}.Release|x64.ActiveCfg = Release|x64
@@ -68,5 +62,9 @@ Global
 		{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}.Debug|x64.Build.0 = Debug|Any CPU
 		{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}.Release|x64.ActiveCfg = Release|Any CPU
 		{D24A66E1-7F5F-4C5E-9282-3BD22777D9F4}.Release|x64.Build.0 = Release|Any CPU
+		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Debug|x64.ActiveCfg = Debug (Post e1.4.1)|x64
+		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Debug|x64.Build.0 = Debug (Post e1.4.1)|x64
+		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|x64.ActiveCfg = Release (Post e1.4.1)|x64
+		{D32B20F4-AB8C-4FDD-9C02-D71AEB37700B}.Release|x64.Build.0 = Release (Post e1.4.1)|x64
 	EndGlobalSection
 EndGlobal

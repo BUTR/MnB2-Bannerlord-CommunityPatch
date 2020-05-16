@@ -159,8 +159,13 @@ namespace CommunityPatch.Patches.Traits {
       foreach (var instr in instructions) {
         //System.Diagnostics.Debug.WriteLine($"opcode:{instr.opcode}  operand:{instr.operand} ");
         if (instr.opcode == OpCodes.Ldc_I4_S)
-          if ((sbyte) instr.operand == 50)
-            instr.operand = (sbyte) -50;
+          try {
+            if ((sbyte) instr.operand == 50)
+              instr.operand = (sbyte) -50;
+          }
+          catch {
+            // nope
+          }
 
         yield return instr;
       }

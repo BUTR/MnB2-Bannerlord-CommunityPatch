@@ -11,6 +11,7 @@ using static CommunityPatch.PatchApplicabilityHelper;
 
 namespace CommunityPatch.Patches.Perks.Social.Leadership {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 4, 1)]
   public sealed class UltimateLeaderPatch : PerkPatchBase<UltimateLeaderPatch> {
 
     public UltimateLeaderPatch() : base("FK3W0SKk") {
