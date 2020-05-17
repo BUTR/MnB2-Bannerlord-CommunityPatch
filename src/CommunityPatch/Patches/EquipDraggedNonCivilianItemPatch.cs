@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using CommunityPatch;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
@@ -10,7 +9,7 @@ using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.PatchApplicabilityHelper;
 
-namespace Patches {
+namespace CommunityPatch.Patches {
   public static class EquipDraggedNonCivilianItemPatch {
 
     internal static readonly MethodInfo UpdateCurrentCharacterIfPossibleMethodInfo = typeof(SPInventoryVM)
@@ -21,19 +20,61 @@ namespace Patches {
     
     internal static readonly MethodInfo AfterTransferMethodInfo = typeof(SPInventoryVM)
       .GetMethod("AfterTransfer", NonPublic | Instance | DeclaredOnly);
-    
+
     internal static readonly MethodInfo SetIsCivilianItemMethodInfo = typeof(SPItemVM)
       .GetMethod("set_IsCivilianItem", Public | Instance | DeclaredOnly);
 
-    internal static readonly FieldInfo RightItemListVmFieldInfo = typeof(SPInventoryVM)
-      .GetField("_rightItemListVM", NonPublic | Instance | DeclaredOnly);
-    
-    internal static readonly FieldInfo LeftItemListVmFieldInfo = typeof(SPInventoryVM)
-      .GetField("_leftItemListVM", NonPublic | Instance | DeclaredOnly);
-
     internal static readonly FieldInfo CurrentCharacterFieldInfo = typeof(SPInventoryVM)
       .GetField("_currentCharacter", NonPublic | Instance | DeclaredOnly);
+    
+    internal static readonly FieldInfo LeftItemListFieldInfo = typeof(SPInventoryVM)
+      .GetField("_leftItemListVM", NonPublic | Instance | DeclaredOnly);
+    
+    internal static readonly FieldInfo RightItemListFieldInfo = typeof(SPInventoryVM)
+      .GetField("_rightItesmListVM", NonPublic | Instance | DeclaredOnly);
+      
+    internal static bool FoundAllFields = false;
+    
+    internal static readonly Action<SPItemVM, bool> SetIsCivilianItem;
+    
+    internal static readonly Func<SPInventoryVM, CharacterObject> CurrentCharacterGetter;
+    
+    internal static readonly Func<SPInventoryVM, MBBindingList<SPItemVM>> LeftItemListVmGetter;
+    
+    internal static readonly Func<SPInventoryVM, MBBindingList<SPItemVM>> RightItemListVmGetter;
 
+    internal static void PrintCannotFindFieldError(String typeName)
+      => CommunityPatchSubModule.Error
+        ($"{nameof(EquipDraggedNonCivilianItemPatch)}: Couldn't find {typeName} by reflection.");
+    
+    static EquipDraggedNonCivilianItemPatch() {
+      if (SetIsCivilianItemMethodInfo == null) {
+        PrintCannotFindFieldError(nameof(SetIsCivilianItemMethodInfo));
+        return;
+      }
+      
+      if (CurrentCharacterFieldInfo == null) {
+        PrintCannotFindFieldError(nameof(CurrentCharacterFieldInfo));
+        return;
+      }
+      
+      if (LeftItemListFieldInfo == null) {
+        PrintCannotFindFieldError(nameof(LeftItemListFieldInfo));
+        return;
+      } 
+      
+      if (RightItemListFieldInfo == null) {
+        PrintCannotFindFieldError(nameof(RightItemListFieldInfo));
+        return;
+      }
+      
+      SetIsCivilianItem = SetIsCivilianItemMethodInfo.BuildInvoker<Action<SPItemVM, bool>>(); 
+      CurrentCharacterGetter = CurrentCharacterFieldInfo.BuildGetter<SPInventoryVM, CharacterObject>(); 
+      LeftItemListVmGetter = LeftItemListFieldInfo.BuildGetter<SPInventoryVM, MBBindingList<SPItemVM>>(); 
+      RightItemListVmGetter = RightItemListFieldInfo.BuildGetter<SPInventoryVM, MBBindingList<SPItemVM>>();
+      FoundAllFields = true;
+    }
+    
     internal static readonly byte[][] UpdateCurrentCharacterIfPossibleHashes = {
       new byte[] {
         // e1.3.1.228624
@@ -102,13 +143,17 @@ namespace Patches {
     
     private static MethodInfo AfterTransferMethodInfo => EquipDraggedNonCivilianItemPatch.AfterTransferMethodInfo;
     
-    private static MethodInfo SetIsCivilianItemMethodInfo => EquipDraggedNonCivilianItemPatch.SetIsCivilianItemMethodInfo;
+    private static Action<SPItemVM, bool> SetIsCivilianItem => EquipDraggedNonCivilianItemPatch.SetIsCivilianItem;
 
-    private static FieldInfo RightItemListVmFieldInfo => EquipDraggedNonCivilianItemPatch.RightItemListVmFieldInfo;
+    private static Func<SPInventoryVM, MBBindingList<SPItemVM>> RightItemListVmGetter => EquipDraggedNonCivilianItemPatch.RightItemListVmGetter;
     
-    private static FieldInfo LeftItemListVmFieldInfo => EquipDraggedNonCivilianItemPatch.LeftItemListVmFieldInfo;
+    private static Func<SPInventoryVM, MBBindingList<SPItemVM>> LeftItemListVmGetter => EquipDraggedNonCivilianItemPatch.LeftItemListVmGetter;
+    
+    private static Func<SPInventoryVM, CharacterObject> CurrentCharacterGetter => EquipDraggedNonCivilianItemPatch.CurrentCharacterGetter;
 
-    private static FieldInfo CurrentCharacterFieldInfo => EquipDraggedNonCivilianItemPatch.CurrentCharacterFieldInfo;
+    private static bool FoundAllFields = EquipDraggedNonCivilianItemPatch.FoundAllFields;
+
+    private static Action<String> PrintCannotFindFieldError = EquipDraggedNonCivilianItemPatch.PrintCannotFindFieldError; 
     
     private MethodInfo UpdateCurrentCharacterIfPossiblePrefixMethodInfo => GetType()
       .GetMethod("UpdateCurrentCharacterIfPossiblePrefix", NonPublic | Static | DeclaredOnly);
@@ -140,6 +185,8 @@ namespace Patches {
     public override bool Applied { get; protected set; }
 
     public override void Apply(Game game) {
+      if (Applied) return;
+      
       CommunityPatchSubModule.Harmony.Patch(InitializeInventoryMethodInfo, postfix: new HarmonyMethod(InitializeInventoryPostfixMethodInfo));
       CommunityPatchSubModule.Harmony.Patch(AfterTransferMethodInfo, postfix: new HarmonyMethod(AfterTransferPostfixMethodInfo));
       CommunityPatchSubModule.Harmony.Patch(UpdateCurrentCharacterIfPossibleMethodInfo,
@@ -149,63 +196,42 @@ namespace Patches {
       Applied = true;
     }
 
-    private void PrintMethodNotFoundByReflectionError(String typeName)
-      => CommunityPatchSubModule.Error
-        ($"{nameof(EquipDraggedNonCivilianItemPatch)}: Couldn't find {typeName} by reflection.");
-    
     public override bool? IsApplicable(Game game) {
+      if (!FoundAllFields) {
+        return false;
+      }
       if (UpdateCurrentCharacterIfPossibleMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(UpdateCurrentCharacterIfPossibleMethodInfo));
+        PrintCannotFindFieldError(nameof(UpdateCurrentCharacterIfPossibleMethodInfo));
         return false;
       }
       
       if (InitializeInventoryMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(InitializeInventoryMethodInfo));
+        PrintCannotFindFieldError(nameof(InitializeInventoryMethodInfo));
         return false;
       }
       
       if (AfterTransferMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(AfterTransferMethodInfo));
-        return false;
-      }
-      
-      if (SetIsCivilianItemMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(SetIsCivilianItemMethodInfo));
+        PrintCannotFindFieldError(nameof(AfterTransferMethodInfo));
         return false;
       }
 
-      if (RightItemListVmFieldInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(RightItemListVmFieldInfo));
-        return false;
-      }
-      
-      if (LeftItemListVmFieldInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(LeftItemListVmFieldInfo));
-        return false;
-      }
-
-      if (CurrentCharacterFieldInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(CurrentCharacterFieldInfo));
-        return false;
-      }
-      
       if (UpdateCurrentCharacterIfPossiblePrefixMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(UpdateCurrentCharacterIfPossiblePrefixMethodInfo));
+        PrintCannotFindFieldError(nameof(UpdateCurrentCharacterIfPossiblePrefixMethodInfo));
         return false;
       }
         
       if (UpdateCurrentCharacterIfPossiblePostfixMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(UpdateCurrentCharacterIfPossiblePostfixMethodInfo));
+        PrintCannotFindFieldError(nameof(UpdateCurrentCharacterIfPossiblePostfixMethodInfo));
         return false;
       } 
         
       if (InitializeInventoryPostfixMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(InitializeInventoryPostfixMethodInfo));
+        PrintCannotFindFieldError(nameof(InitializeInventoryPostfixMethodInfo));
         return false;
       }
       
       if (AfterTransferPostfixMethodInfo == null) {
-        PrintMethodNotFoundByReflectionError(nameof(InitializeInventoryPostfixMethodInfo));
+        PrintCannotFindFieldError(nameof(InitializeInventoryPostfixMethodInfo));
         return false;
       }
 
@@ -225,8 +251,8 @@ namespace Patches {
     }
 
     private static void MapLeftAndRightInventory(SPInventoryVM spInventoryVm, Action<SPItemVM> itemMapper) {
-      var rightItemListVm = (MBBindingList<SPItemVM>) RightItemListVmFieldInfo.GetValue(spInventoryVm);
-      var leftItemListVm = (MBBindingList<SPItemVM>) LeftItemListVmFieldInfo.GetValue(spInventoryVm);
+      var rightItemListVm = RightItemListVmGetter(spInventoryVm);
+      var leftItemListVm =  LeftItemListVmGetter(spInventoryVm);
 
       if (rightItemListVm == null || leftItemListVm == null) {
         return;
@@ -241,7 +267,7 @@ namespace Patches {
       Action<SPItemVM> makeCivilianItemUnequipable = item => {
         var isCivilian = item?.ItemRosterElement.EquipmentElement.Item?.IsCivilian ?? false;
         if (isItemApplicableToPerk(item) && !isCivilian) {
-          SetIsCivilianItemMethodInfo.Invoke(item, new object[] { state });
+          SetIsCivilianItem(item, state);
         }
       };
       
@@ -268,18 +294,17 @@ namespace Patches {
     }
     
     protected static void FlipEquipableStateOfNonCivilianPerkItemsIfDisplayedCharacterHasPerkOrNot(SPInventoryVM spInventoryVm, Func<SPItemVM, bool> isItemApplicableToPerk) {
-      var currentCharacter = (CharacterObject)CurrentCharacterFieldInfo.GetValue(spInventoryVm);
+      var currentCharacter = CurrentCharacterGetter(spInventoryVm);
       if (currentCharacter != null) {
         FlipEquipableStateOfNonCivilianPerkItemsIfCharacterHasPerkOrNot(spInventoryVm, currentCharacter, isItemApplicableToPerk);
       }
     }
     
-    protected static void StorePreviousCharacter(SPInventoryVM spInventoryVm, out CharacterObject currentCharacter) {
-      currentCharacter = (CharacterObject) CurrentCharacterFieldInfo.GetValue(spInventoryVm);
-    }
+    protected static void StorePreviousCharacter(SPInventoryVM spInventoryVm, out CharacterObject currentCharacter) =>
+      currentCharacter = CurrentCharacterGetter(spInventoryVm);
 
     protected static void KeepEquipableStateOfNonCivilianPerkItemsIfPreviousAndDisplayedCharacterHavePerkOrNot(SPInventoryVM spInventoryVm, CharacterObject previousCharacter, Func<SPItemVM, bool> isItemApplicableToPerk) {
-      var displayedCharacter = (CharacterObject) CurrentCharacterFieldInfo.GetValue(spInventoryVm);
+      var displayedCharacter = CurrentCharacterGetter(spInventoryVm);
       var displayedCharacterHasPerk = CharacterHasPerk(displayedCharacter);
       
       // If the previous character in the inventory has the perk, then the non civilian items should not be updated if the new shown character also has the perk.
