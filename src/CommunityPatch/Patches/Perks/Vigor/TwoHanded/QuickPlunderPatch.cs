@@ -9,9 +9,7 @@ using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
-
   public sealed class QuickPlunderPatch : PerkPatchBase<QuickPlunderPatch> {
-
     public override bool Applied { get; protected set; }
 
     private static readonly MethodInfo TargetMethodInfo = RaidingHelper.TargetMethodInfo;
