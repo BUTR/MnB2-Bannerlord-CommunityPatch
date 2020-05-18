@@ -101,6 +101,7 @@ namespace CommunityPatch {
     }
 
     private void HandleOptionChoice(List<InquiryElement> list) {
+      if (list.IsEmpty()) return;
       var selected = (string) list[0].Identifier;
       switch (selected) {
         case nameof(DisableIntroVideo):
