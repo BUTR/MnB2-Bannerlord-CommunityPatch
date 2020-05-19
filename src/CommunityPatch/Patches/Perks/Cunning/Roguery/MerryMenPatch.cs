@@ -33,7 +33,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       }
     };
 
-    public MerryMenPatch() : base("ssljPTUr") {
+    public MerryMenPatch() : base("ssljPTUr", perk => perk.StringId == "RogueryMerryMen") {
     }
 
     public override bool? IsApplicable(Game game) {
