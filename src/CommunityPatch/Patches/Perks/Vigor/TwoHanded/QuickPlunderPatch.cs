@@ -5,10 +5,13 @@ using HarmonyLib;
 using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
+  
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 4, 1)]
   public sealed class QuickPlunderPatch : PerkPatchBase<QuickPlunderPatch> {
     public override bool Applied { get; protected set; }
 
