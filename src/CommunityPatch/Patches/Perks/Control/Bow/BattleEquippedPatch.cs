@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -26,7 +26,7 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
     private static void Postfix(Agent __instance)
       => ApplyPerk(__instance, 6, CanApplyPerk);
 
-    public BattleEquippedPatch() : base("eU0uANvZ") {
+    public BattleEquippedPatch() : base("RGdTKiBN") {
     }
 
   }
