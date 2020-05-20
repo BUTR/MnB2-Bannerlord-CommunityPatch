@@ -3,13 +3,15 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.Source.Missions.Handlers.Logic;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
-
+  
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 4, 1)]
   public sealed class EvisceratorPatch : PerkPatchBase<EvisceratorPatch> {
 
     public override bool Applied { get; protected set; }
