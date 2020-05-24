@@ -31,7 +31,7 @@ namespace CommunityPatch.Patches {
       .GetField("_leftItemListVM", NonPublic | Instance | DeclaredOnly);
     
     internal static readonly FieldInfo RightItemListFieldInfo = typeof(SPInventoryVM)
-      .GetField("_rightItesmListVM", NonPublic | Instance | DeclaredOnly);
+      .GetField("_rightItemListVM", NonPublic | Instance | DeclaredOnly);
       
     internal static bool FoundAllFields = false;
     
