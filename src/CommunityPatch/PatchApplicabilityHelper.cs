@@ -1,13 +1,15 @@
 using System;
 using System.Reflection;
 using HarmonyLib;
+using TaleWorlds.Library;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch {
 
   public static class PatchApplicabilityHelper {
 
-    private static readonly ApplicationVersionComparer VersionComparer = new ApplicationVersionComparer();
+    private static readonly ApplicationVersionComparer VersionComparer = CommunityPatchSubModule.VersionComparer;
+    private static readonly ApplicationVersion GameVersion = CommunityPatchSubModule.GameVersion;
     
     public static String SkippedPatchReason(IPatch patch) {
       var reason = "Skipped";
@@ -20,14 +22,12 @@ namespace CommunityPatch {
     
     public static bool IsPatchObsolete(IPatch patch) {
       var obsolete = patch.GetType().GetCustomAttribute<PatchObsoleteAttribute>();
-      var gameVersion = CommunityPatchSubModule.GameVersion;
-      return obsolete != null && VersionComparer.Compare(gameVersion, obsolete.Version) >= 0;
+      return obsolete != null && VersionComparer.Compare(GameVersion, obsolete.Version) >= 0;
     }
     
     public static bool IsPatchForGameVersion(IPatch patch) {
       var notBefore = patch.GetType().GetCustomAttribute<PatchNotBeforeAttribute>();
-      var gameVersion = CommunityPatchSubModule.GameVersion;
-      return !(notBefore != null && VersionComparer.Compare(gameVersion, notBefore.Version) < 0);
+      return !(notBefore != null && VersionComparer.Compare(GameVersion, notBefore.Version) < 0);
     }
     
     public static bool IsTargetPatchable(MethodInfo targetMethodInfo, byte[][] targetHashes) {
