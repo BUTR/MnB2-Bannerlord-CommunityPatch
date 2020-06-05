@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.Core;
+using static CommunityPatch.PatchApplicabilityHelper;
 
 namespace CommunityPatch {
 
@@ -25,7 +26,7 @@ namespace CommunityPatch {
         }
 
         try {
-          if (patch.IsApplicable(game) ?? false)
+          if (!IsPatchObsolete(patch) && IsPatchForGameVersion(patch) && (patch.IsApplicable(game) ?? false))
             try {
               patch.Apply(game);
             }
@@ -38,10 +39,11 @@ namespace CommunityPatch {
         }
 
         var patchApplied = patch.Applied;
+        
         if (patchApplied)
           ActivePatches[patch.GetType()] = patch;
 
-        ShowMessage($"{(patchApplied ? "Applied" : "Skipped")} Patch: {patch.GetType().Name}");
+        ShowMessage($"{(patchApplied ? "Applied" : SkippedPatchReason(patch))} Patch: {patch.GetType().Name}");
       }
     }
 

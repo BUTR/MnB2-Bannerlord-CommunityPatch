@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 
 namespace CommunityPatch.Patches.Perks.Social.Leadership {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 0, 6)]
   public sealed class DisciplinarianPatch : PerkPatchBase<DisciplinarianPatch> {
 
     public override bool Applied { get; protected set; }
