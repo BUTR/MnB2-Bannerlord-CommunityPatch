@@ -67,7 +67,11 @@ namespace CommunityPatch {
     public static void AddPerkTooltip(List<TooltipProperty> tooltips, PerkObject perk, float bonusValue) {
       if (bonusValue.IsZero()) return;
 
+#if AFTER_E1_4_2
+      var isRate = perk.PrimaryIncrementType == SkillEffect.EffectIncrementType.AddFactor;
+#else
       var isRate = perk.IncrementType == SkillEffect.EffectIncrementType.AddFactor;
+#endif
       var suffix = isRate ? "%" : "";
       var tooltip = new TooltipProperty(perk.Name.ToString(), $"{bonusValue:F1}{suffix}", 0);
       tooltips.Add(tooltip);

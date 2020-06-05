@@ -52,7 +52,11 @@ namespace Patches.Perks.Endurance.Smithing {
         _perkSiegeExpert,
         _perkLegendarySmith.PrimaryRole, _perkLegendarySmith.PrimaryBonus,
         _perkLegendarySmith.SecondaryRole, _perkLegendarySmith.SecondaryBonus,
+#if AFTER_E1_4_2
+        _perkLegendarySmith.PrimaryIncrementType
+#else
         _perkLegendarySmith.IncrementType
+#endif
       );
       Applied = true;
     }
