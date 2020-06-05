@@ -6,11 +6,13 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 4, 2)]
   public sealed class MenuWhenEncounteringAnArmyPatch : PatchBase<MenuWhenEncounteringAnArmyPatch> {
 
     public override bool Applied { get; protected set; }
@@ -43,7 +45,7 @@ namespace CommunityPatch.Patches {
         0x8C, 0x8A, 0x82, 0x38, 0x52, 0xB9, 0x17, 0x3E,
         0x4C, 0x7B, 0x54, 0x23, 0x56, 0x1E, 0x95, 0xF9,
         0xE1, 0x07, 0x74, 0xEF, 0x04, 0xD7, 0x92, 0xDC
-      }
+      },
     };
 
     public override void Reset() {
