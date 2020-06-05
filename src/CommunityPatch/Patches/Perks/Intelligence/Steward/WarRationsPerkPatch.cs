@@ -91,7 +91,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
       var explainedNumber = new ExplainedNumber(__result, explainer);
       explainer?.Lines.RemoveAt(explainer.Lines.Count - 1);
+#if AFTER_E1_4_2
+      switch (perk.PrimaryIncrementType) {
+#else
       switch (perk.IncrementType) {
+#endif
         case SkillEffect.EffectIncrementType.Add:
           explainedNumber.Add(perk.PrimaryBonus, perk.Name);
           break;
