@@ -4,11 +4,13 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
+  [PatchNotBefore(ApplicationVersionType.EarlyAccess, 1, 3)]
   public sealed class BuilderPatch2 : PerkPatchBase<BuilderPatch2> {
 
     public override bool Applied { get; protected set; }
