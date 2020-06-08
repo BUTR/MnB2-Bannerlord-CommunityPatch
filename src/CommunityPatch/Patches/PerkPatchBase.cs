@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using CommunityPatchAnalyzer;
 using JetBrains.Annotations;
@@ -14,13 +15,22 @@ namespace CommunityPatch {
     [PublicAPI]
     public string PerkId { get; }
 
+    private readonly Func<PerkObject, bool> _finder;
+
     private PerkObject _perk;
 
     [PublicAPI]
     public string PerkName => LocalizedTextManager.GetTranslatedText(BannerlordConfig.Language, PerkId);
 
-    protected PerkPatchBase(string perkId)
-      => PerkId = perkId;
+    protected PerkPatchBase(string perkId) {
+      PerkId = perkId;
+      _finder = perk => perk.Name.GetID() == perkId;
+    }
+
+    protected PerkPatchBase(string perkId, Func<PerkObject, bool> disambiguation) {
+      PerkId = perkId;
+      _finder = perk => perk.Name.GetID() == perkId && disambiguation(perk);
+    }
 
     [PublicAPI]
     [CanBeNull]
@@ -30,7 +40,7 @@ namespace CommunityPatch {
         if (_perk != null)
           return _perk;
 
-        _perk = PerkObjectHelpers.Load(PerkId);
+        _perk = PerkObjectHelpers.Load(_finder);
 
         if (_perk == null) {
           //throw new KeyNotFoundException($"Can't find the {PerkName} ({_perkId}) perk.");
