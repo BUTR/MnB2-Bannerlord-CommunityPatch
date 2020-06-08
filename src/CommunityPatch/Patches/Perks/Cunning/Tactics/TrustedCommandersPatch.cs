@@ -72,7 +72,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         _perk.AlternativePerk,
         _perk.PrimaryRole, 50f,
         _perk.SecondaryRole, _perk.SecondaryBonus,
+#if AFTER_E1_4_2
+        _perk.PrimaryIncrementType
+#else
         _perk.IncrementType
+#endif
       );
 
       if (Applied) return;

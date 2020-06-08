@@ -38,7 +38,11 @@ namespace CommunityPatch.Patches.Perks.Control.Crossbow {
     }
 
     protected override bool AppliesToVersion(Game game)
+#if AFTER_E1_4_2
+      => VersionComparer.GreaterThan(GameVersion, ApplicationVersion.FromString("e1.0.0", ApplicationVersionGameType.Singleplayer));
+#else
       => VersionComparer.GreaterThan(GameVersion, ApplicationVersion.FromString("e1.0.0"));
+#endif
 
     // ReSharper disable once InconsistentNaming
 

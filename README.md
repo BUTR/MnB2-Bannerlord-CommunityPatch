@@ -169,6 +169,7 @@ If your Bannerlord or local repo are in a different place, you can change the pr
 * [iPherian](https://www.nexusmods.com/users/86335488)
 * [miguelcjalmeida](https://github.com/miguelcjalmeida)
 * [Eagle](https://github.com/JoeFwd) ([Discord](https://discordapp.com/users/242802595347955715))
+* [fnzr](https://github.com/fnzr)
 
 ##### Others
 * Xaphedo for providing the banner art

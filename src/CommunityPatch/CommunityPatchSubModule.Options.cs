@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using CommunityPatch.Patches;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static CommunityPatch.PatchApplicabilityHelper;
 
 namespace CommunityPatch {
 
@@ -44,11 +46,13 @@ namespace CommunityPatch {
         null
       ));
 
+#if !AFTER_E1_4_2
       elements.Add(new InquiryElement(
         nameof(EnableMenuWhenEncouteringAnArmy),
         EnableMenuWhenEncouteringAnArmy ? " Disable Menu When Encountering an Army" : "Enable Menu When Encountering an Army",
         null
       ));
+#endif
 
       elements.Add(new InquiryElement(
         nameof(RecordFirstChanceExceptions),

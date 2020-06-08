@@ -10,7 +10,11 @@ namespace CommunityPatch {
       => perk.SetPrimary(perk.PrimaryRole, primaryBonus);
 
     public static void SetPrimary(this PerkObject perk, SkillEffect.PerkRole primaryRole, float primaryBonus)
+#if AFTER_E1_4_2
+      => perk.Modify(primaryRole, primaryBonus, perk.PrimaryIncrementType);
+#else
       => perk.Modify(primaryRole, primaryBonus, perk.IncrementType);
+#endif
 
     public static void SetIncrementType(this PerkObject perk, SkillEffect.EffectIncrementType incrementType)
       => perk.Modify(perk.PrimaryRole, perk.PrimaryBonus, incrementType);

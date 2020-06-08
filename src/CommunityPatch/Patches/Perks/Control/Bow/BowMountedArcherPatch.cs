@@ -36,7 +36,12 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
     }
 
     protected override bool AppliesToVersion(Game game)
+#if AFTER_E1_4_2
+      => CommunityPatchSubModule.VersionComparer.GreaterThan(CommunityPatchSubModule.GameVersion, ApplicationVersion.FromString("e1.0.0", ApplicationVersionGameType.Singleplayer));
+#else
       => CommunityPatchSubModule.VersionComparer.GreaterThan(CommunityPatchSubModule.GameVersion, ApplicationVersion.FromString("e1.0.0"));
+#endif
+      
 
     [UsedImplicitly]
     // workaround for https://github.com/pardeike/Harmony/issues/286
