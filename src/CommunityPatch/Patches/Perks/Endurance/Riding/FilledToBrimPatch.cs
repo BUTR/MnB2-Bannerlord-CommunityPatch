@@ -16,8 +16,6 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
     private static readonly MethodInfo TargetMethodInfo = typeof(DefaultInventoryCapacityModel).GetMethod("CalculateInventoryCapacity", Public | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfoPrefix = typeof(FilledToBrimPatch).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
-
     private static readonly MethodInfo PatchMethodInfoPostfix = typeof(FilledToBrimPatch).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);
 
     public override IEnumerable<MethodBase> GetMethodsChecked() {
