@@ -15,16 +15,19 @@ namespace CommunityPatch.Patches {
     public virtual void AddPartySizeLimitBonus(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
 
+      if (party == null || explanation == null || perk == null)
+        return;
+      
       var extra = 0;
       if (perk.PrimaryRole == SkillEffect.PerkRole.PartyMember) {
-        extra = (int) perk.PrimaryBonus * party?.MemberRoster?
+        extra = (int) perk.PrimaryBonus * party.MemberRoster?
           .Count(x =>
             x.Character != null
             && x.Character.IsHero
             && x.Character.HeroObject != null
             && x.Character.HeroObject.GetPerkValue(perk)
           ) ?? 0;
-      } else if (perk.PrimaryRole == SkillEffect.PerkRole.Personal && (party?.LeaderHero?.GetPerkValue(perk) ?? false)) {
+      } else if (party.HasPerk(perk)) {
         extra = (int) perk.PrimaryBonus;
       }
 
@@ -33,7 +36,7 @@ namespace CommunityPatch.Patches {
 
       AddExplainedPartySizeLimitBonus(ref partySizeLimit, extra, explanation);
     }
-    
+
     protected static void AddExplainedPartySizeLimitBonus(ref int partySizeLimit, int extra, StatExplainer explanation) {
       var explainedNumber = new ExplainedNumber(partySizeLimit, explanation);
       var baseLine = explanation?.Lines?.Find(explainedLine => explainedLine?.Name == "Base");

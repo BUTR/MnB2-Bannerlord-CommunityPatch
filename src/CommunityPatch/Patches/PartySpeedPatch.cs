@@ -6,7 +6,7 @@ using TaleWorlds.Core;
 
 namespace CommunityPatch.Patches {
   public sealed class PartySpeedPatch : PatchBase<PartySpeedPatch> {
-    private List<IPartySpeedSubPatch> _subpatches;
+    private List<IPartySpeedSubPatch> _subPatches;
 
     public static readonly byte[][] Hashes = {
       new byte[] {
@@ -20,7 +20,7 @@ namespace CommunityPatch.Patches {
 
     public override void Apply(Game game) {
       if (!Applied) {
-        _subpatches = CommunityPatchSubModule.Patches
+        _subPatches = CommunityPatchSubModule.Patches
           .Where(p => p is IPartySpeedSubPatch && p.IsApplicable(game) == true)
           .Cast<IPartySpeedSubPatch>()
           .ToList();
@@ -34,10 +34,8 @@ namespace CommunityPatch.Patches {
         return;
       }
       var finalSpeed = new ExplainedNumber(__result, explanation);
-      foreach (var subpatch in ActivePatch._subpatches) {
-        if (mobileParty.HasPerk(subpatch.Perk)) {
-          subpatch.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed);
-        }
+      foreach (var subPatch in ActivePatch._subPatches) {
+        subPatch.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed);
       }
       __result = finalSpeed.ResultNumber;
     }
