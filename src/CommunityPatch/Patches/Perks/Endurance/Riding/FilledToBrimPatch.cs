@@ -69,15 +69,9 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        // new HarmonyMethod(PatchMethodInfoPrefix),
         postfix: new HarmonyMethod(PatchMethodInfoPostfix));
       Applied = true;
     }
-
-    // ReSharper disable once InconsistentNaming
-
-    private static void Prefix(ref StatExplainer explanation)
-      => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
 
