@@ -27,7 +27,7 @@ namespace CommunityPatch {
         }
 
         try {
-          if (!patch.IsObsolete() && patch.IsCompatibleWithGameVersion() && (patch.IsApplicable(game) ?? false))
+          if (patch.IsCompatibleWithGameVersion() && (patch.IsApplicable(game) ?? false))
             try {
               patch.Apply(game);
             }
