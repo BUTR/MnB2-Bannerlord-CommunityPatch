@@ -27,7 +27,7 @@ namespace CommunityPatch {
         }
 
         try {
-          if (!IsPatchObsolete(patch) && IsPatchForGameVersion(patch) && (patch.IsApplicable(game) ?? false))
+          if (!patch.IsObsolete() && patch.IsCompatibleWithGameVersion() && (patch.IsApplicable(game) ?? false))
             try {
               patch.Apply(game);
             }
@@ -44,7 +44,7 @@ namespace CommunityPatch {
         if (patchApplied)
           ActivePatches[patch.GetType()] = patch;
 
-        ShowMessage($"{(patchApplied ? "Applied" : SkippedPatchReason(patch))} Patch: {patch.GetType().Namespace.Split('.').Last()}.{patch.GetType().Name}");
+        ShowMessage($"{(patchApplied ? "Applied" : patch.SkippedPatchReason())} Patch: {patch.GetType().Namespace.Split('.').Last()}.{patch.GetType().Name}");
       }
     }
 
