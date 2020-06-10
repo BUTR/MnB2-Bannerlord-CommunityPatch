@@ -35,9 +35,17 @@ We also use ReSharper C++ with Visual Studio.
     * Peak Form
   * Leadership
     * Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub>
-    * Ultimate Leader
+    * Ultimate Leader <sub><sup>Changed to Ultimate Leader II in e1.4.1</sup></sub>
+    * Ultimate Leader I
+    * Ultimate Leader II
   * Scouting
     * Healthy Scout
+    * PathFinder
+    * Night Vision <sub><sup>(former name : Torch Carriers)<sub><sup>
+    * Navigator
+    * Investigator
+    * Farsighted
+    * Eye for Ambush <sub><sup>(former name : Ambusher)<sub><sup>
   * Riding
     * Spare Arrows
     * Spare Throwing Weapon
@@ -53,12 +61,14 @@ We also use ReSharper C++ with Visual Studio.
     * Mounted Archer
     * Large Quiver
     * Battle Equipped
+    * Merry Men
   * Crossbow
     * Crossbow Cavalry
   * Throwing
     * Fully Armed
     * Concealed Carry
     * Battle Ready
+    * Skirmishers
   * Steward
     * Agrarian
     * Assessor
@@ -103,8 +113,8 @@ We also use ReSharper C++ with Visual Studio.
     * Merry men
     * Concealed Blade
   * Two Handed
-    * Quick Plunder
-    * Eviscerate
+    * Quick Plunder <sub><sup>Deleted in e1.4.1+</sup></sub>
+    * Eviscerate <sub><sup>Deleted in e1.4.1+</sup></sub>
   * Tactics
     * Companion Cavalry
     * Tactical Superiority
@@ -116,6 +126,8 @@ We also use ReSharper C++ with Visual Studio.
     * Phalanx
     * Hammer and Anvil
     * Trusted Commander
+  * Trade
+    * Mercenary Trader
 * Policies
   * Land Grants For Veterans
 * Feats
@@ -132,7 +144,7 @@ We also use ReSharper C++ with Visual Studio.
 
 ### Current Features
 * Enable and Disable the Intro Video
-* Enable and Disable Menu when encountering a neutral or enemy army.
+* Enable and Disable Menu when encountering a neutral or enemy army. <sub>Added to the game in e1.4.2<sup>
 * Generate Diagnostic Report
 * Toggle recording First Chance Exception info (don't use unless troubleshooting bugs)
 * Automatically capture Diagnostic Info to the Clipboard when an Unhandled Exception crash occurs
