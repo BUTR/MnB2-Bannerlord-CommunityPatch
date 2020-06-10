@@ -69,30 +69,40 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo,
-        new HarmonyMethod(PatchMethodInfoPrefix),
-        new HarmonyMethod(PatchMethodInfoPostfix));
+        postfix: new HarmonyMethod(PatchMethodInfoPostfix));
       Applied = true;
     }
-
-    // ReSharper disable once InconsistentNaming
-
-    private static void Prefix(ref StatExplainer explanation)
-      => explanation ??= new StatExplainer();
 
     // ReSharper disable once InconsistentNaming
 
     private static void Postfix(ref int __result, MobileParty mobileParty, StatExplainer explanation, bool includeFollowers) {
       var perk = ActivePatch.Perk;
 
-      if (!(mobileParty.LeaderHero?.GetPerkValue(perk) ?? false))
+      var heroesHavePerk = mobileParty.MemberRoster?
+        .Count(x =>
+          x.Character != null
+          && x.Character.IsHero
+          && x.Character.HeroObject != null
+          && x.Character.HeroObject.GetPerkValue(perk)
+        ) ?? 0;
+
+      var extra = 20 * mobileParty.Party.NumberOfPackAnimals * heroesHavePerk + (includeFollowers ? mobileParty.AttachedParties.Sum(x => x.Party.NumberOfPackAnimals) : 0);
+      if (extra <= 0)
         return;
-
-      var explainedNumber = new ExplainedNumber(__result, explanation);
-      var extra = 20 * mobileParty.Party.NumberOfPackAnimals + (includeFollowers ? mobileParty.AttachedParties.Sum(x => x.Party.NumberOfPackAnimals) : 0);
-      explainedNumber.Add(extra, perk.Name);
-      __result = (int) explainedNumber.ResultNumber;
+      
+      AddExplainedBonus(ref __result, extra, explanation);
     }
+    
+    private static void AddExplainedBonus(ref int inventoryCapacityLimit, int extra, StatExplainer explanation) {
+      var explainedNumber = new ExplainedNumber(inventoryCapacityLimit, explanation);
+      var baseLine = explanation?.Lines?.FindLast(explainedLine => explainedLine?.Name == "Base");
+      if (baseLine != null)
+        explanation.Lines.Remove(baseLine);
 
+      explainedNumber.Add(extra, ActivePatch.Perk.Name);
+      inventoryCapacityLimit = (int) explainedNumber.ResultNumber;
+    }
+    
   }
 
 }

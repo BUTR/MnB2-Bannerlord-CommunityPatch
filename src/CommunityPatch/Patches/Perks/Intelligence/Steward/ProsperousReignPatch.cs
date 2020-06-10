@@ -8,7 +8,7 @@ using TaleWorlds.Core;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
-namespace CommunityPatch.Patches {
+namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
   public sealed class ProsperousReignPatch : PerkPatchBase<ProsperousReignPatch> {
 

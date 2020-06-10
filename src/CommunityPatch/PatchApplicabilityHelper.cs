@@ -11,23 +11,25 @@ namespace CommunityPatch {
     private static readonly ApplicationVersionComparer VersionComparer = CommunityPatchSubModule.VersionComparer;
     private static readonly ApplicationVersion GameVersion = CommunityPatchSubModule.GameVersion;
     
-    public static String SkippedPatchReason(IPatch patch) {
-      var reason = "Skipped";
-      if (IsPatchObsolete(patch))
-        reason = "Obsolete";
-      if (!IsPatchForGameVersion(patch))
-        reason = "Non compatible";
-      return reason;
+    public static String SkippedPatchReason(this IPatch patch) {
+      if (patch.IsObsolete())
+        return "Obsolete";
+      
+      if (!patch.IsCompatibleWithGameVersion())
+        return "Non compatible";
+      
+      return "Skipped";
     }
     
-    public static bool IsPatchObsolete(IPatch patch) {
+    public static bool IsObsolete(this IPatch patch) {
       var obsolete = patch.GetType().GetCustomAttribute<PatchObsoleteAttribute>();
       return obsolete != null && VersionComparer.Compare(GameVersion, obsolete.Version) >= 0;
     }
     
-    public static bool IsPatchForGameVersion(IPatch patch) {
+    public static bool IsCompatibleWithGameVersion(this IPatch patch) {
       var notBefore = patch.GetType().GetCustomAttribute<PatchNotBeforeAttribute>();
-      return !(notBefore != null && VersionComparer.Compare(GameVersion, notBefore.Version) < 0);
+      return !(notBefore != null && VersionComparer.Compare(GameVersion, notBefore.Version) < 0)
+        && !patch.IsObsolete();
     }
     
     public static bool IsTargetPatchable(MethodInfo targetMethodInfo, byte[][] targetHashes) {

@@ -1,13 +1,11 @@
 using TaleWorlds.CampaignSystem;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
-  public sealed class PathfinderPatch : PartySpeedSubPatch<PathfinderPatch>, IPartySpeedSubPatch {
+  public sealed class PathfinderPatch : PartySpeedSubPatch<PathfinderPatch> {
     public PathfinderPatch() : base("d2qGHXyx") { }
 
-    void IPartySpeedSubPatch.ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed) {
-      if (Campaign.Current.IsDay) {
-        finalSpeed.AddFactor(Perk.PrimaryBonus, Perk.Name);
-      }
-    }
+    protected override bool IsPerkConditionFulfilled(MobileParty mobileParty, float baseSpeed, ExplainedNumber finalSpeed)
+      => Campaign.Current.IsDay;
+
   }
 }

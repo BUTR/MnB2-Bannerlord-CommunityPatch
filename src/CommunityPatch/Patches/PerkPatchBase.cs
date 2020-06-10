@@ -27,6 +27,10 @@ namespace CommunityPatch {
       _finder = perk => perk.Name.GetID() == perkId;
     }
 
+    protected PerkPatchBase(Func<PerkObject, bool> perkFinder) {
+      _finder = perkFinder;
+    }
+    
     protected PerkPatchBase(string perkId, Func<PerkObject, bool> disambiguation) {
       PerkId = perkId;
       _finder = perk => perk.Name.GetID() == perkId && disambiguation(perk);

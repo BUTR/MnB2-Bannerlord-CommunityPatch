@@ -7,6 +7,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using TaleWorlds.Core;
 
+using static CommunityPatch.PatchApplicabilityHelper;
 using static CommunityPatch.HarmonyHelpers;
 using static HarmonyLib.AccessTools;
 
@@ -39,6 +40,10 @@ namespace CommunityPatch {
     }
 
     public virtual bool? IsApplicable(Game game) {
+      if (!this.IsCompatibleWithGameVersion()) {
+        return false;
+      }
+      
       foreach (var targetMethod in PatchedMethodsInfo.Keys) {
         var patchInfo = Harmony.GetPatchInfo(targetMethod);
         if (AlreadyPatchedByOthers(patchInfo)) {
