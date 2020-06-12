@@ -15,9 +15,9 @@ namespace CommunityPatch.Patches {
     public virtual void ModifyPartySizeLimit(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
 
-      if (party == null || explanation == null || perk == null)
+      if (party == null || perk == null || !party.HasPerk(perk))
         return;
-      
+
       var extra = 0;
       if (perk.PrimaryRole == SkillEffect.PerkRole.PartyMember) {
         extra = (int) perk.PrimaryBonus * party.MemberRoster?

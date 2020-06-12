@@ -15,10 +15,7 @@ namespace CommunityPatch.Patches {
 
     public void ModifyDailyFoodConsumption(ref float dailyFoodConsumption, MobileParty mobileParty, StatExplainer dailyFoodConsumptionExplanation) {
 
-      if (mobileParty == null || _perk == null)
-        return;
-      
-      if (!mobileParty.HasPerk(_perk))
+      if (mobileParty == null || _perk == null || !mobileParty.HasPerk(_perk))
         return;
       
       var extra = Math.Abs(dailyFoodConsumption) / 2;

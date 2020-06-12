@@ -1,7 +1,6 @@
 using Patches;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using static TaleWorlds.Core.TerrainType;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
 
@@ -21,7 +20,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     }
 
     public void ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed) {
-      if (mobileParty.IsInTerrainType(Mountain) || mobileParty.IsInTerrainType(Canyon) || mobileParty.IsInTerrainType(Dune))
+      if (mobileParty.IsInHillTerrain())
         _modifyPartySpeed.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed); 
     }
 
