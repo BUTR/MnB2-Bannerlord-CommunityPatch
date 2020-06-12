@@ -6,9 +6,9 @@ using TaleWorlds.Core;
 
 namespace CommunityPatch.Patches {
 
-  public class InfluenceGainEachDayPatch : PatchBase<InfluenceGainEachDayPatch> {
+  public class DailyInfluenceGainPatch : PatchBase<DailyInfluenceGainPatch> {
 
-    private static List<IInfluenceGainEachDaySubPatch> _subPatches;
+    private static List<IDailyInfluenceGain> _subPatches;
     
     public static readonly byte[][] Hashes = {
       new byte[] {
@@ -52,8 +52,8 @@ namespace CommunityPatch.Patches {
       if (Applied) return;
 
       _subPatches = CommunityPatchSubModule.Patches
-        .Where(p => p is IInfluenceGainEachDaySubPatch && p.IsApplicable(game) == true)
-        .Cast<IInfluenceGainEachDaySubPatch>()
+        .Where(p => p is IDailyInfluenceGain && p.IsApplicable(game) == true)
+        .Cast<IDailyInfluenceGain>()
         .ToList();
 
       base.Apply(game);
@@ -62,7 +62,7 @@ namespace CommunityPatch.Patches {
     [PatchClass(typeof(DefaultClanPoliticsModel))]
     private static void CalculateInfluenceChangeInternalPostfix(Clan clan, ref ExplainedNumber influenceChange) {
       foreach (var subPatch in _subPatches) {
-        subPatch.AddInfluenceGainBonus(clan, ref influenceChange);
+        subPatch.ModifyDailyInfluenceGain(clan, ref influenceChange);
       }
     }
 

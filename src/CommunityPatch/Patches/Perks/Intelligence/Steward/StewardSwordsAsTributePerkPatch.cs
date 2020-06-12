@@ -9,7 +9,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     public SwordsAsTributePatch() : base("7fHHThQr") { }
 
-    public override void AddPartySizeLimitBonus(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
+    public override void ModifyPartySizeLimit(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
 
       var perk = ActivePatch.Perk;
       var hero = party.LeaderHero;

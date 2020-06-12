@@ -10,11 +10,11 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class ProminencePatch : InfluenceGainEachDaySubPatch<ProminencePatch> {
+  public sealed class ProminencePatch : DailyInfluenceGainSubPatch<ProminencePatch> {
 
     public ProminencePatch() : base("71EyPbaE") { }
 
-    public override void AddInfluenceGainBonus(Clan clan, ref ExplainedNumber influenceChange) {
+    public override void ModifyDailyInfluenceGain(Clan clan, ref ExplainedNumber influenceChange) {
       var perk = ActivePatch.Perk;
 
       if (clan?.IsUnderMercenaryService ?? true)

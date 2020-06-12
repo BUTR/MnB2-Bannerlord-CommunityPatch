@@ -1,9 +1,8 @@
 using TaleWorlds.CampaignSystem;
 
 namespace CommunityPatch.Patches {
-  public interface IPartySpeedSubPatch : IPatch {
-    PerkObject Perk { get; }
-
+  public interface IPartySpeed {
     void ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed);
+    
   }
 }

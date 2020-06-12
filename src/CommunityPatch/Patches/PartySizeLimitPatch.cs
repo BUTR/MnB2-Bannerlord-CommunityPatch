@@ -8,7 +8,7 @@ namespace CommunityPatch.Patches {
 
   public class PartySizeLimitPatch : PatchBase<PartySizeLimitPatch> {
 
-    private static List<IPartySizeLimitSubPatch> _subPatches;
+    private static List<IPartySizeLimit> _subPatches;
     
     public static readonly byte[][] Hashes = {
       new byte[] {
@@ -45,8 +45,8 @@ namespace CommunityPatch.Patches {
       if (Applied) return;
 
       _subPatches = CommunityPatchSubModule.Patches
-        .Where(p => p is IPartySizeLimitSubPatch && p.IsApplicable(game) == true)
-        .Cast<IPartySizeLimitSubPatch>()
+        .Where(p => p is IPartySizeLimit && p.IsApplicable(game) == true)
+        .Cast<IPartySizeLimit>()
         .ToList();
 
       base.Apply(game);
@@ -55,7 +55,7 @@ namespace CommunityPatch.Patches {
     [PatchClass(typeof(DefaultPartySizeLimitModel))]
     private static void CalculateMobilePartyMemberSizeLimitPostfix(ref int __result, MobileParty party, StatExplainer explanation) {
       foreach (var subPatch in _subPatches) {
-        subPatch.AddPartySizeLimitBonus(ref __result, party, explanation);
+        subPatch.ModifyPartySizeLimit(ref __result, party, explanation);
       }
     }
 
