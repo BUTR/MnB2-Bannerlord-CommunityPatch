@@ -4,7 +4,7 @@ using TaleWorlds.CampaignSystem;
 
 namespace CommunityPatch.Patches {
 
-  public abstract class PartySizeLimitSubPatch<TPatch> : PerkPatchBase<TPatch>, IPartySizeLimitSubPatch where TPatch : PartySizeLimitSubPatch<TPatch> {
+  public abstract class PartySizeLimitSubPatch<TPatch> : PerkPatchBase<TPatch>, IPartySizeLimit where TPatch : PartySizeLimitSubPatch<TPatch> {
 
     protected PartySizeLimitSubPatch(string perkId) : base(perkId) { }
 
@@ -12,12 +12,12 @@ namespace CommunityPatch.Patches {
     
     protected PartySizeLimitSubPatch(Func<PerkObject, bool> perkFinder) : base(perkFinder) { }
 
-    public virtual void AddPartySizeLimitBonus(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
+    public virtual void ModifyPartySizeLimit(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
       var perk = ActivePatch.Perk;
 
-      if (party == null || explanation == null || perk == null)
+      if (party == null || perk == null || !party.HasPerk(perk))
         return;
-      
+
       var extra = 0;
       if (perk.PrimaryRole == SkillEffect.PerkRole.PartyMember) {
         extra = (int) perk.PrimaryBonus * party.MemberRoster?

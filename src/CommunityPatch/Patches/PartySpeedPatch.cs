@@ -6,7 +6,7 @@ using TaleWorlds.Core;
 
 namespace CommunityPatch.Patches {
   public sealed class PartySpeedPatch : PatchBase<PartySpeedPatch> {
-    private List<IPartySpeedSubPatch> _subPatches;
+    private List<IPartySpeed> _subPatches;
 
     public static readonly byte[][] Hashes = {
       new byte[] {
@@ -21,8 +21,8 @@ namespace CommunityPatch.Patches {
     public override void Apply(Game game) {
       if (!Applied) {
         _subPatches = CommunityPatchSubModule.Patches
-          .Where(p => p is IPartySpeedSubPatch && p.IsApplicable(game) == true)
-          .Cast<IPartySpeedSubPatch>()
+          .Where(p => p is IPartySpeed && p.IsApplicable(game) == true)
+          .Cast<IPartySpeed>()
           .ToList();
         base.Apply(game);
       }
@@ -30,9 +30,6 @@ namespace CommunityPatch.Patches {
 
     [PatchClass(typeof(DefaultPartySpeedCalculatingModel))]
     private static void CalculateFinalSpeedPostfix(ref float __result, MobileParty mobileParty, float baseSpeed, StatExplainer explanation) {
-      if (mobileParty.LeaderHero is null) {
-        return;
-      }
       var finalSpeed = new ExplainedNumber(__result, explanation);
       foreach (var subPatch in ActivePatch._subPatches) {
         subPatch.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed);

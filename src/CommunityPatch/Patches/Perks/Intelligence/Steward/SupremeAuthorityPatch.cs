@@ -10,11 +10,11 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
-  public sealed class SupremeAuthorityPatch : InfluenceGainEachDaySubPatch<SupremeAuthorityPatch> {
+  public sealed class SupremeAuthorityPatch : DailyInfluenceGainSubPatch<SupremeAuthorityPatch> {
 
     public SupremeAuthorityPatch() : base("SFjspNSf") { }
 
-    public override void AddInfluenceGainBonus(Clan clan, ref ExplainedNumber influenceChange) {
+    public override void ModifyDailyInfluenceGain(Clan clan, ref ExplainedNumber influenceChange) {
       var perk = ActivePatch.Perk;
 
       var ruler = clan?.Kingdom?.Ruler;

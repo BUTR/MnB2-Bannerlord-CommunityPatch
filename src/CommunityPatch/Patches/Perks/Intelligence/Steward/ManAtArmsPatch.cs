@@ -8,7 +8,7 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Steward {
 
     public ManAtArmsPatch() : base("WVLzi1fa") { }
 
-    public override void AddPartySizeLimitBonus(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
+    public override void ModifyPartySizeLimit(ref int partySizeLimit, MobileParty party, StatExplainer explanation) {
 
       var perk = ActivePatch.Perk;
       if (!(party.LeaderHero?.GetPerkValue(perk) ?? false))

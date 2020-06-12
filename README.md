@@ -36,16 +36,22 @@ We also use ReSharper C++ with Visual Studio.
   * Leadership
     * Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub>
     * Ultimate Leader <sub><sup>Changed to Ultimate Leader II in e1.4.1</sup></sub>
-    * Ultimate Leader I
-    * Ultimate Leader II
-  * Scouting
+    * Ultimate Leader II <sub><sup>Fixed in e1.4.2</sup></sub>
+  * Scouting (Fully implemented)
     * Healthy Scout
     * PathFinder
-    * Night Vision <sub><sup>(former name : Torch Carriers)<sub><sup>
+    * Night Vision <sub><sup>(Former name : Torch Carriers)<sub><sup>
     * Navigator
     * Investigator
     * Farsighted
-    * Eye for Ambush <sub><sup>(former name : Ambusher)<sub><sup>
+    * Eye for Ambush <sub><sup>(Former name : Ambusher)<sub><sup>
+    * Forest Lore
+    * Desert Lore
+    * Hills Lore
+    * Marshes Lore
+    * Forced March
+    * Grassland Navigator
+    * Lay of the land
   * Riding
     * Spare Arrows
     * Spare Throwing Weapon
@@ -144,7 +150,7 @@ We also use ReSharper C++ with Visual Studio.
 
 ### Current Features
 * Enable and Disable the Intro Video
-* Enable and Disable Menu when encountering a neutral or enemy army. <sub>Added to the game in e1.4.2<sup>
+* Enable and Disable Menu when encountering a neutral or enemy army. <sub><sub>Added to the game in e1.4.2<sup><sub>
 * Generate Diagnostic Report
 * Toggle recording First Chance Exception info (don't use unless troubleshooting bugs)
 * Automatically capture Diagnostic Info to the Clipboard when an Unhandled Exception crash occurs
