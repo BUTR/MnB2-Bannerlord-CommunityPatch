@@ -7,10 +7,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
 
   public class GrasslandNavigatorPatch : PerkPatchBase<GrasslandNavigatorPatch>, IPartySpeed {
 
-    private readonly IPartySpeed _modifyPartySpeed;
-
-    public GrasslandNavigatorPatch() : base("Ekqj9IFR")
-      => _modifyPartySpeed = new ModifyPartySpeed(Perk);
+    public GrasslandNavigatorPatch() : base("Ekqj9IFR") { }
 
     public override void Apply(Game game) {
       Perk.SetPrimaryBonus(0.05f);
@@ -18,8 +15,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
     }
 
     public void ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed) {
-      if (!mobileParty.IsInSnowyTerrain() && mobileParty.IsInTerrainType(Plain) || mobileParty.IsInTerrainType(Steppe))
-        _modifyPartySpeed.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed); 
+      if (mobileParty.IsInSnowyTerrain() || !mobileParty.IsInTerrainType(Plain) && !mobileParty.IsInTerrainType(Steppe))
+        return;
+      
+      IPartySpeed modifyPartySpeed = new ModifyPartySpeed(Perk);
+      modifyPartySpeed.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed); 
     }
 
   }

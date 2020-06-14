@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using CommunityPatchAnalyzer;
 using JetBrains.Annotations;
@@ -47,7 +48,6 @@ namespace CommunityPatch {
         _perk = PerkObjectHelpers.Load(_finder);
 
         if (_perk == null) {
-          //throw new KeyNotFoundException($"Can't find the {PerkName} ({_perkId}) perk.");
           CommunityPatchSubModule.Error($"Can't find the {PerkName} ({PerkId}) perk.");
         }
 
