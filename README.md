@@ -37,7 +37,7 @@ We also use ReSharper C++ with Visual Studio.
     * Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub>
     * Ultimate Leader <sub><sup>Changed to Ultimate Leader II in e1.4.1</sup></sub>
     * Ultimate Leader II <sub><sup>Fixed in e1.4.2</sup></sub>
-  * Scouting (Fully implemented)
+  * Scouting
     * Healthy Scout
     * PathFinder
     * Night Vision <sub><sup>(Former name : Torch Carriers)<sub><sup>
@@ -134,6 +134,7 @@ We also use ReSharper C++ with Visual Studio.
     * Trusted Commander
   * Trade
     * Mercenary Trader
+    * Influential Merchant
 * Policies
   * Land Grants For Veterans
 * Feats
