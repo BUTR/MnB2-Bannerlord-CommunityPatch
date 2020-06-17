@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
@@ -13,7 +12,7 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches {
 
   [PatchObsolete(ApplicationVersionType.EarlyAccess, 1, 4, 2)]
-  public sealed class MenuWhenEncounteringAnArmyPatch : PatchBase<MenuWhenEncounteringAnArmyPatch> {
+  public sealed class TalkToOtherLordsInAnArmyPatch : PatchBase<TalkToOtherLordsInAnArmyPatch> {
 
     public override bool Applied { get; protected set; }
 
@@ -21,7 +20,7 @@ namespace CommunityPatch.Patches {
       typeof(PlayerEncounter)
         .GetMethod("DoMeetingInternal", NonPublic | Instance | DeclaredOnly);
 
-    private static readonly MethodInfo PatchMethodInfo = typeof(MenuWhenEncounteringAnArmyPatch)
+    private static readonly MethodInfo PatchMethodInfo = typeof(TalkToOtherLordsInAnArmyPatch)
       .GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);
 
     public static readonly byte[][] Hashes = {
@@ -69,7 +68,7 @@ namespace CommunityPatch.Patches {
         return false;
 
       if (EncounteredPartyField == null || MapEventStateField == null || StateHandledField == null || DefenderPartyField == null || MeetingDoneField == null) {
-        CommunityPatchSubModule.Error($"{nameof(MenuWhenEncounteringAnArmyPatch)}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
+        CommunityPatchSubModule.Error($"{nameof(TalkToOtherLordsInAnArmyPatch)}: Could not locate all of necessary private fields for patching." + Environment.NewLine);
         return false;
       }
 
@@ -88,7 +87,7 @@ namespace CommunityPatch.Patches {
     private static readonly FieldInfo MeetingDoneField = typeof(PlayerEncounter).GetField("_meetingDone", Instance | NonPublic);
 
     private static bool Prefix(PlayerEncounter __instance) {
-      if (!CommunityPatchSubModule.EnableMenuWhenEncouteringAnArmy)
+      if (!CommunityPatchSubModule.EnableTalkToOtherLordsInAnArmy)
         return true;
 
       var attacker = (PartyBase) EncounteredPartyField.GetValue(__instance);

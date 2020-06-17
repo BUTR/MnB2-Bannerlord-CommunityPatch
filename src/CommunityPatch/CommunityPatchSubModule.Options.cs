@@ -16,9 +16,9 @@ namespace CommunityPatch {
       set => Options.Set(nameof(DisableIntroVideo), value);
     }
 
-    internal static bool EnableMenuWhenEncouteringAnArmy {
-      get => Options.Get<bool>(nameof(EnableMenuWhenEncouteringAnArmy));
-      set => Options.Set(nameof(EnableMenuWhenEncouteringAnArmy), value);
+    internal static bool EnableTalkToOtherLordsInAnArmy {
+      get => Options.Get<bool>(nameof(EnableTalkToOtherLordsInAnArmy));
+      set => Options.Set(nameof(EnableTalkToOtherLordsInAnArmy), value);
     }
 
     internal static bool RecordFirstChanceExceptions {
@@ -48,8 +48,8 @@ namespace CommunityPatch {
 
 #if !AFTER_E1_4_2
       elements.Add(new InquiryElement(
-        nameof(EnableMenuWhenEncouteringAnArmy),
-        EnableMenuWhenEncouteringAnArmy ? " Disable Menu When Encountering an Army" : "Enable Menu When Encountering an Army",
+        nameof(EnableTalkToOtherLordsInAnArmy),
+        EnableTalkToOtherLordsInAnArmy ? "Disable Talk To Other Lords In An Army" : "Enable Talk To Other Lords In An Army",
         null
       ));
 #endif
@@ -114,9 +114,9 @@ namespace CommunityPatch {
           Options.Save();
           break;
 
-        case nameof(EnableMenuWhenEncouteringAnArmy):
-          EnableMenuWhenEncouteringAnArmy = !EnableMenuWhenEncouteringAnArmy;
-          ShowMessage($"Menu When Encountering an Army: {(EnableMenuWhenEncouteringAnArmy ? "Enabled" : "Disabled")}.");
+        case nameof(EnableTalkToOtherLordsInAnArmy):
+          EnableTalkToOtherLordsInAnArmy = !EnableTalkToOtherLordsInAnArmy;
+          ShowMessage($"Talk To Other Lords In An Army: {(EnableTalkToOtherLordsInAnArmy ? "Enabled" : "Disabled")}.");
           Options.Save();
           break;
 
