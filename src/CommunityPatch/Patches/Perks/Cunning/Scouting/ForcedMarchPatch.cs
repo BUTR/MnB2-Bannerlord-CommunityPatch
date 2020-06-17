@@ -1,10 +1,9 @@
-using Patches;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
 
-  public class ForcedMarchPatch : PerkPatchBase<ForcedMarchPatch>, IPartySpeed {
+  public class ForcedMarchPatch : PartySpeedSubPatch<ForcedMarchPatch> {
 
     public ForcedMarchPatch() : base("jhZe9Mfo") { }
     
@@ -13,13 +12,8 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       base.Apply(game);
     }
 
-    public void ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed) {
-      if (mobileParty.Morale <= 70f)
-        return;
-      
-      IPartySpeed modifyPartySpeed = new ModifyPartySpeed(Perk);
-      modifyPartySpeed.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed);
-    }
+    protected override bool IsPerkConditionFulfilled(MobileParty mobileParty, float baseSpeed, ExplainedNumber finalSpeed) 
+      => mobileParty.Morale > Campaign.Current.Models.PartyMoraleModel.HighMoraleValue;
 
   }
 

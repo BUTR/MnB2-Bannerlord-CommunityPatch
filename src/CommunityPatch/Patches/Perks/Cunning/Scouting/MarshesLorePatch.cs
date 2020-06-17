@@ -13,12 +13,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       base.Apply(game);
     }
 
-    public override void ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed) {
-      if (!mobileParty.IsInTerrainType(Swamp) && !mobileParty.IsInTerrainType(ShallowRiver))
-        return;
-      
-      base.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed); 
-    }
+    protected override bool IsIncreasedPartySpeedPerkConditionFulfilled(MobileParty mobileParty)
+      => mobileParty.IsInTerrainType(Swamp) || mobileParty.IsInTerrainType(ShallowRiver);
+
+    protected override bool IsHalvedFoodConsumptionPerkConditionFulfilled(MobileParty mobileParty)
+      => true;
 
   }
 

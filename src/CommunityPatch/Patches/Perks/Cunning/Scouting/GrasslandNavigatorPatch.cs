@@ -1,11 +1,10 @@
-using Patches;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using static TaleWorlds.Core.TerrainType;
 
 namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
 
-  public class GrasslandNavigatorPatch : PerkPatchBase<GrasslandNavigatorPatch>, IPartySpeed {
+  public class GrasslandNavigatorPatch : PartySpeedSubPatch<GrasslandNavigatorPatch> {
 
     public GrasslandNavigatorPatch() : base("Ekqj9IFR") { }
 
@@ -14,14 +13,9 @@ namespace CommunityPatch.Patches.Perks.Cunning.Scouting {
       base.Apply(game);
     }
 
-    public void ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed) {
-      if (mobileParty.IsInSnowyTerrain() || !mobileParty.IsInTerrainType(Plain) && !mobileParty.IsInTerrainType(Steppe))
-        return;
-      
-      IPartySpeed modifyPartySpeed = new ModifyPartySpeed(Perk);
-      modifyPartySpeed.ModifyFinalSpeed(mobileParty, baseSpeed, ref finalSpeed); 
-    }
-
+    protected override bool IsPerkConditionFulfilled(MobileParty mobileParty, float baseSpeed, ExplainedNumber finalSpeed) 
+      => !mobileParty.IsInSnowyTerrain() && mobileParty.IsInTerrainType(Plain) || mobileParty.IsInTerrainType(Steppe);
+    
   }
 
 }

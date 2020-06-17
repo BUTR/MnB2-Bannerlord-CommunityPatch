@@ -6,10 +6,10 @@ namespace Patches {
 
   public class ModifyPartySpeed : IPartySpeed {
 
-    private PerkObject _perk;
+    private readonly PerkObject _perk;
 
     public ModifyPartySpeed(PerkObject perk)
-      => this._perk = perk;
+      => _perk = perk;
 
     public void ModifyFinalSpeed(MobileParty mobileParty, float baseSpeed, ref ExplainedNumber finalSpeed) {
       if (_perk == null || mobileParty == null || !mobileParty.HasPerk(_perk)) {
