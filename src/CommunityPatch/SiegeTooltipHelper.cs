@@ -81,10 +81,12 @@ namespace CommunityPatch {
       if (Hero.MainHero == null) return null;
 
       var heroParty = Hero.MainHero.PartyBelongedTo;
+      if (heroParty == null)
+        return null;
 
       return heroParty.BesiegedSettlement?.SiegeEvent ??
         heroParty.BesiegerCamp?.SiegeEvent ??
-        heroParty.CurrentSettlement.SiegeEvent;
+        heroParty.CurrentSettlement?.SiegeEvent;
     }
 
     public static void UpdateRangedDamageToWallsTooltip(List<TooltipProperty> tooltips, float bonusDamage) {
