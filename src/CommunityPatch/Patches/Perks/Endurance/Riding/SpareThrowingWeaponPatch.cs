@@ -2,11 +2,13 @@
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess,1,4, 3)]
   public class SpareThrowingWeapon : ExtraAmmoPerksPatch<SpareThrowingWeapon> {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(SpareThrowingWeapon).GetMethod(nameof(Postfix), NonPublic | Static | DeclaredOnly);

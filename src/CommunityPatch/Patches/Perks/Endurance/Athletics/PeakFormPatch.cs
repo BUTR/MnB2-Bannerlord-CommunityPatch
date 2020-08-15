@@ -11,6 +11,7 @@ using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess,1,4, 3)]
   public sealed class PeakFormPatch : PerkPatchBase<PeakFormPatch> {
 
     public override bool Applied { get; protected set; }

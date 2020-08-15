@@ -12,6 +12,7 @@ using static System.Reflection.BindingFlags;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
+  [PatchObsolete(ApplicationVersionType.EarlyAccess,1,4, 3)]
   public sealed class CrossbowExpert : AgentWeaponEquippedPatch<CrossbowExpert> {
 
     private static readonly MethodInfo PatchMethodInfo = typeof(CrossbowExpert).GetMethod(nameof(Prefix), NonPublic | Static | DeclaredOnly);

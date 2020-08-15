@@ -15,6 +15,7 @@ using static CommunityPatch.HarmonyHelpers;
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
   [PatchNotBefore(ApplicationVersionType.EarlyAccess, 1, 4)]
+  [PatchObsolete(ApplicationVersionType.EarlyAccess,1,4, 3)]
   public sealed class TramplerPatch2 : PerkPatchBase<TramplerPatch2> {
 
     public override bool Applied { get; protected set; }
