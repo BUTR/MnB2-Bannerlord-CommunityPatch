@@ -3,7 +3,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
         <MSBuildWarningsAsMessages>MSB3106</MSBuildWarningsAsMessages>
-        <Configurations>Debug;Release;Release - e1.4.1;Debug - e1.4.1;Release - Post e1.4.2;Debug - Post e1.4.2</Configurations>
+        <Configurations>Debug;Release;Release - e1.4.1;Debug - e1.4.1;Release - Post e1.4.2;Debug - Post e1.4.2;Release - Post e1.4.3;Debug - Post e1.4.3</Configurations>
         <Platform>x64</Platform>
         <PlatformTarget>x64</PlatformTarget>
         <RootNamespace />
@@ -36,6 +36,11 @@
     <PropertyGroup Condition="$(Configuration.EndsWith('Post e1.4.2'))">
         <DefineConstants>$(DefineConstants);AFTER_E1_4_1</DefineConstants>
         <DefineConstants>$(DefineConstants);AFTER_E1_4_2</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.EndsWith('Post e1.4.3'))">
+        <DefineConstants>$(DefineConstants);AFTER_E1_4_1</DefineConstants>
+        <DefineConstants>$(DefineConstants);AFTER_E1_4_2</DefineConstants>
+        <DefineConstants>$(DefineConstants);AFTER_E1_4_3</DefineConstants>
     </PropertyGroup>
     
     <Choose>
