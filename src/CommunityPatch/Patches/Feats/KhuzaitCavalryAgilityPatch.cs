@@ -20,7 +20,11 @@ namespace CommunityPatch.Patches.Feats {
 
     private static readonly MethodInfo GetCavalryRatioModifierMethod = AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), "GetCavalryRatioModifier");
 
+#if AFTER_E1_4_3
+    private static readonly Func<DefaultPartySpeedCalculatingModel, MobileParty, int, int, float> GetCavalryRatioModifier = GetCavalryRatioModifierMethod.BuildInvoker<Func<DefaultPartySpeedCalculatingModel, MobileParty, int, int, float>>();
+#else
     private static readonly Func<DefaultPartySpeedCalculatingModel, int, int, float> GetCavalryRatioModifier = GetCavalryRatioModifierMethod.BuildInvoker<Func<DefaultPartySpeedCalculatingModel, int, int, float>>();
+#endif
 
     private static readonly MethodInfo GetMountedFootmenRatioModifierMethod = AccessTools.Method(typeof(DefaultPartySpeedCalculatingModel), "GetMountedFootmenRatioModifier");
 
@@ -84,7 +88,11 @@ namespace CommunityPatch.Patches.Feats {
 
         var minFootmenCountNumberOfAvailableMounts = Math.Min(footmenCount, numberOfAvailableMounts);
 
+#if  AFTER_E1_4_3
+        var cavalryRatioModifier = GetCavalryRatioModifier(__instance, mobileParty, menCount, horsemenCount);  
+#else
         var cavalryRatioModifier = GetCavalryRatioModifier(__instance, menCount, horsemenCount);
+#endif
         var mountedFootmenRatioModifier = GetMountedFootmenRatioModifier(__instance, menCount, minFootmenCountNumberOfAvailableMounts);
 
         // calculate Khuzait bonus and apply

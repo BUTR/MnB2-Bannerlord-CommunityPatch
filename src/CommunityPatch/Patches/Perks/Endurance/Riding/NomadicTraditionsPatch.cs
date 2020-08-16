@@ -5,13 +5,11 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
-using TaleWorlds.Library;
 using static System.Reflection.BindingFlags;
 using static CommunityPatch.HarmonyHelpers;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  [PatchObsolete(ApplicationVersionType.EarlyAccess,1,4, 3)]
   public sealed partial class NomadicTraditionsPatch : PerkPatchBase<NomadicTraditionsPatch> {
 
     public override bool Applied { get; protected set; }
