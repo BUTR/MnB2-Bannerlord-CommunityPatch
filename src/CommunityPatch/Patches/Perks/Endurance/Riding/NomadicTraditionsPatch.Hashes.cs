@@ -1,3 +1,5 @@
+#if !AFTER_E1_4_3
+
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
   public partial class NomadicTraditionsPatch {
@@ -58,3 +60,5 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
   }
 
 }
+
+#endif

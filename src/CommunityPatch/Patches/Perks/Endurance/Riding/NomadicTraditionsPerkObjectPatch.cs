@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿#if !AFTER_E1_4_3
+
+using System.Collections.Generic;
 using System.Reflection;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
 
-  [PatchObsolete(ApplicationVersionType.EarlyAccess,1,4, 3)]
+  [PatchObsolete(ApplicationVersionType.EarlyAccess,1, 4, 3)]
   public sealed class NomadicTraditionsPerkObjectPatch : PerkPatchBase<NomadicTraditionsPerkObjectPatch> {
 
     public override bool Applied { get; protected set; }
@@ -33,3 +35,5 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
   }
 
 }
+
+#endif
