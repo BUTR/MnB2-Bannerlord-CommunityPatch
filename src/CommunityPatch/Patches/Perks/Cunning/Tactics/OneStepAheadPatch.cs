@@ -1,3 +1,7 @@
+// Implementation does not seem to correspond to the perk's description.
+
+#if !AFTER_E1_4_3
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -73,3 +77,5 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
   }
 
 }
+
+#endif
