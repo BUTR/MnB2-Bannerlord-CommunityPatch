@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿#if !AFTER_E1_4_3
+
+using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -36,3 +38,5 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
   }
 
 }
+
+#endif

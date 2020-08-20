@@ -1,3 +1,5 @@
+#if !AFTER_E1_4_3
+
 using TaleWorlds.Library;
 
 namespace CommunityPatch.Patches.Perks.Endurance.Riding {
@@ -10,3 +12,5 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
   }
 
 }
+
+#endif

@@ -1,3 +1,5 @@
+#if !AFTER_E1_4_3
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -169,3 +171,5 @@ namespace CommunityPatch.Patches.Perks.Endurance.Riding {
   }
 
 }
+
+#endif

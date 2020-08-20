@@ -1,3 +1,5 @@
+#if !AFTER_E1_4_3
+
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -106,3 +108,5 @@ namespace CommunityPatch.Patches.Perks.Endurance.Athletics {
   }
 
 }
+
+#endif

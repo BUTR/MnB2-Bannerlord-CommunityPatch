@@ -1,3 +1,5 @@
+#if !AFTER_E1_4_3
+
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -36,3 +38,5 @@ namespace CommunityPatch.Patches.Perks.Social.Leadership {
   }
 
 }
+
+#endif
