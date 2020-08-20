@@ -1,3 +1,7 @@
+// OnClanTierIncreased method is not referenced in e1.4.3 anymore.
+
+#if !AFTER_E1_4_3
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -76,3 +80,5 @@ namespace CommunityPatch.Patches {
   }
 
 }
+
+#endif

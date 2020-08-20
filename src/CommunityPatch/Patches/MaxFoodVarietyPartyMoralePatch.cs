@@ -1,3 +1,7 @@
+// As of e1.4.1 Food variety party morale seems to work correctly 
+
+#if !AFTER_E1_4_3
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -84,3 +88,5 @@ namespace CommunityPatch.Patches {
   }
 
 }
+
+#endif

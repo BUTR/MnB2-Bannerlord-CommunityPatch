@@ -1,3 +1,7 @@
+// As of e1.4.3, some targeted methods can not be found anymore
+
+#if !AFTER_E1_4_3
+
 using System;
 using System.Reflection.Emit;
 using System.Collections.Generic;
@@ -72,10 +76,13 @@ namespace CommunityPatch.Patches.Traits {
     private static Harmony Harmony => CommunityPatchSubModule.Harmony;
 
     public override bool? IsApplicable(Game game) {
-      if (ApplySkillAndAttributeEffectsMethod != null
-        && AddPlayerTraitXpMethod != null
-        && NotableDaughterStartConvoMethod != null)
-        return true;
+      if (ApplySkillAndAttributeEffectsMethod == null
+        || AddPlayerTraitXpMethod == null
+        || NotableDaughterStartConvoMethod == null) {
+        CommunityPatchSubModule.Error($"{nameof(TraitFixesPatch)} : Couldn't find all targeted methods");
+        return false;
+      }
+        
 
       if (!ApplySkillAndAttributeEffectsMethod.MakeCilSignatureSha256()
         .MatchesAnySha256(ApplySkillAndAttributeEffectsHashes))
@@ -89,7 +96,7 @@ namespace CommunityPatch.Patches.Traits {
         .MatchesAnySha256(NotableDaughterStartConvoHashes))
         return false;
 
-      return false;
+      return true;
     }
 
     public override void Apply(Game game) {
@@ -174,3 +181,5 @@ namespace CommunityPatch.Patches.Traits {
   }
 
 }
+
+#endif

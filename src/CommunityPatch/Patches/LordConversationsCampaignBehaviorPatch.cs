@@ -1,3 +1,7 @@
+// Fixed since a long time
+
+#if  !AFTER_E1_4_3
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -71,3 +75,5 @@ namespace CommunityPatch.Patches {
   }
 
 }
+
+#endif
