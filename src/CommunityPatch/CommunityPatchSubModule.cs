@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+#if !AFTER_E1_4_3
 using CommunityPatch.Behaviors;
+#endif
 using JetBrains.Annotations;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -86,13 +88,15 @@ namespace CommunityPatch {
       base.OnGameInitializationFinished(game);
     }
 
+#if !AFTER_E1_4_3
     protected override void OnGameStart(Game game, IGameStarter gameStarterObject) {
       if (game.GameType is Campaign) {
         var cgs = (CampaignGameStarter) gameStarterObject;
         cgs.AddBehavior(new CommunityPatchCampaignBehavior());
       }
     }
-
+#endif
+    
   }
 
 }

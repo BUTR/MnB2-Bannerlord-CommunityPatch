@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿#if !AFTER_E1_4_3
+
+using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 
 namespace CommunityPatch.Behaviors {
@@ -25,3 +27,5 @@ namespace CommunityPatch.Behaviors {
   }
 
 }
+
+#endif
