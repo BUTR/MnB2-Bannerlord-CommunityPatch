@@ -30,9 +30,9 @@ We also use ReSharper C++ with Visual Studio.
 <details>
     <summary><b>Athletics Perks</b></summary>
     <ul>
-        <li>Extra Arrows</li>
-        <li>Extra Throwing Weapon</li>
-        <li>Peak Form</li>
+        <li>Extra Arrows <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Extra Throwing Weapon <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Peak Form <sub><sup>Deleted as from e1.4.3</sup></sub></li>
    </ul>
 </details>
 
@@ -178,8 +178,8 @@ We also use ReSharper C++ with Visual Studio.
 <details>
     <summary><b>Two Handed Perks</b></summary>
     <ul>
-        <li>Quick Plunder <sub><sup>Deleted as from e1.4.1+</sup></sub></li>
-        <li>Eviscerate <sub><sup>Deleted as from e1.4.1+</sup></sub></li>
+        <li>Quick Plunder <sub><sup>Deleted as from e1.4.1</sup></sub></li>
+        <li>Eviscerate <sub><sup>Deleted as from e1.4.1</sup></sub></li>
    </ul>
 </details>
 
