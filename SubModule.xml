@@ -3,7 +3,7 @@
 <Module>
     <Name value="Community Patch" />
     <Id value="CommunityPatch" />
-    <Version value="v0.1.0" />
+    <Version value="v0.1.1" />
     <SingleplayerModule value="true" />
     <MultiplayerModule value="true" />
     <Official value="false" />
