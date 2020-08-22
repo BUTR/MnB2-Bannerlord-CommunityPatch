@@ -27,127 +27,205 @@ Our C++ projects are designed to work best in JetBrains CLion.
 We also use ReSharper C++ with Visual Studio.
 
 ### Current Fixes
+<details>
+    <summary><b>Athletics Perks</b></summary>
+    <ul>
+        <li>Extra Arrows</li>
+        <li>Extra Throwing Weapon</li>
+        <li>Peak Form</li>
+   </ul>
+</details>
 
-* Perks
-  * Athletics
-    * Extra Arrows
-    * Extra Throwing Weapon
-    * Peak Form
-  * Leadership
-    * Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub>
-    * Ultimate Leader <sub><sup>Changed to Ultimate Leader II in e1.4.1</sup></sub>
-    * Ultimate Leader II <sub><sup>Fixed in e1.4.2</sup></sub>
-  * Scouting
-    * Healthy Scout
-    * PathFinder
-    * Night Vision <sub><sup>(Former name : Torch Carriers)<sub><sup>
-    * Navigator
-    * Investigator
-    * Farsighted
-    * Eye for Ambush <sub><sup>(Former name : Ambusher)<sub><sup>
-    * Forest Lore
-    * Desert Lore
-    * Hills Lore
-    * Marshes Lore
-    * Forced March
-    * Grassland Navigator
-    * Lay of the land
-  * Riding
-    * Spare Arrows
-    * Spare Throwing Weapon
-    * Bow Expert
-    * Conroi
-    * Crossbow Expert
-    * Filled To Brim
-    * Squires
-    * Trampler
-    * Nomadic Traditions
-    * Horse Grooming
-  * Bow
-    * Mounted Archer
-    * Large Quiver
-    * Battle Equipped
-    * Merry Men
-  * Crossbow
-    * Crossbow Cavalry
-  * Throwing
-    * Fully Armed
-    * Concealed Carry
-    * Battle Ready
-    * Skirmishers
-  * Steward
-    * Agrarian
-    * Assessor
-    * Bannerlord
-    * Enhanced Mines
-    * Food Rationing
-    * Logistics Expert
-    * Man-At-Arms
-    * Nourish Settlement
-    * Prominence
-    * Prosperous Reign
-    * Reconstruction
-    * Reeve
-    * Ruler
-    * Supreme Authority
-    * Swords As Tribute
-    * Tax Collector
-    * Warmonger
-    * War Rations
-  * Engineering
-    * Ballistics
-    * Construction Expert
-    * Improved Masonry
-    * Good Materials
-    * Everyday Engineer
-    * Builder
-    * Scavenger
-    * Armorcraft
-    * Wall Breaker
-    * Imperial Fire
-    * Resolute
-  * Roguery
-    * Party Raiding
-    * Eye for Loot
-    * For the Thrill
-    * Slip into Shadows
-    * Briber
-    * Negotiator
-    * Bribe Master
-    * Escape Artist
-    * Slave Trader
-    * Merry men
-    * Concealed Blade
-  * Two Handed
-    * Quick Plunder <sub><sup>Deleted in e1.4.1+</sup></sub>
-    * Eviscerate <sub><sup>Deleted in e1.4.1+</sup></sub>
-  * Tactics
-    * Companion Cavalry
-    * Tactical Superiority
-    * One Step Ahead
-    * Elusive
-    * Bait
-    * Logistics
-    * Ambush Specialist
-    * Phalanx
-    * Hammer and Anvil
-    * Trusted Commander
-  * Trade
-    * Mercenary Trader
-    * Influential Merchant
-* Policies
-  * Land Grants For Veterans
-* Feats
-  * Aserai Cheap Caravans <sub><sup>Fixed in e1.3.0</sup></sub>
-  * Battanian Forest Agility
-  * Khuzait Cavalry Agility
-  * Sturgian Snow Agility
-* Learning Rate explanation
-* Item Comparison perk-based coloring
-* Party Morale bonus being too low for >10 food variety
-* Fixed crash that occurs when the Neutral clan gains a clan tier 
-* Warn user that early story quests will timeout
-* Fix detection of snowy terrain and apply snow movement debuff as a factor of snow density
+<details>
+    <summary><b>Leadership Perks</b></summary>
+    <ul>
+        <li>Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub></li>
+        <li>Ultimate Leader <sub><sup>Changed to Ultimate Leader II in e1.4.1</sup></sub></li>
+        <li>Ultimate Leader II <sub><sup>Fixed in e1.4.2</sup></sub></li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Scouting Perks</b></summary>
+    <ul>
+        <li>Healthy Scout</li>
+        <li>PathFinder</li>
+        <li>Night Vision</li>
+        <li>Navigator</li>
+        <li>Investigator</li>
+        <li>Farsighted</li>
+        <li>Eye for Ambush</li>
+        <li>Forest Lore</li>
+        <li>Desert Lore</li>
+        <li>Hills Lore</li>
+        <li>Marshes Lore</li>
+        <li>Forced March</li>
+        <li>Grassland Navigator</li>
+        <li>Lay of the land</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Riding Perks</b></summary>
+    <ul>
+        <li>Spare Arrows <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Spare Throwing Weapon <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Bow Expert <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Conroi <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Crossbow Expert <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Filled To Brim <sub><sup>Fixed as from e1.4.3</sup></sub></li>
+        <li>Squires <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Trampler <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Nomadic Traditions <sub><sup>Fixed as from e1.4.3</sup></sub></li>
+        <li>Horse Grooming <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Bow Perks</b></summary>
+    <ul>
+        <li>Mounted Archer</li>
+        <li>Spare Throwing Weapon <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li>Large Quiver</li>
+        <li>Merry Men</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Crossbow Perks</b></summary>
+    <ul>
+        <li>Crossbow Cavalry</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Throwing Perks</b></summary>
+    <ul>
+        <li>Fully Armed</li>
+        <li>Concealed Carry</li>
+        <li>Battle Ready</li>
+        <li>Skirmishers</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Trade Perks</b></summary>
+    <ul>
+        <li>Mercenary Trader</li>
+        <li>Influential Merchant</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Steward Perks</b></summary>
+    <ul>
+        <li>Agrarian</li>
+        <li>Assessor</li>
+        <li>Bannerlord</li>
+        <li>Enhanced Mines</li>
+        <li>Food Rationing</li>
+        <li>Logistics Expert</li>
+        <li>Man-At-Arms</li>
+        <li>Nourish Settlement</li>
+        <li>Prominence</li>
+        <li>Prosperous Reign</li>
+        <li>Reconstruction</li>
+        <li>Reeve</li>
+        <li>Ruler</li>
+        <li>Supreme Authority</li>
+        <li>Swords As Tribute</li>
+        <li>Tax Collector</li>
+        <li>Warmonger</li>
+        <li>War Rations</li>
+   </ul>
+</details>
+
+
+<details>
+    <summary><b>Engineering Perks</b></summary>
+    <ul>
+        <li>Ballistics</li>
+        <li>Construction Expert</li>
+        <li>Improved Masonry</li>
+        <li>Good Materials</li>
+        <li>Everyday Engineer</li>
+        <li>Builder</li>
+        <li>Scavenger</li>
+        <li>Armorcraft</li>
+        <li>Wall Breaker</li>
+        <li>Imperial Fire</li>
+        <li>Resolute</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Roguery Perks</b></summary>
+    <ul>
+        <li>Party Raiding</li>
+        <li>Eye for Loot</li>
+        <li>For the Thrill</li>
+        <li>Slip into Shadows</li>
+        <li>Briber</li>
+        <li>Negotiator</li>
+        <li>Bribe Master</li>
+        <li>Escape Artist</li>
+        <li>Slave Trader</li>
+        <li>Merry men</li>
+        <li>Concealed Blade</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Two Handed Perks</b></summary>
+    <ul>
+        <li>Quick Plunder <sub><sup>Deleted as from e1.4.1+</sup></sub></li>
+        <li>Eviscerate <sub><sup>Deleted as from e1.4.1+</sup></sub></li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Tactics Perks</b></summary>
+    <ul>
+        <li>Companion Cavalry</li>
+        <li>Tactical Superiority</li>
+        <li>Elusive</li>
+        <li>Bait</li>
+        <li>Logistics</li>
+        <li>Ambush Specialist</li>
+        <li>Phalanx</li>
+        <li>Hammer and Anvil</li>
+        <li>Trusted Commander</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Policies</b></summary>
+    <ul>
+        <li>Land Grants For Veterans</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Feats</b></summary>
+    <ul>
+        <li>Aserai Cheap Caravans <sub><sup>Fixed in e1.3.0</sup></sub></li>
+        <li>Battanian Forest Agility</li>
+        <li>Khuzait Cavalry Agility</li>
+        <li>Sturgian Snow Agility</li>
+   </ul>
+</details>
+
+<details>
+    <summary><b>Miscellaneous</b></summary>
+    <ul>
+        <li>Learning Rate explanation <sub><sup>Fixed in e1.3.0</sup></sub></li>
+        <li>Item Comparison perk-based coloring</li>
+        <li>Party Morale bonus being too low for >10 food variety <sub><sup>Fixed as from e1.4.3</sup></sub></li>
+        <li>Fixed crash that occurs when the Neutral clan gains a clan tier <sub><sup>Disabled as from Community Patch v.0.1.1</sup></sub></li>
+        <li>Warn user that early story quests will timeout</li>
+        <li>Fix detection of snowy terrain and apply snow movement debuff as a factor of snow density</li>
+   </ul>
+</details>
 
 ### Current Features
 * Enable and Disable the Intro Video
