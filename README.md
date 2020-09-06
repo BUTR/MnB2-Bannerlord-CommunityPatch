@@ -22,6 +22,7 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Crossbow Expert
     * Filled To Brim
     * Squires
+    * Nomadic Traditions
   * Bow
     * Mounted Archer
     * Large Quiver
@@ -57,6 +58,13 @@ This is going to be a mod that just fixes up some things in Mount &amp; Blade 2:
     * Good Materials
     * Everyday Engineer
     * Builder
+  * Roguery
+    * Party Raiding
+    * Eye for Loot
+    * For the Thrill
+  * Two Handed
+    * Quick Plunder
+    * Eviscerate
 * Policies
   * Land Grants For Veterans
 * Feats
