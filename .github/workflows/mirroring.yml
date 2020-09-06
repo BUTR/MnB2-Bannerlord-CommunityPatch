@@ -1,0 +1,41 @@
+name: Mirroring
+
+on: [push, delete]
+
+jobs:
+  GitLab:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout from GitHub
+        run: |
+          git init --bare .
+          git remote add github --mirror=fetch https://github.com/Tyler-IN/MnB2-Bannerlord-CommunityPatch
+          git config credential.https://github.com/.helper "! f() { echo username=x-access-token; echo password=$GITHUB_TOKEN; };f"
+          git fetch --tags --force -v github
+          git fetch --force -v github
+          git for-each-ref --format 'delete %(refname)' refs/pull | git update-ref --stdin
+      - name: Configure GitLab SSH authentication
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1.0.2
+        with:
+          ssh-private-key: ${{secrets.GITLAB_SSH_PRIVATE_KEY}}
+          ssh-host: gitlab.com
+      - name: Setup GitLab Remote
+        run: |
+          git remote add gitlab --mirror=push git@gitlab.com:tyler-in/MnB2-Bannerlord-CommunityPatch.git
+          git config lfs.https://gitlab.com/tyler-in/MnB2-Bannerlord-CommunityPatch.git/info/lfs.locksverify true
+      - name: Mirror to GitLab
+        run: |
+          rm -f .lfsconfig
+          git push -f --no-verify -v gitlab 
+      - name: Ensure Git LFS is installed
+        run: git lfs install
+      - name: Get hash of all LFS files
+        run: git lfs ls-files -al | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Try to load cache of LFS files
+        uses: actions/cache@v2
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v2
+      - name: Sync LFS
+        run: |
+          git lfs fetch --all github && git lfs push --all gitlab

@@ -1,6 +1,4 @@
 [remote "origin"]
-	lfsurl = https://gitlab.com/tyler-in/MnB2-Bannerlord-CommunityPatch.git
+	lfsurl = git@gitlab.com:tyler-in/MnB2-Bannerlord-CommunityPatch.git
 [remote "github"]
-	lfsurl = https://gitlab.com/tyler-in/MnB2-Bannerlord-CommunityPatch.git
-[lfs]
-	url = https://gitlab.com/tyler-in/MnB2-Bannerlord-CommunityPatch.git/info/lfs
+	lfsurl = git@gitlab.com:tyler-in/MnB2-Bannerlord-CommunityPatch.git
