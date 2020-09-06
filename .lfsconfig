@@ -1,0 +1,4 @@
+[remote "origin"]
+	lfsurl = git@gitlab.com:tyler-in/MnB2-Bannerlord-CommunityPatch.git
+[remote "github"]
+	lfsurl = git@gitlab.com:tyler-in/MnB2-Bannerlord-CommunityPatch.git
