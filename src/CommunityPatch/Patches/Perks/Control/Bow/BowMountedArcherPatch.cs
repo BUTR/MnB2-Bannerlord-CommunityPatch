@@ -1,3 +1,5 @@
+#if !AFTER_E1_5_1
+
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -75,3 +77,5 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
   }
 
 }
+
+#endif

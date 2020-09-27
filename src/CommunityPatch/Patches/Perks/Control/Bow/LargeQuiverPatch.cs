@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿#if !AFTER_E1_5_1
+
+using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -32,3 +34,5 @@ namespace CommunityPatch.Patches.Perks.Control.Bow {
   }
 
 }
+
+#endif
