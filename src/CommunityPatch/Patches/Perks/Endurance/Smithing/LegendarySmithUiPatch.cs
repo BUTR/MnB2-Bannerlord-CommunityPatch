@@ -1,3 +1,7 @@
+// Siege Expert perk was removed as from e1.5.1. Therefore this patch has no use anymore.
+
+#if !AFTER_E1_5_1
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -62,3 +66,5 @@ namespace Patches.Perks.Endurance.Smithing {
     }
   }
 }
+
+#endif

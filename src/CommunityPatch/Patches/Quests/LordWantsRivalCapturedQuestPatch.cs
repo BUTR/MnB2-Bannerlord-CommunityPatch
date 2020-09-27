@@ -1,3 +1,6 @@
+// Issue fixed by the devs
+#if !AFTER_E1_5_1
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -58,3 +61,4 @@ namespace CommunityPatch.Patches.Quests {
 
 }
 
+#endif
