@@ -1,4 +1,8 @@
-  using Patches;
+// This perk was removed when the Throwing perk category was revamped.
+
+#if !AFTER_E1_5_1  
+
+using Patches;
   using TaleWorlds.CampaignSystem;
   using TaleWorlds.CampaignSystem.ViewModelCollection;
   using TaleWorlds.Core;
@@ -36,3 +40,5 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
   }
 
 }
+
+#endif

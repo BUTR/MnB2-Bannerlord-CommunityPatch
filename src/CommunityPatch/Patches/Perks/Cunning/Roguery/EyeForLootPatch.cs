@@ -46,7 +46,7 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
 
     public override void Apply(Game game) {
       Perk.SetPrimaryBonus(5f);
-
+  
       if (Applied) return;
 
       CommunityPatchSubModule.Harmony.Patch(TargetMethodInfo, new HarmonyMethod(PatchMethodInfo));
@@ -65,7 +65,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       var partyMemberHitDamage = new ExplainedNumber(hitDamage);
 
       foreach (var party in __instance.AttackerSide.Parties.Where(x => x.MobileParty != null))
+#if AFTER_E1_5_1
+        PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, true, ref partyMemberHitDamage);
+#else
         PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, ref partyMemberHitDamage);
+#endif
 
       var damageBonus = partyMemberHitDamage.ResultNumber - partyMemberHitDamage.BaseNumber;
       RaidingHelper.SetHitDamage(__instance, partyMemberHitDamage.ResultNumber);

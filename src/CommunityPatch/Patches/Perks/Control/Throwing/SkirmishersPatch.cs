@@ -1,3 +1,7 @@
+// This perk was removed when the Throwing perk category was revamped.
+
+#if !AFTER_E1_5_1
+
 using Patches;
 
 namespace CommunityPatch.Patches.Perks.Control.Throwing {
@@ -9,3 +13,5 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
   }
 
 }
+
+#endif

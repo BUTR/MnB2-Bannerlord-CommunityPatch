@@ -1,4 +1,8 @@
-﻿using System.Reflection;
+﻿// This perk was removed when the Throwing perk category was revamped.
+
+#if !AFTER_E1_5_1
+
+using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -32,3 +36,5 @@ namespace CommunityPatch.Patches.Perks.Control.Throwing {
   }
 
 }
+
+#endif
