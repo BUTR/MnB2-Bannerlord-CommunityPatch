@@ -30,18 +30,18 @@ We also use ReSharper C++ with Visual Studio.
 <details>
     <summary><b>Athletics Perks</b></summary>
     <ul>
-        <li>Extra Arrows <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Extra Throwing Weapon <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Peak Form <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Extra Arrows</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Extra Throwing Weapon</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Peak Form</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
    </ul>
 </details>
 
 <details>
     <summary><b>Leadership Perks</b></summary>
     <ul>
-        <li>Disciplinarian <sub><sup>Fixed in e1.0.6</sup></sub></li>
-        <li>Ultimate Leader <sub><sup>Changed to Ultimate Leader II in e1.4.1</sup></sub></li>
-        <li>Ultimate Leader II <sub><sup>Fixed in e1.4.2</sup></sub></li>
+        <li><del>Disciplinarian</del> <sub><sup>Fixed in e1.0.6</sup></sub></li>
+        <li><del>Ultimate Leader</del> <sub><sup>Changed to Ultimate Leader II in e1.4.1</sup></sub></li>
+        <li><del>Ultimate Leader II</del> <sub><sup>Fixed in e1.4.2</sup></sub></li>
    </ul>
 </details>
 
@@ -68,43 +68,45 @@ We also use ReSharper C++ with Visual Studio.
 <details>
     <summary><b>Riding Perks</b></summary>
     <ul>
-        <li>Spare Arrows <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Spare Throwing Weapon <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Bow Expert <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Conroi <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Crossbow Expert <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Filled To Brim <sub><sup>Fixed as from e1.4.3</sup></sub></li>
-        <li>Squires <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Trampler <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Nomadic Traditions <sub><sup>Fixed as from e1.4.3</sup></sub></li>
-        <li>Horse Grooming <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Spare Arrows</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Spare Throwing Weapon</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Bow Expert</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Conroi</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Crossbow Expert</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Filled To Brim</del> <sub><sup>Fixed as from e1.4.3</sup></sub></li>
+        <li><del>Squires</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Trampler</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Nomadic Traditions</del> <sub><sup>Fixed as from e1.4.3</sup></sub></li>
+        <li><del>Horse Grooming</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
    </ul>
 </details>
 
 <details>
     <summary><b>Bow Perks</b></summary>
     <ul>
-        <li>Mounted Archer</li>
-        <li>Spare Throwing Weapon <sub><sup>Deleted as from e1.4.3</sup></sub></li>
-        <li>Large Quiver</li>
-        <li>Merry Men</li>
+        <li><del>Mounted Archer</del> <sub><sup>Deleted as from e1.5.0</sup></sub></li>
+        <li><del>Spare Throwing Weapon</del> <sub><sup>Deleted as from e1.4.3</sup></sub></li>
+        <li><del>Large Quiver</del> <sub><sup>Deleted as from e1.5.0</sup></sub></li>
+        <li><del>Merry Men</del> <sub><sup>Fixed as from e1.5.0</sup></sub></li>
+        <li>Horse Master</li>
    </ul>
 </details>
 
 <details>
     <summary><b>Crossbow Perks</b></summary>
     <ul>
-        <li>Crossbow Cavalry</li>
+        <li><del>Crossbow Cavalry</del> <sub><sup>Deleted as from e1.5.0</sup></sub></li>
+        <li>Mounted Crossbowman</li>
    </ul>
 </details>
 
 <details>
     <summary><b>Throwing Perks</b></summary>
     <ul>
-        <li>Fully Armed</li>
-        <li>Concealed Carry</li>
-        <li>Battle Ready</li>
-        <li>Skirmishers</li>
+        <li><del>Fully Armed</del> <sub><sup>Deleted as from e1.5.1</sup></sub></li>
+        <li><del>Concealed Carry</del> <sub><sup>Deleted as from e1.5.1</sup></sub></li>
+        <li><del>Battle Ready</del> <sub><sup>Deleted as from e1.5.1</sup></sub></li>
+        <li><del>Skirmishers</del> <sub><sup>Deleted as from e1.5.1</sup></sub></li>
    </ul>
 </details>
 
@@ -178,8 +180,8 @@ We also use ReSharper C++ with Visual Studio.
 <details>
     <summary><b>Two Handed Perks</b></summary>
     <ul>
-        <li>Quick Plunder <sub><sup>Deleted as from e1.4.1</sup></sub></li>
-        <li>Eviscerate <sub><sup>Deleted as from e1.4.1</sup></sub></li>
+        <li><del>Quick Plunder</del> <sub><sup>Deleted as from e1.4.1</sup></sub></li>
+        <li><del>Eviscerate</del> <sub><sup>Deleted as from e1.4.1</sup></sub></li>
    </ul>
 </details>
 
@@ -208,7 +210,7 @@ We also use ReSharper C++ with Visual Studio.
 <details>
     <summary><b>Feats</b></summary>
     <ul>
-        <li>Aserai Cheap Caravans <sub><sup>Fixed in e1.3.0</sup></sub></li>
+        <li><del>Aserai Cheap Caravans</del> <sub><sup>Fixed in e1.3.0</sup></sub></li>
         <li>Battanian Forest Agility</li>
         <li>Khuzait Cavalry Agility</li>
         <li>Sturgian Snow Agility</li>
@@ -218,10 +220,10 @@ We also use ReSharper C++ with Visual Studio.
 <details>
     <summary><b>Miscellaneous</b></summary>
     <ul>
-        <li>Learning Rate explanation <sub><sup>Fixed in e1.3.0</sup></sub></li>
+        <li><del>Learning Rate explanation</del> <sub><sup>Fixed in e1.3.0</sup></sub></li>
         <li>Item Comparison perk-based coloring</li>
-        <li>Party Morale bonus being too low for >10 food variety <sub><sup>Fixed as from e1.4.3</sup></sub></li>
-        <li>Fixed crash that occurs when the Neutral clan gains a clan tier <sub><sup>Disabled as from Community Patch v.0.1.1</sup></sub></li>
+        <li><del>Party Morale bonus being too low for >10 food variety</del> <sub><sup>Fixed as from e1.4.3</sup></sub></li>
+        <li><del>Fixed crash that occurs when the Neutral clan gains a clan tier</del> <sub><sup>Disabled as from Community Patch v.0.1.1</sup></sub></li>
         <li>Warn user that early story quests will timeout</li>
         <li>Fix detection of snowy terrain and apply snow movement debuff as a factor of snow density</li>
    </ul>
@@ -229,7 +231,7 @@ We also use ReSharper C++ with Visual Studio.
 
 ### Current Features
 * Enable and Disable the Intro Video
-* Enable and Disable Menu when encountering a neutral or enemy army. <sub><sub>Added to the game in e1.4.2<sup><sub>
+* <del>Enable and Disable Menu when encountering a neutral or enemy army.</del> <sub><sup>Added to the game in e1.4.2<sup><sub>
 * Generate Diagnostic Report
 * Toggle recording First Chance Exception info (don't use unless troubleshooting bugs)
 * Automatically capture Diagnostic Info to the Clipboard when an Unhandled Exception crash occurs
