@@ -110,8 +110,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var parties = siegeEventSide.SiegeParties.Where(x => x.MobileParty != null);
 
       foreach (var party in parties) {
+#if AFTER_E1_5_1
+        PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, true, ref partyMemberRate);
+        PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, true, ref partyMemberDamage);
+#else
         PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, ref partyMemberRate);
         PerkHelper.AddPerkBonusForParty(perk, party.MobileParty, ref partyMemberDamage);
+#endif        
       }
 
       bonusRateOnly = partyMemberRate.ResultNumber - 100;

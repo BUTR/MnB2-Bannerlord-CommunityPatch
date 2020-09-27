@@ -36,6 +36,20 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
         0xE7, 0x17, 0x84, 0x5E, 0xF9, 0x55, 0xBD, 0x42,
         0xDE, 0x22, 0xB4, 0xA4, 0x0E, 0xA0, 0x95, 0x73,
         0x57, 0x94, 0x6C, 0x5B, 0x4F, 0x45, 0xBF, 0x9B
+      },
+      new byte[] {
+        // e1.5.1.241359
+        0x1E, 0x2A, 0x82, 0xC6, 0x91, 0x6E, 0x12, 0xBF,
+        0x51, 0x64, 0x29, 0x98, 0xA4, 0x6B, 0xFA, 0xEE,
+        0x19, 0xA6, 0x6B, 0x9A, 0x81, 0x1E, 0x8F, 0x82,
+        0x39, 0x1B, 0x77, 0x32, 0x19, 0xFF, 0x14, 0xB8
+      },
+      new byte[] {
+        // e1.5.1.241359
+        0x1E, 0x2A, 0x82, 0xC6, 0x91, 0x6E, 0x12, 0xBF,
+        0x51, 0x64, 0x29, 0x98, 0xA4, 0x6B, 0xFA, 0xEE,
+        0x19, 0xA6, 0x6B, 0x9A, 0x81, 0x1E, 0x8F, 0x82,
+        0x39, 0x1B, 0x77, 0x32, 0x19, 0xFF, 0x14, 0xB8
       }
     };
 
@@ -67,10 +81,17 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
 
     public static void Postfix(AgentMoraleInteractionLogic __instance, Agent affectedAgent, Agent affectorAgent, AgentState agentState,
       KillingBlow killingBlow) {
+      
+      if (affectedAgent == null) return;
+#if AFTER_E1_5_1
+      if (affectorAgent == null) return; 
+#else
       var affectorCharacter = (CharacterObject) affectorAgent?.Character;
-      var affectorLeaderCharacter = (CharacterObject) affectorAgent?.Team?.Leader?.Character;
-
       if (affectorCharacter == null) return;
+#endif
+      
+      var affectorLeaderCharacter = (CharacterObject) affectorAgent.Team?.Leader?.Character;
+      
       if (!affectorAgent.HasMount) return;
 
       var perk = ActivePatch.Perk;
@@ -79,7 +100,12 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       if (affectedAgent.Character == null) return;
       if (affectedAgent.Team == null) return;
       if (agentState != AgentState.Killed && agentState != AgentState.Unconscious) return;
-#if AFTER_E1_4_1
+      
+#if AFTER_E1_5_1
+      var skill = WeaponComponentData.GetRelevantSkillFromWeaponClass((WeaponClass) killingBlow.ItmClass);
+      var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled
+        (affectedAgent, affectorAgent, skill);
+#elif AFTER_E1_4_1
       var skill = WeaponComponentData.GetRelevantSkillFromWeaponClass((WeaponClass) killingBlow.ItmClass);
       var moralChangesTuple = MissionGameModels.Current.BattleMoraleModel.CalculateMoraleChangeAfterAgentKilled
         (affectedAgent, affectorCharacter, skill);

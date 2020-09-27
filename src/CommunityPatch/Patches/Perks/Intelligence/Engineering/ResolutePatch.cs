@@ -42,6 +42,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
         0x4F, 0xFE, 0x6A, 0x1E, 0xE2, 0x7A, 0x60, 0xE8,
         0xC4, 0x1A, 0x97, 0x01, 0x88, 0x31, 0xE6, 0x92,
         0x9C, 0x89, 0x0D, 0x3F, 0x89, 0x62, 0x6A, 0xBA
+      },
+      new byte[] {
+        // e1.5.1.241359
+        0x1C, 0x8D, 0xC8, 0xCA, 0x5B, 0x8C, 0x30, 0xAC,
+        0xE4, 0xF9, 0x56, 0x42, 0x7D, 0x73, 0x0E, 0x75,
+        0x28, 0xA3, 0x8E, 0xA3, 0x06, 0xE0, 0x4A, 0x3F,
+        0x5F, 0xDD, 0xB7, 0xD3, 0x73, 0x59, 0x84, 0x32
       }
     };
 
@@ -86,7 +93,11 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
 
     private static float GetPartyMemberBonus(MobileParty mobileParty, PerkObject perk) {
       var perkPartyMemberValue = new ExplainedNumber(100);
+#if AFTER_E1_5_1
+      PerkHelper.AddPerkBonusForParty(perk, mobileParty, true, ref perkPartyMemberValue);
+#else
       PerkHelper.AddPerkBonusForParty(perk, mobileParty, ref perkPartyMemberValue);
+#endif 
       var additiveMoralePenaltyReductionRate = perkPartyMemberValue.ResultNumber - perkPartyMemberValue.BaseNumber;
       return additiveMoralePenaltyReductionRate;
     }

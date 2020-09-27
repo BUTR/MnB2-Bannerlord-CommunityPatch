@@ -72,7 +72,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Roguery {
       var perk = ActivePatch.Perk;
 
       foreach (var attacker in attackers)
+#if AFTER_E1_5_1
+        PerkHelper.AddPerkBonusForParty(perk, attacker.MobileParty, true, ref moraleGain);
+#else
         PerkHelper.AddPerkBonusForParty(perk, attacker.MobileParty, ref moraleGain);
+#endif
 
       return moraleGain.ResultNumber;
     }

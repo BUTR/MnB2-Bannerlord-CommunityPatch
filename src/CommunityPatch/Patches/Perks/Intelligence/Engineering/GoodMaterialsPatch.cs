@@ -209,8 +209,13 @@ namespace CommunityPatch.Patches.Perks.Intelligence.Engineering {
       var partyMemberRate = new ExplainedNumber(100);
 
       foreach (var siegeParty in sideSiegeEvent.SiegeParties.Where(x => x.MobileParty != null)) {
+#if AFTER_E1_5_1
+        PerkHelper.AddPerkBonusForParty(perk, siegeParty.MobileParty, true, ref partyMemberHealth);
+        PerkHelper.AddPerkBonusForParty(perk, siegeParty.MobileParty, true, ref partyMemberRate);
+#else
         PerkHelper.AddPerkBonusForParty(perk, siegeParty.MobileParty, ref partyMemberHealth);
         PerkHelper.AddPerkBonusForParty(perk, siegeParty.MobileParty, ref partyMemberRate);
+#endif   
       }
 
       bonusFlatHp = partyMemberHealth.ResultNumber - partyMemberHealth.BaseNumber;

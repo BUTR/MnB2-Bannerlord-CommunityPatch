@@ -104,7 +104,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       var finalRadius = new ExplainedNumber(baseRadius);
 
       if (party.MobileParty != null)
+#if AFTER_E1_5_1
+        PerkHelper.AddPerkBonusForParty(ActivePatch.Perk, party.MobileParty, true, ref finalRadius);
+#else
         PerkHelper.AddPerkBonusForParty(ActivePatch.Perk, party.MobileParty, ref finalRadius);
+#endif
 
       return finalRadius.ResultNumber;
     }

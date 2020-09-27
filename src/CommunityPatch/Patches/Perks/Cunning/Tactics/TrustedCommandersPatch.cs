@@ -122,7 +122,11 @@ namespace CommunityPatch.Patches.Perks.Cunning.Tactics {
       if (party == null) return false;
 
       var partyMemberPower = new ExplainedNumber(1f);
+#if AFTER_E1_5_1
+      PerkHelper.AddPerkBonusForParty(perk, party, true, ref partyMemberPower);
+#else
       PerkHelper.AddPerkBonusForParty(perk, party, ref partyMemberPower);
+#endif
       return partyMemberPower.ResultNumber.IsDifferentFrom(partyMemberPower.BaseNumber);
     }
 
